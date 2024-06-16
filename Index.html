@@ -165,6 +165,8 @@
 		.box.blue
 		{background:url(bgBlue.jpg) fixed,rgba(16,54,94,0.5);color:#33e0ff;}
 		.box.blue e{color:#fff;}
+		.box.green
+		{background:url(bgGreen.jpg) fixed,rgba(16,54,94,0.5);color:#118f31;}
 		.team
 		{
 			position:relative;
@@ -2590,6 +2592,8 @@ G={
 								text=text.replaceAll('[RED]','');
 							if (text.indexOf('[BLUE]')!=-1) classes.push('blue');
 								text=text.replaceAll('[BLUE]','');
+							if (text.indexOf('[GREEN]')!=-1) classes.push('green');
+								text=text.replaceAll('[GREEN]','');
 							var action={chars:actors,text:text,classes:classes.join(' ')};
 							actions.push(action);
 							
