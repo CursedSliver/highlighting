@@ -2595,8 +2595,13 @@ G={
 			G.combatOverseer.prototype.removeParticipant = function(participant) {
 				this.participants.splice(this.participants.indexof(participant), 1);
 			}
-			G.combatOverseer.prototype.addBox = function(str) {
-				this.outStr += '<div class="box action green">'+str+'</div><br>';
+			G.combatOverseer.prototype.addBox = function(str, chars) {
+				var pics = '';
+				for (let i in chars) {
+					pics+=`<img src="${chars[i].pic}" class="pic" title="${chars[i].name}"/>`;
+					if (chars[i].has('dead')) pics+=`<div class="picSkull"></div>`;
+				}
+				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+str+'</div></div><br>';
 			}
 			G.combatOverseer.prototype.end = function() {
 				G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1);
@@ -2613,7 +2618,7 @@ G={
 				//when performing, it first checks for available intercepting moves, then if not successfully intercepted it sees if it succeeds, then if succeeds it calls the func
 				//returns text for display (in one box)
 				var str = '';
-				var overseer = this.tracker.overseer;
+				var overseer = this.combat.overseer;
 				var otherChars = overseer.participants;
 				otherChars.splice(otherChars.indexOf(this), 1);
 				var availableMoves = [];
