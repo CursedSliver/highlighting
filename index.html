@@ -2513,7 +2513,7 @@ G={
 				this.magic = obj.magic||0; //magical?
 			}
 			G.checkReq = function(char, req) {
-				let list = G.act.prototype.fit(req);
+				let list = G.act.prototype.fit.call({ people: req }, req);
 				if (list.indexOf(char)!=-1) { return true; } else { return false; }
 			}; //extreme lazy ahhhh (performance can go die)
 			G.checkCReq = function(char, cReq, otherMove) {
