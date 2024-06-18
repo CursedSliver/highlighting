@@ -484,6 +484,7 @@ SmoothToggles=function()
 		setTimeout(function(){if (el){el.remove();}},250);
 	}
 }();
+function randomFloor(x) {if ((x%1)<Math.random()) return Math.floor(x); else return Math.ceil(x);} = $1
 
 
 //dubious reliability
@@ -1244,6 +1245,18 @@ G={
 						if (reason) this.deathReason=reason;
 						//if (this.team) {this.team.chars.splice(this.team.chars.indexOf(this),1);this.team=0;}
 						return true;
+					}
+					return false;
+				}
+				G.char.prototype.isDisabled = function() {
+					for (let i in this.perks) {
+						if (this.perks[i].disabled) { return true; }
+					}
+					return false;
+				}
+				G.char.prototype.isOut = function() {
+					for (let i in this.perks) {
+						if (this.perks[i].out) { return true; }
 					}
 					return false;
 				}
@@ -2567,14 +2580,20 @@ G={
 				this.performers = [].concat(performers);
 				this.opponents = [].concat(opponents);
 			}
+			G.ongoingCombats = [];
 			G.combatOverseer = function() {
 				this.participants = [];
+				this.processed = false;
+				G.ongoingCombats.push(this);
 			}
 			G.combatOverseer.prototype.addParticipant = function(participant) {
 				this.participants.push(participant);
 			}
 			G.combatOverseer.prototype.removeParticipant = function(participant) {
 				this.participants.splice(this.participants.indexof(participant), 1);
+			}
+			G.combatOverseer.prototype.end = function() {
+				G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1);
 			}
 			G.combatTracker = function(overseer, carrier) { //added to chars
 				this.overseer = overseer;
@@ -2630,7 +2649,7 @@ G={
 					charList = charList.concat(G.teams[i].chars);
 				}
 				for (let i in charList) {
-					if (charList[i].combat || charList[i].has('disabled')) { charList.splice(i, 1); i--; }
+					if (charList[i].combat || charList[i].isDisabled() || charList[i].isOut()) { charList.splice(i, 1); i--; }
 				}
 				var opponent = choose(charList);
 
@@ -2733,20 +2752,27 @@ G={
 				
 				var str='';
 				
-				for (var i in G.teams){G.teams[i].acted=false;}
-				for (var i in G.chars){G.chars[i].acted=false;}
+				for (let i in G.teams){G.teams[i].acted=false;}
+				for (let i in G.chars){G.chars[i].acted=false;}
+				for (let i = 0; i < randomFloor(Math.log2(G.chars.length + 1)); i++) {
+					if (Math.random() < 0.4) {
+						//chooses someone able to initiate combat with someone else
+						var pool = [];
+						for (let i in G.chars) {
+							if (G.chars[i].isDisabled() || G.chars[i].isOut()) { continue; }
+							pool.push(G.chars[i]);
+						}
+						choose(pool).initiateCombat();
+					}
+				}
+				for (let i in G.ongoingCombats) { G.ongoingCombats[i].processed = false; }
 				
 				var everybody=shuffle(G.teams).concat(shuffle(G.chars));
 				for (var iAct=0;iAct<everybody.length;iAct++)
 				{
 					var me=everybody[iAct];
 					
-					if (me.tier==0 || (Math.random()<1/5))
-					{
-						if (Math.random()<0.15 && me.type == 'char') {
-							G.initiateCombat(me);
-							continue;
-						}
+					if (!me.combat && (me.tier==0 || (Math.random()<1/5))) {
 						var acts=[];
 						for (var i in actsList)
 						{
@@ -2812,7 +2838,13 @@ G={
 							}
 							str+=`<div class="box action${action.classes?(' '+action.classes):''}"><div>${pics}</div><div>${action.text}</div></div>`;
 						}
+					} else if (me.combat) {
+						//get html for combat sequence
+						if (me.combat.overseer.happened) { continue; }
+						me.combat.overseer.happened = true;
+						me.makeMove();
 					}
+					if (me.has('act again') && !me.combat) { me.lose('act again'); i--; }
 				}
 				
 				if (!str) str=`<div class="box action"><div></div><div>(Absolutely nothing happened.)</div></div>`;
