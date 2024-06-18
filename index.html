@@ -2635,7 +2635,7 @@ G={
 						availableMoves.push(m);
 					}
 				}
-				if (availableMoves.length == 0) { overseer.addBox('No longer knows what to do!'); return this.has('fleed'); }
+				if (availableMoves.length == 0) { overseer.addBox('No longer knows what to do!', overseer.participants); return this.has('fleed'); }
 				var m = choose(availableMoves);
 
 				for (let i in otherChars) {
@@ -2643,7 +2643,7 @@ G={
 					if (typeof success === 'string') { str += success; }
 				}
 
-				if (m.fail && m.fail()) { m.failFunc.call(this); overseer.addBox(m.failText + (str?('<br>'+str):'')); return this.has('fleed'); } else { m.successFunc.call(this); overseer.addBox(m.text + (str?('<br>'+str):'')); return this.has('fleed'); }
+				if (m.fail && m.fail()) { m.failFunc.call(this); overseer.addBox(m.failText + (str?('<br>'+str):''), overseer.participants); return this.has('fleed'); } else { m.successFunc.call(this); overseer.addBox(m.text + (str?('<br>'+str):''), overseer.participants); return this.has('fleed'); }
 			}
 			G.char.prototype.makeIntercept = function() {
 				//returns string to add, or null if chooses to not intercept at all
