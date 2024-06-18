@@ -2850,8 +2850,13 @@ G={
 						var overseer = me.combat.overseer;
 						if (overseer.happened) { continue; }
 						overseer.happened = true;
+						var count = 0;
 						while(true) {
-							
+							for (let i in overseer.participants) {
+								if (overseer.participants[i].makeMove()) { overseer.participants[i].fleeCombat(); }
+							}
+							if (Math.random() > 1 / (count + 1)) { break; }
+							count++;
 						}
 						str += overseer.outStr;
 					}
