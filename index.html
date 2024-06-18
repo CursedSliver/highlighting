@@ -628,6 +628,7 @@ G={
 		new G.perk({name:`gremlin`,desc:`Has gone into gremlin mode, causing chaos everywhere.`});
         new G.perk({name:`laughed`,desc:`AH HA HA HA HA -Tidus`});
 		new G.perk({name:`act again`,desc:`Act another time in the same round!`});
+		new G.perk({name:`fleed`,desc:`Has managed to successfully flee from combat!`});
         //Make sure people stay "gone" -TW
         new G.perk({name:`nihil`,desc:`Has ceased to exist entirely.`,out:true});
         new G.perk({name:`confirmed`,desc:`Has been confirmed to not be mostly dead.`,out:true});
@@ -2584,6 +2585,8 @@ G={
 			G.combatOverseer = function() {
 				this.participants = [];
 				this.processed = false;
+				this.outStr = '';
+				
 				G.ongoingCombats.push(this);
 			}
 			G.combatOverseer.prototype.addParticipant = function(participant) {
@@ -2591,6 +2594,9 @@ G={
 			}
 			G.combatOverseer.prototype.removeParticipant = function(participant) {
 				this.participants.splice(this.participants.indexof(participant), 1);
+			}
+			G.combatOverseer.prototype.addBox = function(str) {
+				this.outStr += '<div class="box action green">'+str+'</div><br>';
 			}
 			G.combatOverseer.prototype.end = function() {
 				G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1);
@@ -2602,12 +2608,13 @@ G={
 				this.horizontal = 0; //intentionally vague in order to produce funny
 				this.vertical = 0; 
 			}
-			G.char.prototype.makeMove = function(moveList) {
+			G.char.prototype.makeMove = function() {
 				//iterate through every move available and collects any that fit both reqs, then select one to perform
 				//when performing, it first checks for available intercepting moves, then if not successfully intercepted it sees if it succeeds, then if succeeds it calls the func
 				//returns text for display (in one box)
 				var str = '';
-				var otherChars = this.tracker.overseer.participants;
+				var overseer = this.tracker.overseer;
+				var otherChars = overseer.participants;
 				otherChars.splice(otherChars.indexOf(this), 1);
 				var availableMoves = [];
 				for (let i in G.moves) {
@@ -2616,7 +2623,7 @@ G={
 					if (m.element.interact && !G.checkCReq(this, m.cReq)) { continue; }
 					availableMoves.push(m);
 				}
-				if (availableMoves.length == 0) { return 'No longer knows what to do!'; }
+				if (availableMoves.length == 0) { overseer.addBox('No longer knows what to do!'); }
 				var m = choose(availableMoves);
 
 				for (let i in otherChars) {
@@ -2624,7 +2631,7 @@ G={
 					if (typeof success === 'string') { str += success; }
 				}
 
-				if (m.fail()) { m.failFunc.call(this); return m.failText + (str?('<br>'+str):''); } else { m.successFunc.call(this); return m.text + (str?('<br>'+str):''); }
+				if (m.fail()) { m.failFunc.call(this); overseer.addBox(m.failText + (str?('<br>'+str):'')); return this.has('fleed'); } else { m.successFunc.call(this); overseer.addBox(m.text + (str?('<br>'+str):'')); return this.has('fleed'); }
 			}
 			G.char.prototype.makeIntercept = function() {
 				//returns string to add, or null if chooses to not intercept at all
@@ -2765,7 +2772,7 @@ G={
 						choose(pool).initiateCombat();
 					}
 				}
-				for (let i in G.ongoingCombats) { G.ongoingCombats[i].processed = false; }
+				for (let i in G.ongoingCombats) { G.ongoingCombats[i].processed = false; G.ongoingCombats[i].outStr = ''; }
 				
 				var everybody=shuffle(G.teams).concat(shuffle(G.chars));
 				for (var iAct=0;iAct<everybody.length;iAct++)
@@ -2840,9 +2847,13 @@ G={
 						}
 					} else if (me.combat) {
 						//get html for combat sequence
-						if (me.combat.overseer.happened) { continue; }
-						me.combat.overseer.happened = true;
-						me.makeMove();
+						var overseer = me.combat.overseer;
+						if (overseer.happened) { continue; }
+						overseer.happened = true;
+						while(true) {
+							
+						}
+						str += overseer.outStr;
 					}
 					if (me.has('act again') && !me.combat) { me.lose('act again'); i--; }
 				}
