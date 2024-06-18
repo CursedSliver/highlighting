@@ -455,6 +455,7 @@ cloneDom=function(el)
 	var elems=alias.getElementsByTagName('*');for (var i=0;i<elems.length;i++){elems[i].removeAttribute('id');}
 	return alias;
 }
+function randomFloor(x) {if ((x%1)<Math.random()) return Math.floor(x); else return Math.ceil(x);}
 
 
 SmoothToggles=function()
@@ -484,7 +485,6 @@ SmoothToggles=function()
 		setTimeout(function(){if (el){el.remove();}},250);
 	}
 }();
-function randomFloor(x) {if ((x%1)<Math.random()) return Math.floor(x); else return Math.ceil(x);} = $1
 
 
 //dubious reliability
