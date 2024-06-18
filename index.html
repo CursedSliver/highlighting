@@ -2557,6 +2557,7 @@ G={
 			G.intercept = function(obj) {
 				obj = obj||{};
 
+				this.chance = obj.chance||1;
 				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = []; };
 				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = []; }; //reqs for other move/people to try to intercept this move
 				this.text = obj.text||''; //text when intercepting OTHER moves
@@ -2596,6 +2597,7 @@ G={
 				this.participants.splice(this.participants.indexof(participant), 1);
 			}
 			G.combatOverseer.prototype.addBox = function(str, chars) {
+				chars = [].concat(chars);
 				var pics = '';
 				for (let i in chars) {
 					pics+=`<img src="${chars[i].pic}" class="pic" title="${chars[i].name}"/>`;
@@ -2628,7 +2630,7 @@ G={
 					if (m.element.interact && !G.checkCReq(this, m.cReq)) { continue; }
 					availableMoves.push(m);
 				}
-				if (availableMoves.length == 0) { overseer.addBox('No longer knows what to do!'); }
+				if (availableMoves.length == 0) { overseer.addBox('No longer knows what to do!'); return this.has('fleed'); }
 				var m = choose(availableMoves);
 
 				for (let i in otherChars) {
@@ -2636,7 +2638,7 @@ G={
 					if (typeof success === 'string') { str += success; }
 				}
 
-				if (m.fail()) { m.failFunc.call(this); overseer.addBox(m.failText + (str?('<br>'+str):'')); return this.has('fleed'); } else { m.successFunc.call(this); overseer.addBox(m.text + (str?('<br>'+str):'')); return this.has('fleed'); }
+				if (m.fail && m.fail()) { m.failFunc.call(this); overseer.addBox(m.failText + (str?('<br>'+str):'')); return this.has('fleed'); } else { m.successFunc.call(this); overseer.addBox(m.text + (str?('<br>'+str):'')); return this.has('fleed'); }
 			}
 			G.char.prototype.makeIntercept = function() {
 				//returns string to add, or null if chooses to not intercept at all
@@ -2650,7 +2652,7 @@ G={
 				if (availableIntercepts.length == 0) { return null; }
 				var int = choose(availableIntercepts);
 
-				if (int.fail()) { int.failFunc(); return int.failText; } else { int.successFunc(); return int.text; }
+				if (int.fail && int.fail()) { int.failFunc(); return int.failText; } else { int.successFunc(); return int.text; }
 			}
 			
 			G.char.prototype.initiateCombat = function() {
