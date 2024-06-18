@@ -2514,6 +2514,7 @@ G={
 			}
 			G.checkReq = function(char, req) {
 				let list = G.act.prototype.fit.call({ people: req }, choose(G.chars));
+				if (!list) { return false; }
 				if (list.indexOf(char)!=-1) { return true; } else { return false; }
 			}; //extreme lazy ahhhh (performance can go die)
 			G.checkCReq = function(char, cReq, otherMove) {
