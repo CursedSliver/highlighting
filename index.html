@@ -2855,7 +2855,7 @@ G={
 						}
 						str += overseer.outStr;
 					}
-					if (me.has('act again') && !me.combat) { me.lose('act again'); i--; }
+					if (me.type == 'char' && me.has('act again') && !me.combat) { me.lose('act again'); i--; }
 				}
 				
 				if (!str) str=`<div class="box action"><div></div><div>(Absolutely nothing happened.)</div></div>`;
