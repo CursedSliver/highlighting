@@ -2483,13 +2483,13 @@ G={
 				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = []; }//req is a string as the conditions to meet before the move can be considered possible (returns true or false)
 				//unfortunately due to not wanting to recode an entirely new set of syntaxes and having to update that one whenever updating G.act.prototype.fit ive decided to take shortcut and just use that syntax and sacrifice the ability to dynamically adjust move chances but whatev
 				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = []; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
-				this.fail = obj.fail||(new Function()); //function returning whether the move succeeds
+				this.text = obj.text||''; 
+				this.fail = obj.fail||(function() { return false; }); //function returning whether the move fails
 				this.failText = obj.failText||''; 
 				this.successFunc = obj.successFunc||(new Function()); //called on move success; with the call function setting the char
 				this.failFunc = obj.failFunc||(new Function()); //called on move failure
 				if (obj.id) { this.id = obj.id; } else { this.id = null; }
 				
-				this.text = text; 
 				G.moves.push(this);
 			}
 			G.element = function(obj) {
@@ -2516,10 +2516,11 @@ G={
 				let list = G.act.prototype.fit(req);
 				if (list.indexOf(char)!=-1) { return true; } else { return false; }
 			}; //extreme lazy ahhhh (performance can go die)
-			G.checkCReq = function(char, cReq, otherMove, otherPeople) {
+			G.checkCReq = function(char, cReq, otherMove) {
 				//each item in array is a condition of the opposing move or char that determines whether the move is possible
-				otherPeople = [].concat(otherPeople);
+				if (cReq.length == 0) { return true; }
 				let me = cReq[0].split(' '); //the move parameters
+				let otherPeople = cReq.splice(0, 1);
 				let fit = true;
 				/* syntax: 
 				NOT operator: ! (brackets not supported)
@@ -2563,11 +2564,12 @@ G={
 				this.text = obj.text||''; //text when intercepting OTHER moves
 				this.successFunc = obj.successFunc||(new Function()); //called when successfully intercepting
 				this.failText = obj.failText||''; //text when failing to intercept OTHER moves
-				this.fail = obj.fail||(new Function()); //function returning whether the intercept succeeds
+				this.fail = obj.fail||(function() { return false; }); //function returning whether the intercept fails
 				this.failFunc = obj.failFunc||(new Function()); //called when failing to intercept
 			} 
 			G.parseEle = function(str, otherMove) {
 				let arr = str.split(':');
+				if (!otherMove) { return true; }
 				if (arr[arr.length-1] && parseFloat(arr[arr.length-1])<Math.random()) {
 					return false;
 				}
@@ -2628,7 +2630,9 @@ G={
 					const m = G.moves[i];
 					if (!G.checkReq(this, m.req)) { continue; }
 					if (m.element.interact && !G.checkCReq(this, m.cReq)) { continue; }
-					availableMoves.push(m);
+					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
+						availableMoves.push(m);
+					}
 				}
 				if (availableMoves.length == 0) { overseer.addBox('No longer knows what to do!'); return this.has('fleed'); }
 				var m = choose(availableMoves);
@@ -2647,13 +2651,20 @@ G={
 					const int = G.intercepts[i];
 					if (!G.checkReq(this, int.req)) { continue; }
 					if (!G.checkCReq(this, int.cReq)) { continue; }
-					availableIntercepts.push(int);
+					for (let ii = 0; ii < randomFloor(int.chance); ii++) {
+						availableIntercepts.push(int);
+					}
 				}
 				if (availableIntercepts.length == 0) { return null; }
 				var int = choose(availableIntercepts);
 
 				if (int.fail && int.fail()) { int.failFunc(); return int.failText; } else { int.successFunc(); return int.text; }
 			}
+
+			new G.move({
+				req: ['any|any'],
+				text: 'Does something ????????'
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
