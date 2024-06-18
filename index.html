@@ -626,6 +626,7 @@ G={
 		new G.perk({name:`blind`,desc:`Has lost their glasses.`});
 		new G.perk({name:`gremlin`,desc:`Has gone into gremlin mode, causing chaos everywhere.`});
         new G.perk({name:`laughed`,desc:`AH HA HA HA HA -Tidus`});
+		new G.perk({name:`act again`,desc:`Act another time in the same round!`});
         //Make sure people stay "gone" -TW
         new G.perk({name:`nihil`,desc:`Has ceased to exist entirely.`,out:true});
         new G.perk({name:`confirmed`,desc:`Has been confirmed to not be mostly dead.`,out:true});
@@ -1188,6 +1189,7 @@ G={
 				this.kills=[];
 				this.deathReason='';
 				this.killer=[];
+				this.combat=null;
 				for (var i in o){this[i]=o[i];}
 				G.chars.push(this);
 			}
@@ -2461,22 +2463,28 @@ G={
 
 			//Descriptive combat system by CS
 			G.moves = [];
-			G.move = function(chance, element, req, text, func, cReq, id) {
-				this.chance = chance;
-				this.element = element; //element determines the nature of the attack as well as which attacks it can counter/be countered by
-				this.req = [].concat(req); //req is a string as the conditions to meet before the move can be considered possible (returns true or false)
+			G.move = function(obj) {
+				this.chance = obj.chance||1;
+				this.element = obj.element||new G.element(); //element determines the nature of the attack as well as which attacks it can counter/be countered by
+				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = []; }//req is a string as the conditions to meet before the move can be considered possible (returns true or false)
 				//unfortunately due to not wanting to recode an entirely new set of syntaxes and having to update that one whenever updating G.act.prototype.fit ive decided to take shortcut and just use that syntax and sacrifice the ability to dynamically adjust move chances but whatev
-				if (cReq){ this.cReq = [].concat(cReq); } else { this.cReq = []; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
-				this.func = func;
-				if (id) { this.id = id; } else { this.id = null; }
+				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = []; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
+				this.fail = obj.fail||(new Function()); //function returning whether the move succeeds
+				this.failText = obj.failText||''; 
+				this.successFunc = obj.successFunc||(new Function()); //called on move success; with the call function setting the char
+				this.failFunc = obj.failFunc||(new Function()); //called on move failure
+				if (obj.id) { this.id = obj.id; } else { this.id = null; }
 				
 				this.text = text; 
 				G.moves.push(this);
 			}
 			G.element = function(obj) {
 				//obj is some stuff to indicate its parameters
-				this.y = obj.y||0; //(from) straight-up [2], above [1], level [0], below [-1], straight-down [-2]
-				this.temp = obj.temp||0; //molten [4], glowing [3], boiling [2], hot [1], room temp [0], chilly [-1], freezing [-2], on-touch frostbite [-3]
+				obj = obj||{};
+				
+				this.y = obj.y||0; //(from) straight-up [4], above [2], level [0], below [-2], straight-down [-4]
+				this.interact = obj.interact||true; //whether this move interacts with other people
+				this.temp = obj.temp||0; //molten [4], glowing [3], boiling [2], hot [1], rom temp [0], chilly [-1], freezing [-2], on-touch frostbite [-3]
 				this.state = obj.state||0; //plasma [3], gas [2], liquid [1], solid [0]
 				this.reach = obj.reach||0; //the number of one-eighth of circles of area (roughly)
 				this.range = obj.range||0; //arbitary units
@@ -2484,6 +2492,9 @@ G={
 				this.delay = obj.delay||0; //seconds to delay to use
 				this.size = obj.size||0; //also describes weight; arbitary units
 				this.sharp = obj.sharp||0; //polished katana [2], regular knife [1], blunt side of pen [0], crushing only [-1]
+				this.moveHorizontal = obj.moveHorizontal||0; //arbitary units; moves away (pos) or to (neg) the other people
+				this.moveVertical = obj.movevertical||0; //8 to -8
+				this.objects = ([].concat(obj.objects))||[]; //objects used (e.g. "dry tree")
 				this.elec = obj.elec||0; //electrically charged?
 				this.magic = obj.magic||0; //magical?
 			}
@@ -2528,6 +2539,18 @@ G={
 				}
 				return fit;
 			}
+			G.intercepts = [];
+			G.intercept = function(obj) {
+				obj = obj||{};
+
+				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = []; };
+				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = []; }; //reqs for other move/people to try to intercept this move
+				this.text = obj.text||''; //text when intercepting OTHER moves
+				this.successFunc = obj.successFunc||(new Function()); //called when successfully intercepting
+				this.failText = obj.failText||''; //text when failing to intercept OTHER moves
+				this.fail = obj.fail||(new Function()); //function returning whether the intercept succeeds
+				this.failFunc = obj.failFunc||(new Function()); //called when failing to intercept
+			} 
 			G.parseEle = function(str, otherMove) {
 				let arr = str.split(':');
 				if (arr[arr.length-1] && parseFloat(arr[arr.length-1])<Math.random()) {
@@ -2544,19 +2567,85 @@ G={
 				this.performers = [].concat(performers);
 				this.opponents = [].concat(opponents);
 			}
-			G.char.prototype.makeMove = function(me, moveList) {
+			G.combatOverseer = function() {
+				this.participants = [];
+			}
+			G.combatOverseer.prototype.addParticipant = function(participant) {
+				this.participants.push(participant);
+			}
+			G.combatOverseer.prototype.removeParticipant = function(participant) {
+				this.participants.splice(this.participants.indexof(participant), 1);
+			}
+			G.combatTracker = function(overseer, carrier) { //added to chars
+				this.overseer = overseer;
+				this.carrier = carrier;
+				overseer.addParticipant(carrier);
+				this.horizontal = 0; //intentionally vague in order to produce funny
+				this.vertical = 0; 
+			}
+			G.char.prototype.makeMove = function(moveList) {
 				//iterate through every move available and collects any that fit both reqs, then select one to perform
-				
+				//when performing, it first checks for available intercepting moves, then if not successfully intercepted it sees if it succeeds, then if succeeds it calls the func
+				//returns text for display (in one box)
+				var str = '';
+				var otherChars = this.tracker.overseer.participants;
+				otherChars.splice(otherChars.indexOf(this), 1);
+				var availableMoves = [];
+				for (let i in G.moves) {
+					const m = G.moves[i];
+					if (!G.checkReq(this, m.req)) { continue; }
+					if (m.element.interact && !G.checkCReq(this, m.cReq)) { continue; }
+					availableMoves.push(m);
+				}
+				if (availableMoves.length == 0) { return 'No longer knows what to do!'; }
+				var m = choose(availableMoves);
+
+				for (let i in otherChars) {
+					const success = otherChars[i].makeIntercept();
+					if (typeof success === 'string') { str += success; }
+				}
+
+				if (m.fail()) { m.failFunc.call(this); return m.failText + (str?('<br>'+str):''); } else { m.successFunc.call(this); return m.text + (str?('<br>'+str):''); }
+			}
+			G.char.prototype.makeIntercept = function() {
+				//returns string to add, or null if chooses to not intercept at all
+				var availableIntercepts = [];
+				for (let i in G.intercepts) {
+					const int = G.intercepts[i];
+					if (!G.checkReq(this, int.req)) { continue; }
+					if (!G.checkCReq(this, int.cReq)) { continue; }
+					availableIntercepts.push(int);
+				}
+				if (availableIntercepts.length == 0) { return null; }
+				var int = choose(availableIntercepts);
+
+				if (int.fail()) { int.failFunc(); return int.failText; } else { int.successFunc(); return int.text; }
 			}
 			
-			G.enterCombat = function(me) {
+			G.char.prototype.initiateCombat = function() {
 				var charList = [];
+				var me = this;
 				for (let i in G.teams) {
 					if (G.teams[i] == me.team) { continue; }
 					charList = charList.concat(G.teams[i].chars);
 				}
+				for (let i in charList) {
+					if (charList[i].combat || charList[i].has('disabled')) { charList.splice(i, 1); i--; }
+				}
 				var opponent = choose(charList);
-				
+
+				var overseer = new G.combatOverseer();
+				me.combat = new G.combatTracker(overseer, me);
+				opponent.combat = new G.combatTracker(overseer, opponent);
+			}
+			G.char.prototype.joinCombat = function(overseer) {
+				if (this.combat) { return false; }
+				this.combat = new G.combatTracker(overseer, me);
+			}
+			G.char.prototype.fleeCombat = function() {
+				if (!this.combat) { return false; }
+				this.combat.overseer.removeParticipant(this);
+				this.combat = null;
 			}
 			
 			G.parse=function(text,actors)
@@ -2655,7 +2744,7 @@ G={
 					if (me.tier==0 || (Math.random()<1/5))
 					{
 						if (Math.random()<0.15 && me.type == 'char') {
-							G.enterCombat(me);
+							G.initiateCombat(me);
 							continue;
 						}
 						var acts=[];
