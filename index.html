@@ -2596,13 +2596,15 @@ G={
 			}
 			G.combatOverseer.prototype.addParticipant = function(participant) {
 				this.participants.push(participant);
+				console.log('added!');
 			}
 			G.combatOverseer.prototype.removeParticipant = function(participant) {
-				this.participants.splice(this.participants.indexOf(participant), 1);
+				if (this.participants.indexOf(participant) != -1) { this.participants.splice(this.participants.indexOf(participant), 1); }
 				if (this.participants.length <= 1) {
 					if (this.participants[0]) { this.participants[0].fleeCombat(); }
 					if (G.ongoingCombats.indexOf(this) != -1) { G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1); }
 				}
+				console.log('removed!');
 			}
 			G.combatOverseer.prototype.addBox = function(str, chars) {
 				chars = [].concat(chars);
@@ -2677,9 +2679,8 @@ G={
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
-				var me = this;
 				for (let i in G.teams) {
-					if (G.teams[i] == me.team) { continue; }
+					if (G.teams[i] == this.team) { continue; }
 					charList = charList.concat(G.teams[i].chars);
 				}
 				for (let i in charList) {
@@ -2688,7 +2689,7 @@ G={
 				if (charList.length > 0) { var opponent = choose(charList); } else { return false; } 
 
 				var overseer = new G.combatOverseer();
-				me.combat = new G.combatTracker(overseer, me);
+				me.combat = new G.combatTracker(overseer, this);
 				opponent.combat = new G.combatTracker(overseer, opponent);
 			}
 			G.char.prototype.joinCombat = function(overseer) {
