@@ -2630,7 +2630,7 @@ G={
 				//when performing, it first checks for available intercepting moves, then if not successfully intercepted it sees if it succeeds, then if succeeds it calls the func
 				//returns text for display (in one box)
 				var str = '';
-				if (!this.combat.overseer) { return; }
+				if (!this.combat) { return; }
 				var overseer = this.combat.overseer;
 				var otherChars = overseer.participants;
 				otherChars.splice(otherChars.indexOf(this), 1);
