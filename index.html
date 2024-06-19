@@ -2599,6 +2599,10 @@ G={
 			}
 			G.combatOverseer.prototype.removeParticipant = function(participant) {
 				this.participants.splice(this.participants.indexOf(participant), 1);
+				if (this.participants.length <= 1) {
+					if (this.participants[0]) { this.participants[0].fleeCombat(); }
+					if (G.ongoingCombats.indexOf(this) != -1) { G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1); }
+				}
 			}
 			G.combatOverseer.prototype.addBox = function(str, chars) {
 				chars = [].concat(chars);
@@ -2636,7 +2640,7 @@ G={
 						availableMoves.push(m);
 					}
 				}
-				if (availableMoves.length == 0) { overseer.addBox('No longer knows what to do!', overseer.participants); return this.has('fleed'); }
+				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', overseer.participants); return this.has('fleed'); }
 				var m = choose(availableMoves);
 
 				for (let i in otherChars) {
@@ -2681,7 +2685,7 @@ G={
 				for (let i in charList) {
 					if (charList[i].combat || charList[i].isDisabled() || charList[i].isOut()) { charList.splice(i, 1); i--; }
 				}
-				var opponent = choose(charList);
+				if (charList.length > 0) { var opponent = choose(charList); } else { return false; } 
 
 				var overseer = new G.combatOverseer();
 				me.combat = new G.combatTracker(overseer, me);
