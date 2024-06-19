@@ -2879,8 +2879,8 @@ G={
 					} else if (me.combat) {
 						//get html for combat sequence
 						var overseer = me.combat.overseer;
-						if (overseer.happened) { continue; }
-						overseer.happened = true;
+						if (overseer.processed) { continue; }
+						overseer.processed = true;
 						var count = 0;
 						while(true) {
 							for (let i in overseer.participants) {
