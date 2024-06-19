@@ -2792,7 +2792,7 @@ G={
 							if (G.chars[i].isDisabled() || G.chars[i].isOut() || G.chars[i].combat) { continue; }
 							pool.push(G.chars[i]);
 						}
-						choose(pool).initiateCombat();
+						if (pool.length > 0) { choose(pool).initiateCombat(); }
 					}
 				}
 				for (let i in G.ongoingCombats) { G.ongoingCombats[i].processed = false; G.ongoingCombats[i].outStr = ''; }
