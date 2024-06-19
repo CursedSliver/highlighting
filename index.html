@@ -2886,7 +2886,7 @@ G={
 							for (let i in overseer.participants) {
 								if (overseer.participants[i].makeMove()) { overseer.participants[i].fleeCombat(); }
 							}
-							if (Math.random() > 1 / (count + 1)) { break; }
+							if (overseer.participants.length <= 1 || Math.random() > 1 / (count + 1)) { break; }
 							count++;
 						}
 						str += overseer.outStr;
