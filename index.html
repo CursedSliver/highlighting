@@ -2513,7 +2513,8 @@ G={
 				this.magic = obj.magic||0; //magical?
 			}
 			G.checkReq = function(char, req) {
-				let list = G.act.prototype.fit.call({ people: req }, choose(G.chars));
+				if (req) { req = ['any any'].concat(req); } else { return true; }
+				let list = G.act.prototype.fit.call({ people: req }, G.teams[0]);
 				if (!list) { return false; }
 				if (list.indexOf(char)!=-1) { return true; } else { return false; }
 			}; //extreme lazy ahhhh (performance can go die)
@@ -2597,7 +2598,7 @@ G={
 				this.participants.push(participant);
 			}
 			G.combatOverseer.prototype.removeParticipant = function(participant) {
-				this.participants.splice(this.participants.indexof(participant), 1);
+				this.participants.splice(this.participants.indexOf(participant), 1);
 			}
 			G.combatOverseer.prototype.addBox = function(str, chars) {
 				chars = [].concat(chars);
@@ -2663,8 +2664,11 @@ G={
 			}
 
 			new G.move({
-				req: ['any|any'],
 				text: 'Does something ????????'
+			});
+			new G.move({
+				text: '[1] manages to flee from the fight!',
+				successFunc: function() { this.fleeCombat(); }
 			});
 			
 			G.char.prototype.initiateCombat = function() {
@@ -2781,11 +2785,11 @@ G={
 				for (let i in G.teams){G.teams[i].acted=false;}
 				for (let i in G.chars){G.chars[i].acted=false;}
 				for (let i = 0; i < randomFloor(Math.log2(G.chars.length + 1)); i++) {
-					if (Math.random() < 0.4) {
+					if (Math.random() < 0.2) {
 						//chooses someone able to initiate combat with someone else
 						var pool = [];
 						for (let i in G.chars) {
-							if (G.chars[i].isDisabled() || G.chars[i].isOut()) { continue; }
+							if (G.chars[i].isDisabled() || G.chars[i].isOut() || G.chars[i].combat) { continue; }
 							pool.push(G.chars[i]);
 						}
 						choose(pool).initiateCombat();
