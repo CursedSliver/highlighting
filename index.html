@@ -2687,11 +2687,13 @@ G={
 				for (let i in charList) {
 					if (charList[i].combat || charList[i].isDisabled() || charList[i].isOut()) { charList.splice(i, 1); i--; }
 				}
-				if (charList.length > 0) { var opponent = choose(charList); } else { return false; } 
+				var opponent = null;
+				if (charList.length > 0) { opponent = choose(charList); } else { return false; } 
 
 				var overseer = new G.combatOverseer();
 				me.combat = new G.combatTracker(overseer, this);
 				opponent.combat = new G.combatTracker(overseer, opponent);
+				console.log(opponent.name);
 			}
 			G.char.prototype.joinCombat = function(overseer) {
 				if (this.combat) { return false; }
