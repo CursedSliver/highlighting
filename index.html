@@ -2478,27 +2478,41 @@ G={
 			//Descriptive combat system by CS
 			G.moves = [];
 			G.move = function(obj) {
-				this.chance = obj.chance||1;
-				this.element = obj.element||new G.element(); //element determines the nature of the attack as well as which attacks it can counter/be countered by
-				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = []; }//req is a string as the conditions to meet before the move can be considered possible (returns true or false)
+				this.chance = obj.chance||G.moveDefault.chance;
+				this.element = obj.element||G.moveDefault.element; //element determines the nature of the attack as well as which attacks it can counter/be countered by
+				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = G.moveDefault.req; }//req is a string as the conditions to meet before the move can be considered possible (returns true or false)
 				//unfortunately due to not wanting to recode an entirely new set of syntaxes and having to update that one whenever updating G.act.prototype.fit ive decided to take shortcut and just use that syntax and sacrifice the ability to dynamically adjust move chances but whatev
-				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = []; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
-				this.text = obj.text||''; 
-				this.fail = obj.fail||(function() { return false; }); //function returning whether the move fails
-				this.failText = obj.failText||''; 
-				this.successFunc = obj.successFunc||(new Function()); //called on move success; with the call function setting the char
-				this.failFunc = obj.failFunc||(new Function()); //called on move failure
-				this.func = obj.func||(new Function()); //called before either funcs (and in fact, before fail check)
-				if (obj.id) { this.id = obj.id; } else { this.id = null; }
+				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = G.moveDefault.cReq; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
+				this.text = obj.text||G.moveDefault.text; 
+				this.fail = obj.fail||G.moveDefault.fail; //function returning whether the move fails
+				this.failText = obj.failText||G.moveDefault.failText; 
+				this.successFunc = obj.successFunc||G.moveDefault.successFunc; //called on move success; with the call function setting the char
+				this.failFunc = obj.failFunc||G.moveDefault.failFunc; //called on move failure
+				this.func = obj.func||G.moveDefault.func; //called before either funcs (and in fact, before fail check)
+				if (obj.id) { this.id = obj.id; } else { this.id = G.moveDefault.id; }
 				
 				G.moves.push(this);
 			}
+			G.moveDefault = {
+				chance: 1,
+				element: new G.element(),
+				req: [],
+				cReq: [],
+				text: '',
+				fail: function() { return false; },
+				failText: '',
+				successFunc: function() { },
+				failFunc: function() { },
+				func: function() { },
+				id: null
+			};
 			G.element = function(obj) {
 				//obj is some stuff to indicate its parameters
 				obj = obj||{};
 				
 				this.y = obj.y||0; //(from) straight-up [4], above [2], level [0], below [-2], straight-down [-4]
-				this.interact = obj.interact||true; //whether this move interacts with other people
+				this.interact = obj.interact||1; //the maximum amount of other people that this move interacts with
+				this.interactMin = obj.interactMin||1; //the minimum amount of other people required
 				this.temp = obj.temp||0; //molten [4], glowing [3], boiling [2], hot [1], rom temp [0], chilly [-1], freezing [-2], on-touch frostbite [-3]
 				this.state = obj.state||0; //plasma [3], gas [2], liquid [1], solid [0]
 				this.reach = obj.reach||0; //the number of one-eighth of circles of area (roughly)
@@ -2563,15 +2577,25 @@ G={
 			G.intercept = function(obj) {
 				obj = obj||{};
 
-				this.chance = obj.chance||1;
-				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = []; };
-				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = []; }; //reqs for other move/people to try to intercept this move
-				this.text = obj.text||''; //text when intercepting OTHER moves
-				this.successFunc = obj.successFunc||(new Function()); //called when successfully intercepting
-				this.failText = obj.failText||''; //text when failing to intercept OTHER moves
-				this.fail = obj.fail||(function() { return false; }); //function returning whether the intercept fails
-				this.failFunc = obj.failFunc||(new Function()); //called when failing to intercept
+				this.chance = obj.chance||G.interceptDefault.chance;
+				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = G.interceptDefault.req; };
+				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = G.interceptDefault.cReq; }; //reqs for other move/people to try to intercept this move
+				this.text = obj.text||G.interceptDefault.text; //text when intercepting OTHER moves
+				this.successFunc = obj.successFunc||G.interceptDefault.successFunc; //called when successfully intercepting
+				this.failText = obj.failText||G.interceptDefault.failText; //text when failing to intercept OTHER moves
+				this.fail = obj.fail||G.interceptDefault.fail; //function returning whether the intercept fails
+				this.failFunc = obj.failFunc||G.interceptDefault.failFunc; //called when failing to intercept
 			} 
+			G.interceptDefault = {
+				chance: 1,
+				req: [],
+				cReq: [],
+				text: '',
+				successFunc: function() { },
+				failText: '',
+				fail: function() { return false; },
+				failFunc: function() { }
+			};
 			G.parseEle = function(str, otherMove) {
 				let arr = str.split(':');
 				if (!otherMove) { return true; }
@@ -2650,8 +2674,9 @@ G={
 				var availableMoves = [];
 				for (let i in G.moves) {
 					const m = G.moves[i];
+					if (m.element.interactMin > boxCharList.length - 1) { continue; }
 					//if (!G.checkReq(this, m.req)) { continue; }
-					if (m.element.interact && !G.checkCReq(this, m.cReq, null, boxCharList)) { continue; }
+					if (!G.checkCReq(this, m.cReq, null, boxCharList)) { continue; }
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
 						availableMoves.push(m);
 					}
