@@ -2613,7 +2613,7 @@ G={
 					pics+=`<img src="${chars[i].pic}" class="pic" title="${chars[i].name}"/>`;
 					if (chars[i].has('dead')) pics+=`<div class="picSkull"></div>`;
 				}
-				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+str+'</div></div><br>';
+				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+G.parse(str, chars)+'</div></div><br>';
 			}
 			G.combatOverseer.prototype.end = function() {
 				G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1);
