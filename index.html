@@ -2518,7 +2518,7 @@ G={
 				if (!list) { return false; }
 				if (list.indexOf(char)!=-1) { return true; } else { return false; }
 			}; //extreme lazy ahhhh (performance can go die)
-			G.checkCReq = function(char, cReq, otherMove) {
+			G.checkCReq = function(char, cReq, otherMove, people) {
 				//each item in array is a condition of the opposing move or char that determines whether the move is possible
 				if (cReq.length == 0) { return true; }
 				let me = cReq[0].split(' '); //the move parameters
@@ -2547,11 +2547,11 @@ G={
 					if (!pass) { fit = false; break; }
 				}
 
+				var target = choose(people);
+
 				for (let i = 1; i < cReq.length; i++) {
 					let pass = false;
-					for (let ii in otherPeople) {
-						if (G.checkReq(otherPeople[ii], cReq[i])) { pass = true; break; } 
-					}
+					if (G.checkReq(target, cReq[i])) { pass = true; break; } 
 					if (!pass) { fit = false; break; }
 				}
 				return fit;
@@ -2633,17 +2633,22 @@ G={
 				if (!this.combat) { return; }
 				var overseer = this.combat.overseer;
 				var otherChars = overseer.participants;
-				//otherChars.splice(otherChars.indexOf(this), 1); this breaks things since otherChars is not a duplicate of the array but rather is the original array
-				var availableMoves = [];
+				var boxCharList = [];
+				for (let i in overseer.participants) {
+					if (overseer.participants[i] == this) { continue; }
+					boxCharList.push(overseer.participants[i]);
+				}
+				var target = choose(boxCharList);
+				boxCharList = [this].concat(target);
 				for (let i in G.moves) {
 					const m = G.moves[i];
 					if (!G.checkReq(this, m.req)) { continue; }
-					if (m.element.interact && !G.checkCReq(this, m.cReq)) { continue; }
+					if (m.element.interact && !G.checkCReq(this, m.cReq, null, boxCharList)) { continue; }
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
 						availableMoves.push(m);
 					}
 				}
-				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', overseer.participants); return this.has('fleed'); }
+				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', boxCharList); return this.has('fleed'); }
 				var m = choose(availableMoves);
 
 				for (let i in otherChars) {
@@ -2652,7 +2657,7 @@ G={
 					if (typeof success === 'string') { str += success; }
 				}
 
-				if (m.fail && m.fail()) { m.failFunc.call(this); overseer.addBox(m.failText + (str?('<br>'+str):''), overseer.participants); return this.has('fleed'); } else { m.successFunc.call(this); overseer.addBox(m.text + (str?('<br>'+str):''), overseer.participants); return this.has('fleed'); }
+				if (m.fail && m.fail()) { m.failFunc.call(this); overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); return this.has('fleed'); } else { m.successFunc.call(this); overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); return this.has('fleed'); }
 			}
 			G.char.prototype.makeIntercept = function() {
 				//returns string to add, or null if chooses to not intercept at all
