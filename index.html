@@ -2624,7 +2624,6 @@ G={
 			}
 			G.combatOverseer.prototype.addParticipant = function(participant) {
 				this.participants.push(participant);
-				console.log('added!');
 			}
 			G.combatOverseer.prototype.removeParticipant = function(participant) {
 				if (this.participants.indexOf(participant) != -1) { this.participants.splice(this.participants.indexOf(participant), 1); }
@@ -2632,7 +2631,6 @@ G={
 					if (this.participants[0]) { this.participants[0].fleeCombat(); }
 					if (G.ongoingCombats.indexOf(this) != -1) { G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1); }
 				}
-				console.log('removed!');
 			}
 			G.combatOverseer.prototype.addBox = function(str, chars) {
 				chars = [].concat(chars);
@@ -2683,6 +2681,7 @@ G={
 					}
 				}
 				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', boxCharList); return this.has('fleed'); }
+				console.log(availableMoves.length);
 				var m = choose(availableMoves);
 				m.func.call(this, boxCharList);
 
@@ -2697,8 +2696,12 @@ G={
 						m.failFunc.call(this, boxCharList); 
 						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
 						return this.has('fleed'); 
+					} else { 
+						m.successFunc.call(this, boxCharList); 
+						overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
+						return this.has('fleed'); 
 					}
-				} else { 
+				} else {
 					m.successFunc.call(this, boxCharList); 
 					overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
 					return this.has('fleed'); 
@@ -2737,7 +2740,7 @@ G={
 				failText: '[1] tries to punch [2], but missed!',
 				fail: 0.4,
 				func: function(charList) {
-					this.combat.moveInFrontOf(charList[1]);
+					this.combat.moveInFrontOf(charList[1], 2);
 				}
 			});
 			
