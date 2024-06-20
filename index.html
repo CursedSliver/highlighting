@@ -2488,6 +2488,7 @@ G={
 				this.failText = obj.failText||''; 
 				this.successFunc = obj.successFunc||(new Function()); //called on move success; with the call function setting the char
 				this.failFunc = obj.failFunc||(new Function()); //called on move failure
+				this.func = obj.func||(new Function()); //called before either funcs (and in fact, before fail check)
 				if (obj.id) { this.id = obj.id; } else { this.id = null; }
 				
 				G.moves.push(this);
@@ -2653,6 +2654,7 @@ G={
 				}
 				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', boxCharList); return this.has('fleed'); }
 				var m = choose(availableMoves);
+				m.func.call(this);
 
 				for (let i in otherChars) {
 					if (otherChars[i] == this) { continue; }
@@ -2660,7 +2662,17 @@ G={
 					if (typeof success === 'string') { str += success; }
 				}
 
-				if (m.fail && m.fail()) { m.failFunc.call(this); overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); return this.has('fleed'); } else { m.successFunc.call(this); overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); return this.has('fleed'); }
+				if (typeof m.fail != 'undefined') { 
+					if ((typeof m.fail == 'number' && m.fail < Math.random()) || (typeof m.fail == 'function' && m.fail())) { 
+						m.failFunc.call(this); 
+						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
+						return this.has('fleed'); 
+					}
+				} else { 
+					m.successFunc.call(this); 
+					overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
+					return this.has('fleed'); 
+				}
 			}
 			G.char.prototype.makeIntercept = function() {
 				//returns string to add, or null if chooses to not intercept at all
@@ -2680,7 +2692,8 @@ G={
 			}
 
 			new G.move({
-				text: 'Does something ????????'
+				text: '[1] does something ????????',
+				chance: 0.001
 			});
 			new G.move({
 				text: '[1] manages to flee from the fight!',
@@ -2688,6 +2701,14 @@ G={
 			});
 			new G.move({
 				text: '[1] stands still, vigilant and awaiting [1:their] opponent\'s next move...'
+			});
+			new G.move({
+				text: '[1] punches [2], right in the face!',
+				failText: '[1] tries to punch [2], but missed!',
+				fail: 0.4,
+				func: function() {
+					this.combatTracker.horizontal += 15;
+				}
 			});
 			
 			G.char.prototype.initiateCombat = function() {
