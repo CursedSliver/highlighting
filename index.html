@@ -2514,13 +2514,15 @@ G={
 			}
 			G.checkReq = function(char, req) {
 				if (req) { req = ['any any'].concat(req); } else { return true; }
-				let list = G.act.prototype.fit.call({ people: req }, G.teams[0]);
+				let obj = {};
+				obj.people = req;
+				let list = char.fit.call(obj, G.teams[0]);
 				if (!list) { return false; }
 				if (list.indexOf(char)!=-1) { return true; } else { return false; }
 			}; //extreme lazy ahhhh (performance can go die)
 			G.checkCReq = function(char, cReq, otherMove, people) {
 				//each item in array is a condition of the opposing move or char that determines whether the move is possible
-				if (cReq.length == 0) { return true; }
+				if (cReq.length == 0 || !cReq) { return true; }
 				let me = cReq[0].split(' '); //the move parameters
 				let otherPeople = cReq.splice(0, 1);
 				let fit = true;
@@ -2643,7 +2645,7 @@ G={
 				var availableMoves = [];
 				for (let i in G.moves) {
 					const m = G.moves[i];
-					if (!G.checkReq(this, m.req)) { continue; }
+					//if (!G.checkReq(this, m.req)) { continue; }
 					if (m.element.interact && !G.checkCReq(this, m.cReq, null, boxCharList)) { continue; }
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
 						availableMoves.push(m);
@@ -2683,6 +2685,9 @@ G={
 			new G.move({
 				text: '[1] manages to flee from the fight!',
 				successFunc: function() { this.fleeCombat(); }
+			});
+			new G.move({
+				text: '[1] stands still, vigilant and awaiting [1:their] opponent\'s next move...'
 			});
 			
 			G.char.prototype.initiateCombat = function() {
