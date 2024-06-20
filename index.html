@@ -2625,8 +2625,12 @@ G={
 				this.overseer = overseer;
 				this.carrier = carrier;
 				overseer.addParticipant(carrier);
-				this.horizontal = 0; //intentionally vague in order to produce funny
-				this.vertical = 0; 
+				this.horizontal = 0; //intentionally vague in order to produce funny; can be negative
+				this.vertical = 0; //same as above but less so since its only one dimension; can be negative (not recommended)
+			}
+			G.combatTracker.prototype.moveInFrontOf = function(target, dist) {
+				var h = target.combat.horizontal;
+				if (this.horizontal < h) { this.horizontal = h - dist; } else { this.horizontal = h + dist; }
 			}
 			G.char.prototype.makeMove = function() {
 				//iterate through every move available and collects any that fit both reqs, then select one to perform
@@ -2654,7 +2658,7 @@ G={
 				}
 				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', boxCharList); return this.has('fleed'); }
 				var m = choose(availableMoves);
-				m.func.call(this);
+				m.func.call(this, boxCharList);
 
 				for (let i in otherChars) {
 					if (otherChars[i] == this) { continue; }
@@ -2664,12 +2668,12 @@ G={
 
 				if (typeof m.fail != 'undefined') { 
 					if ((typeof m.fail == 'number' && m.fail < Math.random()) || (typeof m.fail == 'function' && m.fail())) { 
-						m.failFunc.call(this); 
+						m.failFunc.call(this, boxCharList); 
 						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
 						return this.has('fleed'); 
 					}
 				} else { 
-					m.successFunc.call(this); 
+					m.successFunc.call(this, boxCharList); 
 					overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
 					return this.has('fleed'); 
 				}
@@ -2706,8 +2710,8 @@ G={
 				text: '[1] punches [2], right in the face!',
 				failText: '[1] tries to punch [2], but missed!',
 				fail: 0.4,
-				func: function() {
-					this.combatTracker.horizontal += 15;
+				func: function(charList) {
+					this.combat.moveInFrontOf(charList[1]);
 				}
 			});
 			
