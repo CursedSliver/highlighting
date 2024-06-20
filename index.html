@@ -2495,7 +2495,7 @@ G={
 			}
 			G.moveDefault = {
 				chance: 1,
-				element: new G.element(),
+				element: null,
 				req: [],
 				cReq: [],
 				text: '',
@@ -2527,6 +2527,7 @@ G={
 				this.elec = obj.elec||0; //electrically charged?
 				this.magic = obj.magic||0; //magical?
 			}
+			G.moveDefault.element = new G.element();
 			G.checkReq = function(char, req) {
 				if (req) { req = ['any any'].concat(req); } else { return true; }
 				let obj = {};
