@@ -2640,6 +2640,7 @@ G={
 				}
 				var target = choose(boxCharList);
 				boxCharList = [this].concat(target);
+				var availableMoves = [];
 				for (let i in G.moves) {
 					const m = G.moves[i];
 					if (!G.checkReq(this, m.req)) { continue; }
