@@ -2691,7 +2691,7 @@ G={
 				if (charList.length > 0) { opponent = choose(charList); } else { return false; } 
 
 				var overseer = new G.combatOverseer();
-				me.combat = new G.combatTracker(overseer, this);
+				this.combat = new G.combatTracker(overseer, this);
 				opponent.combat = new G.combatTracker(overseer, opponent);
 				console.log(opponent.name);
 			}
