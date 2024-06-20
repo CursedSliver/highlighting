@@ -2633,7 +2633,7 @@ G={
 				if (!this.combat) { return; }
 				var overseer = this.combat.overseer;
 				var otherChars = overseer.participants;
-				otherChars.splice(otherChars.indexOf(this), 1);
+				//otherChars.splice(otherChars.indexOf(this), 1); this breaks things since otherChars is not a duplicate of the array but rather is the original array
 				var availableMoves = [];
 				for (let i in G.moves) {
 					const m = G.moves[i];
@@ -2647,6 +2647,7 @@ G={
 				var m = choose(availableMoves);
 
 				for (let i in otherChars) {
+					if (otherChars[i] == this) { continue; }
 					const success = otherChars[i].makeIntercept();
 					if (typeof success === 'string') { str += success; }
 				}
