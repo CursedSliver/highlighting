@@ -1394,7 +1394,7 @@ G={
 					let item = str.split('%')[0];
 					let actualTrue = true;
 					let actualFalse = false;
-					if (str[0] == '!') { actualTrue = false; actualFalse = true; str = str.slice(1, str.length); }
+					if (item[0] == '!') { actualTrue = false; actualFalse = true; item = item.slice(1, str.length); }
 					if (chance) { if (!(Math.random() < chance)) { return actualFalse; } }
 					if (G.actReqKeywords.includes(str)) {
 						if (str == 'team') { return cNegate(actualTrue, this.type == 'team'); }
