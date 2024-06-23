@@ -2749,7 +2749,7 @@ G={
 
 				overseer.lastMove = m;
 				if (typeof m.fail != 'undefined') { 
-					if ((typeof m.fail == 'number' && m.fail < Math.random()) || (typeof m.fail == 'function' && m.fail.call(this, boxCharList))) { 
+					if ((typeof m.fail == 'number' && m.fail < Math.random()) || (typeof m.fail == 'function' && (m.fail.call(this, boxCharList)) < Math.random())) { 
 						m.failFunc.call(this, boxCharList); 
 						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
 						return this.has('fleed'); 
