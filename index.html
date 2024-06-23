@@ -456,7 +456,7 @@ cloneDom=function(el)
 	return alias;
 }
 function randomFloor(x) {if ((x%1)<Math.random()) return Math.floor(x); else return Math.ceil(x);}
-function deepCopy(arr) {
+function deepArrCopy(arr) {
 	if (!Array.isArray(arr)) { return arr; }
 	let newArr = [];
 	for (let i in arr) {
