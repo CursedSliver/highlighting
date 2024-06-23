@@ -460,7 +460,7 @@ function deepArrCopy(arr) {
 	if (!Array.isArray(arr)) { return arr; }
 	let newArr = [];
 	for (let i in arr) {
-		newArr.push(deepCopy(arr[i]));
+		newArr.push(deepArrCopy(arr[i]));
 	}
 	return newArr;
 }
