@@ -1390,6 +1390,7 @@ G={
 				//refactored TW's code to be much more sensible - CS
 				G.char.prototype.testCond = function(str, prevTeam) {
 					//individual expressions, without AND or OR
+					if (!str) { return false; } 
 					let chance = str.split('%')[1]; 
 					let item = str.split('%')[0];
 					let actualTrue = true;
