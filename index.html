@@ -1354,7 +1354,7 @@ G={
 					else if (!op && val==cond) return true;
 					else return false;
 				}
-				G.act.prototype.fit=function(me)
+				G.act.prototype.fit=function(me, toMatch)
 				{
 					/*
 						returns one or more people/team who fit the given conditions
@@ -1398,14 +1398,16 @@ G={
 							'any'
 								> can be abled or disabled (still doesn't accept out)
 					*/
+					var bigReq = null;
+					if (toMatch) { bigReq = toMatch; } else { bigReq = this.people; }
 					
 					var selected=[];
 					
 					var prevTeam=0;
 					
-					for (var i=0;i<this.people.length;i++)
+					for (var i=0;i<bigReq.length;i++)
 					{
-						var req=this.people[i].split(' ');
+						var req=bigReq[i].split(' ');
 						//if (req.indexOf('team')==-1 && req.indexOf('dead')==-1) req.unshift('!dead');
 						
 						var pool=[];
@@ -1581,7 +1583,7 @@ G={
 						}
 						if (!found) return false;
 					}
-					if (selected.length!=this.people.length) return false; 
+					if (selected.length!=bigReq.length) return false; 
 					return selected;
 				}
 			
@@ -2529,10 +2531,9 @@ G={
 			}
 			G.moveDefault.element = new G.element();
 			G.checkReq = function(char, req) {
-				if (req) { req = ['any any'].concat(req); } else { return true; }
-				let obj = {};
-				obj.people = req;
-				let list = G.acts.fit.call(obj, G.teams[0]);
+				if (!req) { return true; }
+				let list = G.act.prototype.fit(char, req);
+				console.log(list);
 				if (!list) { return false; }
 				if (list.indexOf(char)!=-1) { return true; } else { return false; }
 			}; //extreme lazy ahhhh (performance can go die)
