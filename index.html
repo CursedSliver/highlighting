@@ -2608,7 +2608,7 @@ G={
 				this.vertical = 0; //same as above but less so since its only one dimension; can be negative (not recommended)
 			}
 			G.combatTracker.prototype.moveInFrontOf = function(target, dist) {
-				if (!target.combat) { return; }
+				if (!target || !target.combat) { return; }
 				var h = target.combat.horizontal;
 				if (this.horizontal < h) { this.horizontal = h - dist; } else { this.horizontal = h + dist; }
 			}
@@ -2632,7 +2632,7 @@ G={
 					//if (!G.checkReq(this, m.req)) { continue; }
 					var list = deepArrCopy(boxCharList);
 					var targets = [];
-					for (let i = 0; i < m.interact; i++) {
+					for (let i = 0; i < m.element.interact; i++) {
 						if (list.length == 0) { break; }
 						let chosen = choose(list);
 						targets.push(chosen);
