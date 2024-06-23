@@ -1350,7 +1350,7 @@ G={
 					list.sort((a,b)=>a.uses-b.uses);
 					console.log(list.map(me=>(me.uses+' : '+me.text)));
 				}
-				let testCond=function(val,cond)
+				G.testCond=function(val,cond)
 				{
 					//can handle val:1, val:<1, val:>1
 					var op=cond.charAt(0);
@@ -1367,7 +1367,7 @@ G={
 					/*
 						returns one or more people/team who fit the given conditions
 						the "me" parameter specifies which person/team the first condition must match
-						ie. ['shotgun lunatic','- meek'] will return a person with the "shotgun" and "lunatic" perks, and a person who is "meek" and on a different team
+						ie. ['shotgun lunatic','- meek'] will return a person with the "shotgun" and "lunatic" perks specified by me, and a person who is "meek" and on a different team
 						syntax :
 							'perk_name'
 								> must have the perk
@@ -1405,6 +1405,8 @@ G={
 								> must have a perk marked .disable (trapped, shell-shocked etc)
 							'any'
 								> can be abled or disabled (still doesn't accept out)
+							'every'
+       								> matches everyone
 					*/
 					var bigReq = null;
 					if (toMatch) { bigReq = toMatch; } else { bigReq = this.people; }
@@ -1415,6 +1417,7 @@ G={
 					
 					for (var i=0;i<bigReq.length;i++)
 					{
+						//i is each person in the req
 						var req=bigReq[i].split(' ');
 						//if (req.indexOf('team')==-1 && req.indexOf('dead')==-1) req.unshift('!dead');
 						
@@ -1427,6 +1430,7 @@ G={
 						var found=false;
 						for (var ii=0;ii<pool.length;ii++)
 						{
+							//ii is iteration over all chars and teams to try match ("it")
 							var it=pool[ii];
 							var fit=true;
 							if (selected.indexOf(it)!=-1) {fit=false;continue;}
@@ -1443,7 +1447,7 @@ G={
 							var any=req.indexOf('any')==-1?false:true;
 							var every=req.indexOf('every')==-1?false:true;
 							
-							if (it.type!='team')
+							if (it.type=='char') 
 							{
 								for (var iii in it.perks)
 								{
@@ -1456,7 +1460,7 @@ G={
 							
 							//filter for abnormal perks (we don't select people with those perks unless the req specifically calls for it)
 							//todo : this doesn't match multiple choices like terrified|shell-shocked|dazed
-							if (it.type!='team')
+							if (it.type=='char')
 							{
 								var tolerateDisabled=false;
 								var tolerateOut=false;
@@ -1464,9 +1468,10 @@ G={
 								if (every) {tolerateDisabled=true;tolerateOut=true;}
 								for (var iii in it.perks)
 								{
+									//iii is individual perks of a char
 									var perk=it.perks[iii];
-									var needed=(req.indexOf(perk.name)!=-1);
-									if (perk.disable && needed) {tolerateDisabled=true;}
+									var needed=(req.indexOf(perk.name)!=-1); //whether the perk is in the req; only checks for items without an OR operator
+									if (perk.disable && needed) {tolerateDisabled=true;} //if a req specifically calls for a perk with disable then it tolerates
 									if (perk.out && needed) {tolerateOut=true;}
 									if (!every && ((perk.disable && !any) || perk.out) && !needed) {fit=false;break;}
 									//if (((perk.disable && !any) || perk.out) && req.indexOf(perk.name)==-1) {fit=false;break;}
@@ -1497,7 +1502,7 @@ G={
 									else if (bit=='noTeam') {if (it.team){fit=false;break;}}
 									else if (bit=='+') {forceSame=true;forceDif=false;}
 									else if (bit=='-') forceDif=true;
-									else if (prop=='members'){if (!it.chars || !testCond(it.chars,arg)){fit=false;break;}}
+									else if (prop=='members'){if (!it.chars || !G.testCond(it.chars,arg)){fit=false;break;}}
 									else if (prop=='alive')
 									{
 										var alive=0;
@@ -1505,7 +1510,7 @@ G={
 										{
 											if (!G.chars[iiii].has('dead')) alive++;
 										}
-										if (!testCond(alive,arg)){fit=false;break;}
+										if (!G.testCond(alive,arg)){fit=false;break;}
 									}
 									else if (prop=='dead')
 									{
@@ -1514,9 +1519,9 @@ G={
 										{
 											if (G.chars[iiii].has('dead')) dead++;
 										}
-										if (!testCond(dead,arg)){fit=false;break;}
+										if (!G.testCond(dead,arg)){fit=false;break;}
 									}
-									else if (prop=='deaths'){if (!testCond(G.deaths,arg)){fit=false;break;}}
+									else if (prop=='deaths'){if (!G.testCond(G.deaths,arg)){fit=false;break;}}
 									else if (prop=='teamalive')
 									{
 										if (!team) {fit=false;break;}
@@ -1527,7 +1532,7 @@ G={
 											{
 												if (!team.chars[iiii].has('dead')) alive++;
 											}
-											if (!testCond(alive,arg)){fit=false;break;}
+											if (!G.testCond(alive,arg)){fit=false;break;}
 										}
 									}
 									else if (prop=='teamdead' || prop=='teamdeaths')
@@ -1540,7 +1545,7 @@ G={
 											{
 												if (team.chars[iiii].has('dead')) dead++;
 											}
-											if (!testCond(dead,arg)){fit=false;break;}
+											if (!G.testCond(dead,arg)){fit=false;break;}
 										}
 									}
 									else if (it.type=='char')
@@ -2490,7 +2495,7 @@ G={
 			G.move = function(obj) {
 				this.chance = obj.chance||G.moveDefault.chance;
 				this.element = obj.element||G.moveDefault.element; //element determines the nature of the attack as well as which attacks it can counter/be countered by
-				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = G.moveDefault.req; }//req is a string as the conditions to meet before the move can be considered possible (returns true or false)
+				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = G.moveDefault.req; }//req is a string as the conditions to meet before the move can be considered possible in the first index, then indexes after that define reqs the opponents have to meet
 				//unfortunately due to not wanting to recode an entirely new set of syntaxes and having to update that one whenever updating G.act.prototype.fit ive decided to take shortcut and just use that syntax and sacrifice the ability to dynamically adjust move chances but whatev
 				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = G.moveDefault.cReq; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
 				this.text = obj.text||G.moveDefault.text; 
@@ -2924,6 +2929,8 @@ G={
 						{
 							var act=acts[i];
 							actors=act.fit(me);//returns a random selection of people who match the act; the first person must be "me"
+							//if does not match, returns false
+							//I think this code is broken
 							if (actors)
 							{
 								choice=act;
