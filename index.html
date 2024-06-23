@@ -2608,6 +2608,7 @@ G={
 				this.vertical = 0; //same as above but less so since its only one dimension; can be negative (not recommended)
 			}
 			G.combatTracker.prototype.moveInFrontOf = function(target, dist) {
+				if (!target.combat) { return; }
 				var h = target.combat.horizontal;
 				if (this.horizontal < h) { this.horizontal = h - dist; } else { this.horizontal = h + dist; }
 			}
@@ -2715,7 +2716,7 @@ G={
 				fail: 0.7,
 				req: ['big_stick'],
 				func: function(charList) {
-					this.combat.moveInFrontOf(charList[1], Math.floor(Math.random() * 4));
+					this.combat.moveInFrontOf(charList[1], Math.floor(Math.random() * 3 + 1));
 				}
 			});
 			
