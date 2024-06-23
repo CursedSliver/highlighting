@@ -456,6 +456,14 @@ cloneDom=function(el)
 	return alias;
 }
 function randomFloor(x) {if ((x%1)<Math.random()) return Math.floor(x); else return Math.ceil(x);}
+function deepCopy(arr) {
+	if (!Array.isArray(arr)) { return arr; }
+	let newArr = [];
+	for (let i in arr) {
+		newArr.push(deepCopy(arr[i]));
+	}
+	return newArr;
+}
 
 
 SmoothToggles=function()
@@ -2669,21 +2677,31 @@ G={
 					if (overseer.participants[i] == this) { continue; }
 					boxCharList.push(overseer.participants[i]);
 				}
-				var target = choose(boxCharList);
-				boxCharList = [this].concat(target);
 				var availableMoves = [];
 				for (let i in G.moves) {
 					const m = G.moves[i];
-					if (m.element.interactMin > boxCharList.length - 1) { continue; }
+					if (m.element.interactMin > boxCharList.length) { continue; }
 					//if (!G.checkReq(this, m.req)) { continue; }
-					if (!G.checkCReq(this, m.cReq, null, boxCharList)) { continue; }
+					var list = deepArrCopy(boxCharList);
+					var targets = [];
+					for (let i = 0; i < m.interact; i++) {
+						if (list.length == 0) { break; }
+						let chosen = choose(list);
+						targets.push(chosen);
+						list.splice(list.indexOf(chosen), 1);
+					}
+					
+					targets = [this].concat(targets);
+					if (!G.checkCReq(this, m.cReq, null, targets)) { continue; }
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
-						availableMoves.push(m);
+						availableMoves.push([m, targets]);
 					}
 				}
-				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', boxCharList); return this.has('fleed'); }
-				console.log(availableMoves.length);
+				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', [this]); return this.has('fleed'); }
+				
 				var m = choose(availableMoves);
+				boxCharList = m[1];
+				m = m[0];
 				m.func.call(this, boxCharList);
 
 				for (let i in otherChars) {
