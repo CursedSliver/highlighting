@@ -2532,7 +2532,7 @@ G={
 				if (req) { req = ['any any'].concat(req); } else { return true; }
 				let obj = {};
 				obj.people = req;
-				let list = char.fit.call(obj, G.teams[0]);
+				let list = G.acts.fit.call(obj, G.teams[0]);
 				if (!list) { return false; }
 				if (list.indexOf(char)!=-1) { return true; } else { return false; }
 			}; //extreme lazy ahhhh (performance can go die)
@@ -2741,6 +2741,15 @@ G={
 				fail: 0.4,
 				func: function(charList) {
 					this.combat.moveInFrontOf(charList[1], 2);
+				}
+			});
+			new G.move({
+				text: '[1] swings [1:their] big stick right down [2]\'s skull.',
+				failText: '[1] slams down [1:their] big stick at [2], but only managed to kick off dirt in all directions.',
+				fail: 0.7,
+				req: ['big_stick'],
+				func: function(cl) {
+					this.combat.moveInFrontOf(charList[1], Math.floor(Math.random() * 4));
 				}
 			});
 			
