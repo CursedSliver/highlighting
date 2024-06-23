@@ -2440,6 +2440,7 @@ G={
 				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = G.moveDefault.req; }//req is a string as the conditions to meet before the move can be considered possible in the first index, then indexes after that define reqs the opponents have to meet
 				//unfortunately due to not wanting to recode an entirely new set of syntaxes and having to update that one whenever updating G.act.prototype.fit ive decided to take shortcut and just use that syntax and sacrifice the ability to dynamically adjust move chances but whatev
 				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = G.moveDefault.cReq; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
+				if (obj.pReq) { this.pReq = [].concat(obj.pReq); } else { this.pReq = G.moveDefault.pReq; } //proximity requirement
 				this.text = obj.text||G.moveDefault.text; 
 				this.fail = obj.fail||G.moveDefault.fail; //function returning whether the move fails
 				this.failText = obj.failText||G.moveDefault.failText; 
@@ -2455,6 +2456,7 @@ G={
 				element: null,
 				req: [],
 				cReq: [],
+				pReq: [],
 				text: '',
 				fail: function() { return false; },
 				failText: '',
@@ -2546,6 +2548,58 @@ G={
 				}
 				return fit;
 			}
+			G.checkPReq = function(char, otherChar, pReq) {
+				/* pReq is a string for an actor pair
+					returns whether this char (otherChar) is in the correct proximity to the char to do stuff to it
+					syntax:
+					AND operator: ' ' (space)
+	 				OR operator: '|'
+	  				expressions are of the following:
+	   					[key]:[max]
+					or 
+	 					[key]:[min]/[max]
+	  				keys:
+	   				h
+						> horizontal distance (h for horizontal)
+	  				v
+	   					> vertical distance (v for vertical)
+		 			d
+	  					> distance of shortest line (d for distance)
+					t 
+	 					> h + v (t for total)
+	   				e
+						> the "effort function"
+				*/
+				if (pReq.length == 0) { return true; }
+				const c1 = char.combat;
+				const c1h = c1.horizontal;
+				const c1v = c1.vertical;
+				const c1t = c1h + c1v;
+				const c2 = otherChar.combat;
+				const c2h = c2.horizontal;
+				const c2v = c2.vertical;
+				const c2t = c2h + c2v;
+				let AND = pReq.split(' ');
+				let fitAND = true;
+				for (let i in AND) {
+					let OR = AND[i].split('|');
+					let fitOR = false;
+					for (let ii in OR) {
+						const key = OR[ii].split(':')[0];
+						const content = OR[ii].split(':')[1];
+						const min = (content.includes('/')?parseFloat(content.split('/')[0]):0);
+						const max = (content.includes('/')?parseFloat(content.split('/')[1]):parseFloat(content.split('/')[0]));
+						
+						if (key=='h' && (Math.abs(c1h - c2h) > min && Math.abs(c1h - c2h) < max)) { fitOR = true; break; }
+						if (key=='v' && (Math.abs(c1v - c2v) > min && Math.abs(c1v - c2v) < max)) { fitOR = true; break; }
+						if (key=='d' && ((c1h-c2h)*(c1h-c2h) + (c1v-c2v)*(c1v-c2v) > min*min && (c1h-c2h)*(c1h-c2h) + (c1v-c2v)*(c1v-c2v) < max*max)) { fitOR = true; break; }
+						if (key=='t' && (Math.abs((c1h + c1v) - (c2h + c2v)) > min && Math.abs((c1h + c1v) - (c2h + c2v)) < max)) { fitOR = true; break; }
+						if (key=='e' && c1.dist(otherChar) > min && c1.dist(otherChar) < max) { fitOR = true; break; }
+					}
+					if (!fitOR) { fitAND = false; break; }
+				}
+				return fitAND;
+			}
 			G.intercepts = [];
 			G.intercept = function(obj) {
 				obj = obj||{};
@@ -2591,6 +2645,7 @@ G={
 				this.participants = [];
 				this.processed = false;
 				this.outStr = '';
+				this.lastMove = null;
 				
 				G.ongoingCombats.push(this);
 			}
@@ -2671,7 +2726,7 @@ G={
 					}
 					
 					targets = [this].concat(targets);
-					if (!G.checkCReq(this, m.cReq, null, targets)) { continue; }
+					if (!G.checkCReq(this, m.cReq, overseer.lastMove, targets)) { continue; }
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
 						availableMoves.push([m, targets]);
 					}
@@ -2689,6 +2744,7 @@ G={
 					if (typeof success === 'string') { str += success; }
 				}
 
+				overseer.lastMove = m;
 				if (typeof m.fail != 'undefined') { 
 					if ((typeof m.fail == 'number' && m.fail < Math.random()) || (typeof m.fail == 'function' && m.fail())) { 
 						m.failFunc.call(this, boxCharList); 
