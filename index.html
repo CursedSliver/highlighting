@@ -464,6 +464,9 @@ function deepArrCopy(arr) {
 	}
 	return newArr;
 }
+function cNegate(bool, negate) {
+	if (negate) { return !bool; } else { return bool; }
+}
 
 
 SmoothToggles=function()
@@ -1350,7 +1353,7 @@ G={
 					list.sort((a,b)=>a.uses-b.uses);
 					console.log(list.map(me=>(me.uses+' : '+me.text)));
 				}
-				G.testCond=function(val,cond)
+				G.testVariableCond=function(val,cond)
 				{
 					//can handle val:1, val:<1, val:>1
 					var op=cond.charAt(0);
@@ -1362,6 +1365,80 @@ G={
 					else if (!op && val==cond) return true;
 					else return false;
 				}
+				G.actReqKeywords = ['team', 'any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', 'every'];
+				G.getAliveCharsN = function() {
+					let amount = 0;
+					for (let i in G.chars) {
+						if (!G.chars[i].isOut()) { amount++; }
+					}
+					return amount;
+				}
+				G.getDeadCharsN = function() {
+					return G.chars.length - G.getAliveCharsN();
+				}
+				G.team.prototype.getAliveCharsN = function() {
+					let amount = 0; 
+					for (let i in this.chars) {
+						if (!this.chars[i].isOut()) { amount++; }
+					}
+					return amount;
+				}
+				G.team.prototype.getDeadCharsN = function() {
+					return this.chars.length - this.getAliveCharsN();
+				}
+				//refactored TW's code to be much more sensible - CS
+				G.char.prototype.testCond = function(str, prevTeam) {
+					//individual expressions, without AND or OR
+					let chance = str.split('%')[1]; 
+					let item = str.split('%')[0];
+					let actualTrue = true;
+					let actualFalse = false;
+					if (str[0] == '!') { actualTrue = false; actualFalse = true; str = str.slice(1, str.length); }
+					if (chance) { if (!(Math.random() < chance)) { return actualFalse; } }
+					if (G.actReqKeywords.includes(str)) {
+						if (str == 'team') { return cNegate(actualTrue, this.type == 'team'); }
+						if (str == 'any') { return cNegate(actualTrue, this.isOut()); } 
+						if (str == 'able') { return cNegate(actualTrue, this.isDisabled()); }
+						if (str == 'out') { return cNegate(actualTrue, !this.isOut()); }
+						if (str == 'inTeam') { return cNegate(actualTrue, !this.team); }
+						if (str == 'noTeam') { return cNegate(actualTrue, this.team); }
+						if (str == '-') { return cNegate(actualTrue, (this.team === prevTeam)); }
+						if (str == '+') { return cNegate(actualTrue, !(this.team === prevTeam)); }
+						if (str == 'every') { return actualTrue; }
+						throw 'Special keyword not found!';
+					}
+					if (item.indexOf(':') != -1) {
+						let amount = item.split(':')[1];
+						let key = item.split(':')[0];
+						if (key == 'members') { 
+							if (this.team) { return cNegate(actualFalse, G.testVariableCond(this.team.chars.length, amount)); }
+							else { return actualFalse; }
+						}
+						if (key == 'alive') {
+							return cNegate(actualFalse, G.testVariableCond(G.getAliveCharsN(), amount));
+						}
+						if (key == 'dead') {
+							return cNegate(actualFalse, G.testVariableCond(G.getDeadCharsN(), amount));
+						}
+						if (key == 'deaths') {
+							return cNegate(actualFalse, G.testVariableCond(G.deaths, amount));
+						}
+						if (key == 'teamalive') {
+							return cNegate(actualFalse, G.testVariableCond(this.team.getAliveCharsN(), amount));
+						}
+						if (key == 'teamdeaths') {
+							return cNegate(actualFalse, G.testVariableCond(this.team.getDeadCharsN(), amount));
+						}
+						throw 'Special variable keyword not found!';
+					} 
+					//finally, perks
+					item = item.replaceAll('_', ' ');
+					if (!G.perks[item]) { throw '"'+item+'" is not a valid perk!'; }
+					
+					if (!G.perks[item].disabled && this.isDisabled()) { return actualFalse; }
+					if (!G.perks[item].out && this.isOut()) { return actualFalse; }
+					return this.has(item);
+				}
 				G.act.prototype.fit=function(me, toMatch)
 				{
 					/*
@@ -1369,6 +1446,10 @@ G={
 						the "me" parameter specifies which person/team the first condition must match
 						ie. ['shotgun lunatic','- meek'] will return a person with the "shotgun" and "lunatic" perks specified by me, and a person who is "meek" and on a different team
 						syntax :
+	  						' '
+		 						> AND operator, put expressions to the left and right to signify that both must be met
+		 					'|'
+								> OR operator, put expressions go the left and right to signify that at least one must be met 
 							'perk_name'
 								> must have the perk
 							'!perk_name'
@@ -1392,7 +1473,7 @@ G={
 							'teamdeaths:3' 'teamdeaths:<3' 'teamdeaths:>3'
 								> this many in the team must be dead
 							'+'
-								> must be the same team as the previous team/person selected
+								> must be the same team as the previous team/person selected (separated to others via AND)
 							'-'
 								> must be a different team
 							'inTeam'
@@ -1406,7 +1487,8 @@ G={
 							'any'
 								> can be abled or disabled (still doesn't accept out)
 							'every'
-       								> matches everyone
+       							> matches everyone
+			   				put '%N' after any perk to signify a chance for that to be true, where N is the chance
 					*/
 					var bigReq = null;
 					if (toMatch) { bigReq = toMatch; } else { bigReq = this.people; }
@@ -1415,10 +1497,13 @@ G={
 					
 					var prevTeam=0;
 					
-					for (var i=0;i<bigReq.length;i++)
+					for (let i=0;i<bigReq.length;i++)
 					{
 						//i is each person in the req
-						var req=bigReq[i].split(' ');
+						var req=bigReq[i].split(' '); //req now describes all statements separated by AND
+						for (let ii in req) {
+							req[ii] = req[ii].split('|'); //req is now a nested array, with layer one being AND and layer two being OR
+						}
 						//if (req.indexOf('team')==-1 && req.indexOf('dead')==-1) req.unshift('!dead');
 						
 						var pool=[];
@@ -1428,165 +1513,20 @@ G={
 						if (i==0 && pool.indexOf(me)==-1) pool=[];
 						
 						var found=false;
-						for (var ii=0;ii<pool.length;ii++)
+						for (let ii=0;ii<pool.length;ii++)
 						{
 							//ii is iteration over all chars and teams to try match ("it")
-							var it=pool[ii];
-							var fit=true;
-							if (selected.indexOf(it)!=-1) {fit=false;continue;}
-							if (i==0 && it!=me) {fit=false;continue;}
-							if (i==0 && it.acted) {fit=false;continue;}
-							
-							var team=0;
-							if (it.type=='team') team=it; else team=it.team;
-							var forceSame=false;
-							var forceDif=false;
-							
-							var able=true;
-							var out=false;
-							var any=req.indexOf('any')==-1?false:true;
-							var every=req.indexOf('every')==-1?false:true;
-							
-							if (it.type=='char') 
-							{
-								for (var iii in it.perks)
-								{
-									if (it.perks[iii].disable) able=false;
-									if (it.perks[iii].out) out=true;
+							let it=pool[ii];
+							let fitAND = true;
+							for (let iii in req) {
+								let fitOR = false;
+								for (let iiii in req[iii]) {
+									if (it.testCond(req[iii][iiii], prevTeam)) { fitOR = true; break; }
 								}
+								if (!fitOR) { fitAND = false; break; }
 							}
 							
-							//goal : [any] should give us both able and disabled, otherwise block disabled unless a perk calls it
-							
-							//filter for abnormal perks (we don't select people with those perks unless the req specifically calls for it)
-							//todo : this doesn't match multiple choices like terrified|shell-shocked|dazed
-							if (it.type=='char')
-							{
-								var tolerateDisabled=false;
-								var tolerateOut=false;
-								
-								if (every) {tolerateDisabled=true;tolerateOut=true;}
-								for (var iii in it.perks)
-								{
-									//iii is individual perks of a char
-									var perk=it.perks[iii];
-									var needed=(req.indexOf(perk.name)!=-1); //whether the perk is in the req; only checks for items without an OR operator
-									if (perk.disable && needed) {tolerateDisabled=true;} //if a req specifically calls for a perk with disable then it tolerates
-									if (perk.out && needed) {tolerateOut=true;}
-									if (!every && ((perk.disable && !any) || perk.out) && !needed) {fit=false;break;}
-									//if (((perk.disable && !any) || perk.out) && req.indexOf(perk.name)==-1) {fit=false;break;}
-								}
-								if (!tolerateDisabled && !able && !any) fit=false;
-								if (!tolerateOut && out) fit=false;
-							}
-							
-							if (fit)
-							{
-								for (var iii=0;iii<req.length;iii++)
-								{
-									var bit=req[iii];
-									var bitSplit=bit.split(':');
-									var prop=bitSplit[0]?bitSplit[0]:0;
-									var arg=bitSplit[1]?bitSplit[1]:0;
-									if (!arg) prop=0;
-									
-									if (bit=='') {}
-									else if (bit=='team') {}
-									else if (bit=='out') {if (!out){fit=false;break;}}
-										else if (bit=='!out') {if (out){fit=false;break;}}
-									else if (bit=='able') {if (!able){fit=false;break;}}
-										else if (bit=='!able') {if (able){fit=false;break;}}
-									else if (bit=='any') {}
-									else if (bit=='every') {}
-									else if (bit=='inTeam') {if (!it.team){fit=false;break;}}
-									else if (bit=='noTeam') {if (it.team){fit=false;break;}}
-									else if (bit=='+') {forceSame=true;forceDif=false;}
-									else if (bit=='-') forceDif=true;
-									else if (prop=='members'){if (!it.chars || !G.testCond(it.chars,arg)){fit=false;break;}}
-									else if (prop=='alive')
-									{
-										var alive=0;
-										for (var iiii in G.chars)
-										{
-											if (!G.chars[iiii].has('dead')) alive++;
-										}
-										if (!G.testCond(alive,arg)){fit=false;break;}
-									}
-									else if (prop=='dead')
-									{
-										var dead=0;
-										for (var iiii in G.chars)
-										{
-											if (G.chars[iiii].has('dead')) dead++;
-										}
-										if (!G.testCond(dead,arg)){fit=false;break;}
-									}
-									else if (prop=='deaths'){if (!G.testCond(G.deaths,arg)){fit=false;break;}}
-									else if (prop=='teamalive')
-									{
-										if (!team) {fit=false;break;}
-										else
-										{
-											var alive=0;
-											for (var iiii in team.chars)
-											{
-												if (!team.chars[iiii].has('dead')) alive++;
-											}
-											if (!G.testCond(alive,arg)){fit=false;break;}
-										}
-									}
-									else if (prop=='teamdead' || prop=='teamdeaths')
-									{
-										if (!team) {fit=false;break;}
-										else
-										{
-											var dead=0;
-											for (var iiii in team.chars)
-											{
-												if (team.chars[iiii].has('dead')) dead++;
-											}
-											if (!G.testCond(dead,arg)){fit=false;break;}
-										}
-									}
-									else if (it.type=='char')
-									{
-										//probably perk
-										var neg=false;
-										bit=bit.replaceAll('_',' ');
-										if (bit.charAt(0)=='!')
-										{
-											bit=bit.substr(1);
-											neg=true;
-										}
-										if (bit.indexOf('|')!=-1)//either
-										{
-											bit=bit.split('|');
-											var hasAnyPerk=false;
-											for (var iiii in bit)//this might be the first time i've reached iiii
-											{
-												if (bit[iiii].indexOf('%')!=-1) //For giving individual traits a reduced chance of being in the event. -TW
-												{
-													bit[iiii]=bit[iiii].split('%');
-													if (it.has(bit[iiii][0]) && Math.random()<Number(bit[iiii][1]))  {hasAnyPerk=true;break;} // This is the scariest piece of code I have ever written -TW
-													if (bit[iiii][0]=='any' && Math.random()<Number(bit[iiii][1]))  {hasAnyPerk=true;break;} // Default for giving anyone a chance for an event. -TW
-												}
-												else if (it.has(bit[iiii])) {hasAnyPerk=true;break;}
-											}
-											if ((hasAnyPerk && neg) || (!hasAnyPerk && !neg)) {fit=false;break;}
-										}
-										else
-										{
-											var hasPerk=it.has(bit);
-											if ((hasPerk && neg) || (!hasPerk && !neg)) {fit=false;break;}
-										}
-									}
-								}
-								
-								if (i>0 && forceSame && (!team || team!=prevTeam)) fit=false;
-								if (i>0 && forceDif && team && team==prevTeam) fit=false;
-							}
-							
-							if (fit)
+							if (fitAND)
 							{
 								selected.push(it);
 								prevTeam=team;
