@@ -2698,6 +2698,7 @@ G={
 				}
 				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult;
 			} //vertical is here too, but each vertical distance above adds and each vertical distance below removes
+			G.lastCharList = null; //debug
 			G.char.prototype.makeMove = function() {
 				//iterate through every move available and collects any that fit both reqs, then select one to perform
 				//when performing, it first checks for available intercepting moves, then if not successfully intercepted it sees if it succeeds, then if succeeds it calls the func
@@ -2724,6 +2725,7 @@ G={
 						targets.push(chosen);
 						list.splice(list.indexOf(chosen), 1);
 					}
+					if (m.element.interactMin > targets.length) { continue; }
 					
 					targets = [this].concat(targets);
 					if (!G.checkCReq(this, m.cReq, overseer.lastMove, targets)) { continue; }
@@ -2735,6 +2737,7 @@ G={
 				
 				var m = choose(availableMoves);
 				boxCharList = m[1];
+				G.lastCharList = boxCharList;
 				m = m[0];
 				m.func.call(this, boxCharList);
 
