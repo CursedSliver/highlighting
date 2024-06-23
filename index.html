@@ -548,7 +548,7 @@ G={
 		//perks
 		
 		G.perks=[];
-		G.perksBN=[];
+		G.perksBN={};
 		G.perk=function(o)
 		{
 			for (var i in G.glob){this[i]=G.glob[i];}
@@ -1434,10 +1434,10 @@ G={
 					} 
 					//finally, perks
 					item = item.replaceAll('_', ' ');
-					if (!G.perks[item]) { throw '"'+item+'" is not a valid perk!'; }
+					if (!G.perksBN[item]) { throw '"'+item+'" is not a valid perk!'; }
 					
-					if (!G.perks[item].disabled && this.isDisabled()) { return actualFalse; }
-					if (!G.perks[item].out && this.isOut()) { return actualFalse; }
+					if (!G.perksBN[item].disabled && this.isDisabled()) { return actualFalse; }
+					if (!G.perksBN[item].out && this.isOut()) { return actualFalse; }
 					return this.has(item);
 				}
 				G.act.prototype.fit=function(me, toMatch)
