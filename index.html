@@ -2790,8 +2790,8 @@ G={
 				text: '[1] manages to flee from the fight!',
 				failText: '[1] tries to flee from the fight, but is caught by [2] before [1:they] can make it!',
 				fail: function(charList) {
-					if (charList[1].combat.dist() < Math.random() * 4 + 4) { return 0.1; }
-					if (charList[1].combat.dist() < Math.random() * 6 + 8) { return 0.5; }
+					if (this.combat.dist(charList[1]) < Math.random() * 4 + 4) { return 0.1; }
+					if (this.combat.dist(charList[1]) < Math.random() * 6 + 8) { return 0.5; }
 					return 0.85;
 				},
 				successFunc: function() { this.fleeCombat(); }
