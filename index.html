@@ -2713,7 +2713,7 @@ G={
 				failText: '[1] slams down [1:their] big stick at [2], but only managed to kick off dirt in all directions.',
 				fail: 0.7,
 				req: ['big_stick'],
-				func: function(cl) {
+				func: function(charList) {
 					this.combat.moveInFrontOf(charList[1], Math.floor(Math.random() * 4));
 				}
 			});
