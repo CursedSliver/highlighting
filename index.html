@@ -2467,30 +2467,46 @@ G={
 				//obj is some stuff to indicate its parameters
 				obj = obj||{};
 				
-				this.y = obj.y||0; //(from) straight-up [4], above [2], level [0], below [-2], straight-down [-4]
-				this.interact = obj.interact||1; //the maximum amount of other people that this move interacts with
-				this.interactMin = obj.interactMin||1; //the minimum amount of other people required
-				this.temp = obj.temp||0; //molten [4], glowing [3], boiling [2], hot [1], rom temp [0], chilly [-1], freezing [-2], on-touch frostbite [-3]
-				this.state = obj.state||0; //plasma [3], gas [2], liquid [1], solid [0]
-				this.reach = obj.reach||0; //the number of one-eighth of circles of area (roughly)
-				this.range = obj.range||0; //arbitary units
-				this.speed = obj.speed||0; //arbitary units
-				this.delay = obj.delay||0; //seconds to delay to use
-				this.size = obj.size||0; //also describes weight; arbitary units
-				this.sharp = obj.sharp||0; //polished katana [2], regular knife [1], blunt side of pen [0], crushing only [-1]
-				this.moveHorizontal = obj.moveHorizontal||0; //arbitary units; moves away (pos) or to (neg) the other people
-				this.moveVertical = obj.movevertical||0; //8 to -8
-				this.objects = ([].concat(obj.objects))||[]; //objects used (e.g. "dry tree")
-				this.elec = obj.elec||0; //electrically charged?
-				this.magic = obj.magic||0; //magical?
+				this.y = obj.y||G.elementDefault.y; //(from) straight-up [4], above [2], level [0], below [-2], straight-down [-4]
+				this.interact = obj.interact||G.elementDefault.interact; //the maximum amount of other people that this move interacts with
+				this.interactMin = obj.interactMin||G.elementDefault.interactMin; //the minimum amount of other people required
+				this.temp = obj.temp||G.elementDefault.temp; //molten [4], glowing [3], boiling [2], hot [1], rom temp [0], chilly [-1], freezing [-2], on-touch frostbite [-3]
+				this.state = obj.state||G.elementDefault.state; //plasma [3], gas [2], liquid [1], solid [0]
+				this.reach = obj.reach||G.elementDefault.reach; //the number of one-sixteenth of circles of area (roughly)
+				this.range = obj.range||G.elementDefault.range; //arbitary units, but 1 is like half an arms length
+				this.speed = obj.speed||G.elementDefault.speed; //arbitary units
+				this.delay = obj.delay||G.elementDefault.delay; //seconds to delay to use
+				this.size = obj.size||G.elementDefault.size; //also describes weight; arbitary units
+				this.sharp = obj.sharp||G.elementDefault.sharp; //polished katana [2], regular knife [1], blunt side of pen [0], crushing only [-1]
+				this.moveHorizontal = obj.moveHorizontal||G.elementDefault.moveHorizontal; //arbitary units; moves away (pos) or to (neg) the other people
+				this.moveVertical = obj.movevertical||G.elementDefault.moveVertical; //8 to -8
+				this.objects = ([].concat(obj.objects))||G.elementDefault.objects; //objects used (e.g. "dry tree")
+				this.elec = obj.elec||G.elementDefault.elec; //electrically charged?
+				this.magic = obj.magic||G.elementDefault.magic; //magical?
 			}
 			G.moveDefault.element = new G.element();
+			G.elementDefault = {
+				y: 0,
+				interact: 1,
+				interactMin: 1,
+				temp: 0, 
+				state: 0,
+				reach: 0,
+				range: 0,
+				speed: 0,
+				delay: 0,
+				size: 0,
+				sharp: 0,
+				moveHorizontal: 0,
+				moveVertical: 0,
+				objects: [],
+				elec: 0,
+				magic: 0
+			};
 			G.checkReq = function(char, req) {
 				if (!req) { return true; }
 				let list = G.act.prototype.fit(char, req);
-				console.log(list);
-				if (!list) { return false; }
-				if (list.indexOf(char)!=-1) { return true; } else { return false; }
+				if (!list) { return false; } else { return true; }
 			}; //extreme lazy ahhhh (performance can go die)
 			G.checkCReq = function(char, cReq, otherMove, people) {
 				//each item in array is a condition of the opposing move or char that determines whether the move is possible
@@ -2608,10 +2624,25 @@ G={
 				this.vertical = 0; //same as above but less so since its only one dimension; can be negative (not recommended)
 			}
 			G.combatTracker.prototype.moveInFrontOf = function(target, dist) {
-				if (!target || !target.combat) { return; }
-				var h = target.combat.horizontal;
+				let h = target.combat.horizontal;
 				if (this.horizontal < h) { this.horizontal = h - dist; } else { this.horizontal = h + dist; }
 			}
+			G.combatTracker.prototype.moveToward = function(target, dist) {
+				let h = target.combat.horizontal;
+				if (this.horizontal < h) { this.horizontal += dist; } else { this.horizontal -= dist; }
+			}
+			G.combatTracker.prototype.dist = function(target) {
+				//describes a function amount of effort requires for this character to reach another character
+				let verticalOffset = target.combat.vertical - this.vertical;
+				let add = 0;
+				let mult = 1;
+				if (verticalOffset >= 0) {
+					add = Math.pow(target.combat.vertical, 3) * 5;
+				} else {
+					mult = 1 / (-verticalOffset * 0.6 + 1);
+				}
+				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult;
+			} //vertical is here too, but each vertical distance above adds and each vertical distance below removes
 			G.char.prototype.makeMove = function() {
 				//iterate through every move available and collects any that fit both reqs, then select one to perform
 				//when performing, it first checks for available intercepting moves, then if not successfully intercepted it sees if it succeeds, then if succeeds it calls the func
@@ -2629,7 +2660,7 @@ G={
 				for (let i in G.moves) {
 					const m = G.moves[i];
 					if (m.element.interactMin > boxCharList.length) { continue; }
-					//if (!G.checkReq(this, m.req)) { continue; }
+					if (!G.checkReq(this, m.req)) { continue; }
 					var list = deepArrCopy(boxCharList);
 					var targets = [];
 					for (let i = 0; i < m.element.interact; i++) {
@@ -2693,18 +2724,31 @@ G={
 
 			new G.move({
 				text: '[1] does something ????????',
-				chance: 0.001
+				chance: 0.001,
+				element: new G.element({ interactMin: 0, interact: 0 })
 			});
 			new G.move({
 				text: '[1] manages to flee from the fight!',
+				failText: '[1] tries to flee from the fight, but is caught by [2] before [1:they] can make it!',
+				fail: function(charList) {
+					if (charList[1].combat.dist() < Math.random() * 4 + 4) { return 0.1; }
+					if (charList[1].combat.dist() < Math.random() * 6 + 8) { return 0.5; }
+					return 0.85;
+				},
 				successFunc: function() { this.fleeCombat(); }
 			});
 			new G.move({
-				text: '[1] stands still, vigilant and awaiting [1:their] opponent\'s next move...'
+				text: '[1] stands still, vigilant and awaiting [2]\'s next move...'
+			});
+			new G.move({
+				text: '[1] carefully approaches [2]...',
+				func: function(charList) {
+					this.combat.moveToward(charList[1], 2);
+				}
 			});
 			new G.move({
 				text: '[1] punches [2], right in the face!',
-				failText: '[1] tries to punch [2], but missed!',
+				failText: '[1] tries to punch [2], but [missed|the punch was just a bit off]!',
 				fail: 0.4,
 				func: function(charList) {
 					this.combat.moveInFrontOf(charList[1], 2);
@@ -2713,11 +2757,21 @@ G={
 			new G.move({
 				text: '[1] swings [1:their] big stick right down [2]\'s skull.',
 				failText: '[1] slams down [1:their] big stick at [2], but only managed to kick off dirt in all directions.',
+				element: new G.element({
+					y: 2,
+					reach: 1, 
+					range: 1,
+					delay: 1.5,
+					size: 2
+				}),
 				fail: 0.7,
 				req: ['big_stick'],
 				func: function(charList) {
 					this.combat.moveInFrontOf(charList[1], Math.floor(Math.random() * 3 + 1));
 				}
+			});
+			new G.move({
+				text: ''
 			});
 			
 			G.char.prototype.initiateCombat = function() {
