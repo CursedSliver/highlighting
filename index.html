@@ -2465,6 +2465,24 @@ G={
 				func: function() { },
 				id: null
 			};
+			G.elementDefault = {
+				y: 0,
+				interact: 1,
+				interactMin: 1,
+				temp: 0, 
+				state: 0,
+				reach: 0,
+				range: 0,
+				speed: 0,
+				delay: 0,
+				size: 0,
+				sharp: 0,
+				moveHorizontal: 0,
+				moveVertical: 0,
+				objects: [],
+				elec: 0,
+				magic: 0
+			};
 			G.element = function(obj) {
 				//obj is some stuff to indicate its parameters
 				obj = obj||{};
@@ -2487,24 +2505,6 @@ G={
 				this.magic = obj.magic||G.elementDefault.magic; //magical?
 			}
 			G.moveDefault.element = new G.element();
-			G.elementDefault = {
-				y: 0,
-				interact: 1,
-				interactMin: 1,
-				temp: 0, 
-				state: 0,
-				reach: 0,
-				range: 0,
-				speed: 0,
-				delay: 0,
-				size: 0,
-				sharp: 0,
-				moveHorizontal: 0,
-				moveVertical: 0,
-				objects: [],
-				elec: 0,
-				magic: 0
-			};
 			G.checkReq = function(char, req) {
 				if (!req) { return true; }
 				let list = G.act.prototype.fit(char, req);
