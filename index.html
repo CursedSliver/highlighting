@@ -2955,14 +2955,15 @@ G={
 			});
 
 			//hand to hand combat
-			let hardHeadHit = function(cl) {
+			G.moveAssets = {};
+			G.moveAssets.hardHeadHit = function(cl) {
 				let chance = 0.6;
 				if (cl[1].has('bulky') || cl[1].has('survivalist')) { chance -= 0.15; }
 				if (this.has('bulky')) { chance += 0.1; }
 				if (chance > Math.random()) { cl[1].gain('dazed'); }
 				else if (chance / 4 > Math.random()) { this.kill(cl[1], 'fractured skull'); }
 			}
-			let mediumHeadHit = function(cl) {
+			G.moveAssets.mediumHeadHit = function(cl) {
 				let chance = 0.3;
 				if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.2; }
 				if (this.has('bulky')) { chance += 0.1; }
@@ -2976,7 +2977,7 @@ G={
 				func: function(charList) {
 					this.combat.moveInFrontOf(charList[1], 2);
 				},
-				successFunc: mediumheadHit
+				successFunc: G.moveAssets.mediumheadHit
 			});
 			new G.move({
 				text: 'Uppercut! [1] smashes [1:their] fist right into [2]\'s [jaw|chest].',
@@ -2991,7 +2992,7 @@ G={
 					reach: 0.5,
 					range: 1
 				}),
-				successFunc: hardHeadHit,
+				successFunc: G.moveAssets.hardHeadHit,
 				pReq: ['h:1 v:0.25'],
 				req: ['!peaceful|medic']
 			});
@@ -3003,7 +3004,7 @@ G={
 					if (c1[1].has('ninja') || c1[1].has('marksmen')) { chance -= 0.2; }
 					return chance;
 				},
-				successFunc: hardHeadHit,
+				successFunc: G.moveAssets.hardHeadHit,
 				pReq: ['h:1 v:0'],
 				req: ['!peaceful|medic']
 			})
