@@ -2654,6 +2654,7 @@ G={
 				this.processed = false;
 				this.outStr = '';
 				this.lastMove = null;
+				this.moveCount = 0;
 				
 				G.ongoingCombats.push(this);
 			}
@@ -2677,7 +2678,7 @@ G={
 					indexes += chars[i].id+'/';
 				}
 				indexes = indexes.slice(0, indexes.length - 1);
-				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+'[FRONT]'+str+'[BACK '+indexes+']'+'</div></div>';
+				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+'[FRONT]'+(this.moveCount==1?'[1] and [2] meets and, [in a bet for glory|for their survival|seeing each other as a threat], starts fighting!<br>':'')+str+'[BACK '+indexes+']'+'</div></div>';
 			}
 			G.parseCombatText = function(str) {
 				while(true) {
@@ -2742,6 +2743,7 @@ G={
 				//returns text for display (in one box)
 				var str = '';
 				if (!this.combat) { return; }
+				this.combat.moveCount++;
 				var overseer = this.combat.overseer;
 				var otherChars = overseer.participants;
 				var boxCharList = [];
@@ -2824,8 +2826,8 @@ G={
 				element: new G.element({ interactMin: 0, interact: 0 })
 			});
 			new G.move({
-				text: '[1] runs away from the fight.',
-				failText: '[1] tries to run away from the fight, but is caught by [2] before [1:they] can make it!',
+				text: '[1] runs away.',
+				failText: '[1] tries to run away, but is caught by [2] before [1:they] can make it!',
 				fail: function(charList) {
 					if (this.combat.dist(charList[1]) < Math.random() * 4 + 4) { return 0.1; }
 					if (this.combat.dist(charList[1]) < Math.random() * 6 + 8) { return 0.5; }
