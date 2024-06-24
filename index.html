@@ -1257,7 +1257,11 @@ G={
 						G.deadThisRound.push(this);
 						this.gain('dead');
 						if (reason) this.deathReason=reason;
-						this.fleeCombat(true);
+						if (this.combat) {
+							this.combat.overseer.injectBack('[RED]');
+							this.combat.overseer.addSkull(this.name);
+							this.fleeCombat(true);
+						}
 						//if (this.team) {this.team.chars.splice(this.team.chars.indexOf(this),1);this.team=0;}
 						return true;
 					}
@@ -2694,7 +2698,7 @@ G={
 					indexes += chars[i].id+'/';
 				}
 				indexes = indexes.slice(0, indexes.length - 1);
-				this.outStr += '<div class="box action green"><div>'+(noCharBoxes?'':pics)+'</div><div>'+'[FRONT]'+(this.moveCount==1?'[1] and [2] meets and, [in a bet for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|]!<br>':'')+str+'[BACK '+indexes+']'+'</div></div>';
+				this.outStr += '<div class="box action [COLOR]"><div>'+(noCharBoxes?'':pics)+'</div><div>'+'[FRONT]'+(this.moveCount==1?'[1] and [2] meets and, [in a bet for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|]!<br>':'')+str+'[BACK '+indexes+']'+'</div></div>';
 			}
 			G.combatOverseer.prototype.recordMove = function() {
 				this.moveCount++;
@@ -2706,23 +2710,48 @@ G={
 					const BACK = str.indexOf('[BACK ');
 					const snippet = str.slice(FRONT + 7, BACK);
 					const charStr = str.slice(BACK + 6, str.indexOf(']', BACK));
+					let COLOR = '';
+					if (snippet.includes('[BLUE]')) { COLOR = 'blue'; }
+					else if (snippet.includes('[RED]')) { COLOR = 'red'; }
+					else { COLOR = 'green'; }
+					for (let i = FRONT; i >= 0; i--) {
+						if (str.slice(i, i + 7) == '[COLOR]') { str = str.slice(0, i) + COLOR + str.slice(i + 7, str.length); break; }
+					}
 					let charList = charStr.split('/');
 					for (let i in charList) {
 						for (let ii in G.chars) {
 							if (G.chars[ii].id.toString() == charList[i]) { charList[i] = G.chars[ii]; break; }
 						}
 					}
-					const snippetNew = G.parse(snippet, charList);
+					const snippetNew = G.parse(snippet.replace('[BLUE]', '').replace('[RED]', ''), charList);
 					str = str.replace('[FRONT]'+snippet+'[BACK '+charStr+']', snippetNew);
 				}
 			}
 			G.combatOverseer.prototype.end = function() {
 				G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1);
 			}
+			G.combatOverseer.prototype.injectFront = function(content) {
+				for (let i = this.outStr.length - 1; i >= 0; i--) {
+					if (this.outStr.slice(i, i + 7) == '[FRONT]') {
+						this.outStr = this.outStr.slice(0, i + 7) + content + this.outStr.slice(i + 7, this.outStr.length);
+						return true;
+					}
+				}
+				return false; 
+			}
 			G.combatOverseer.prototype.injectBack = function(content) {
 				for (let i = this.outStr.length - 1; i >= 0; i--) {
 					if (this.outStr.slice(i, i + 5) == '[BACK') {
 						this.outStr = this.outStr.slice(0, i) + content + this.outStr.slice(i, this.outStr.length);
+						return true;
+					}
+				}
+				return false; 
+			}
+			G.combatOverseer.prototype.injectSkull = function(name) {
+				for (let i = this.outStr.length - 1; i >= 0; i--) {
+					if (this.outStr.slice(i, i + name.length) == name) {
+						this.outStr = this.outStr.slice(0, i + name.length + 2) + '<div class="picSkull"></div>' + this.outStr.slice(i + name.length + 2, this.outStr.length);
 						return true;
 					}
 				}
