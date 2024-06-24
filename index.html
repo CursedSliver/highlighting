@@ -2678,7 +2678,7 @@ G={
 					indexes += chars[i].id+'/';
 				}
 				indexes = indexes.slice(0, indexes.length - 1);
-				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+'[FRONT]'+(this.moveCount==1?'[1] and [2] meets and, [in a bet for glory|for their survival|seeing each other as a threat], starts fighting!<br>':'')+str+'[BACK '+indexes+']'+'</div></div>';
+				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+'[FRONT]'+(this.moveCount==1?'[1] and [2] meets and, [in a bet for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|]!<br>':'')+str+'[BACK '+indexes+']'+'</div></div>';
 			}
 			G.combatOverseer.prototype.recordMove = function() {
 				this.moveCount++;
@@ -2744,23 +2744,32 @@ G={
 				//iterate through every move available and collects any that fit both reqs, then select one to perform
 				//when performing, it first checks for available intercepting moves, then if not successfully intercepted it sees if it succeeds, then if succeeds it calls the func
 				//returns text for display (in one box)
-				var str = '';
+				let str = '';
 				if (!this.combat) { return; }
-				var overseer = this.combat.overseer;
-				var otherChars = overseer.participants;
-				var boxCharList = [];
+				let overseer = this.combat.overseer;
+				let otherChars = overseer.participants;
+				let boxCharList = [];
 				for (let i in overseer.participants) {
 					if (overseer.participants[i] == this) { continue; }
 					boxCharList.push(overseer.participants[i]);
 				}
-				var availableMoves = [];
+				let availableMoves = [];
 				for (let i in G.moves) {
 					const m = G.moves[i];
 					if (m.element.interactMin > boxCharList.length) { continue; }
 					if (!G.checkReq(this, m.req)) { continue; }
-					var list = deepArrCopy(boxCharList);
-					var targets = [];
-					for (let i = 0; i < m.element.interact; i++) {
+					let list = deepArrCopy(boxCharList);
+
+					for (let ii = 0; ii < list.length; ii++) {
+						let fit = false;
+						for (let iii in m.pReq) {
+							if (G.checkPReq(this, list[ii], m.pReq[iii])) { fit = true; break; }
+						}
+						if (!fit) { list.splice(ii, 1); ii--; }
+					} //ik with this you can have some funny stuff going on but cant be bothered to fix such a relatively rare event
+					
+					let targets = [];
+					for (let ii = 0; ii < m.element.interact; ii++) {
 						if (list.length == 0) { break; }
 						let chosen = choose(list);
 						targets.push(chosen);
@@ -2776,7 +2785,7 @@ G={
 				}
 				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', [this]); return this.has('fleed'); }
 				
-				var m = choose(availableMoves);
+				let m = choose(availableMoves);
 				boxCharList = m[1];
 				G.lastCharList = boxCharList;
 				m = m[0];
@@ -2886,6 +2895,12 @@ G={
 					this.fleeCombat();
 				}
 			});
+			new G.move({
+				text: 'Uppercut! [1] smashes [1:their] fist right into [2]\'s [jaw|chest].',
+				failText: '[1] swings [1:their] fist upward in a crescent arc, but [2] falls backward, [narrowingly|barely||] avoiding the punch.',
+				fail: 0.25,
+				pReq: ['h:1 v:0.25']
+			})
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
