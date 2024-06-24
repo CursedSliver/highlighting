@@ -2680,6 +2680,9 @@ G={
 				indexes = indexes.slice(0, indexes.length - 1);
 				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+'[FRONT]'+(this.moveCount==1?'[1] and [2] meets and, [in a bet for glory|for their survival|seeing each other as a threat], starts fighting!<br>':'')+str+'[BACK '+indexes+']'+'</div></div>';
 			}
+			G.combatOverseer.prototype.recordMove = function() {
+				this.moveCount++;
+			}
 			G.parseCombatText = function(str) {
 				while(true) {
 					const FRONT = str.indexOf('[FRONT]');
@@ -2743,7 +2746,7 @@ G={
 				//returns text for display (in one box)
 				var str = '';
 				if (!this.combat) { return; }
-				this.combat.moveCount++;
+				this.combat.recordMove();
 				var overseer = this.combat.overseer;
 				var otherChars = overseer.participants;
 				var boxCharList = [];
