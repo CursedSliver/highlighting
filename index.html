@@ -1388,14 +1388,15 @@ G={
 					return this.chars.length - this.getAliveCharsN();
 				}
 				//refactored TW's code to be much more sensible - CS
-				G.char.prototype.testCond = function(str, prevTeam) {
+				G.char.prototype.testCond = function(str, prevTeam, negate) {
 					//individual expressions, without AND or OR
 					if (!str) { return false; } 
 					let chance = str.split('%')[1]; 
 					let item = str.split('%')[0];
 					let actualTrue = true;
 					let actualFalse = false;
-					if (item[0] == '!') { actualTrue = false; actualFalse = true; item = item.slice(1, str.length); }
+					if (negate) { actualTrue = !actualTrue; actualFalse = !actualFalse; }
+					if (item[0] == '*') { actualTrue = !actualTrue; actualFalse = !actualFalse; item = item.slice(1, str.length); }
 					if (chance) { if (!(Math.random() < chance)) { return actualFalse; } }
 					if (G.actReqKeywords.includes(str)) {
 						if (str == 'team') { return cNegate(actualTrue, this.type == 'team'); }
@@ -1451,15 +1452,15 @@ G={
 	  						' '
 		 						> AND operator, put expressions to the left and right to signify that both must be met
 		 					'|'
-								> OR operator, put expressions go the left and right to signify that at least one must be met 
+								> OR operator, put expressions go the left and right to signify that at least one must be met
+							'!'
+	   							> AND-level NOT operator, put before the entire OR statement chain (e.x. !perk_name|other_perk for not having either)
+		   					'*'
+		  						> Local level NOT operator, put before individual perks
 							'perk_name'
 								> must have the perk
-							'!perk_name'
-								> must not have the perk
 							'perk_name|other_perk|third_perk'
 								> must have either of those perks
-							'!perk_name|other_perk|third_perk'
-								> must not have any of those perks
 							'team'
 								> must be a team (otherwise must be a person)
 							'members:3' 'members:<3' 'members:>3'
@@ -1522,8 +1523,13 @@ G={
 							let fitAND = true;
 							for (let iii in req) {
 								let fitOR = false;
+								let neg = false;
+								if (req[iii][0][0] == '!') {
+									req[iii][0] = req[iii][0].slice(1, req[iii][0].length);
+									neg = true;
+								}
 								for (let iiii in req[iii]) {
-									if (it.testCond(req[iii][iiii], prevTeam)) { fitOR = true; break; }
+									if (it.testCond(req[iii][iiii], prevTeam, neg)) { fitOR = true; break; }
 								}
 								if (!fitOR) { fitAND = false; break; }
 							}
@@ -2662,12 +2668,30 @@ G={
 			}
 			G.combatOverseer.prototype.addBox = function(str, chars) {
 				chars = [].concat(chars);
-				var pics = '';
+				let pics = '';
+				let indexes = '';
 				for (let i in chars) {
 					pics+=`<img src="${chars[i].pic}" class="pic" title="${chars[i].name}"/>`;
 					if (chars[i].has('dead')) pics+=`<div class="picSkull"></div>`;
+					indexes += G.chars.indexOf(chars[i])+'/';
 				}
-				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+G.parse(str, chars)+'</div></div>';
+				indexes = indexes.slice(0, indexes.length - 1);
+				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+'[FRONT]'+str+'[BACK '+indexes+']'+'</div></div>';
+			}
+			G.parseCombatText = function(str) {
+				while(true) {
+					const FRONT = str.indexOf('[FRONT]');
+					if (FRONT == -1) { return str; }
+					const BACK = str.indexOf('[BACK ');
+					const snippet = str.slice(FRONT + 7, BACK);
+					const charStr = str.slice(BACK + 6, str.indexOf(']', BACK));
+					let charList = charStr.split('/');
+					for (let i in charList) {
+						charList[i] = G.chars[charList[i]];
+					}
+					const snippetNew = G.parse(snippet, charList);
+					str = str.replace('[FRONT]'+snippet+'[BACK '+charStr+']', snippetNew);
+				}
 			}
 			G.combatOverseer.prototype.end = function() {
 				G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1);
@@ -2833,6 +2857,17 @@ G={
 			new G.move({
 				text: '[1] taunts [2], [menacingly|aggressively|confidently].',
 				req: ['any%0.5|sociopath|lunatic%0.5']
+			});
+			new G.move({
+				text: '[1] fakes a charge at [2] before running away.',
+				failText: '[1] fakes a charge at [2] in an attempt to flee, but [2] saw right through and charged back, striking [1] on the [chest|head|heart|shoulder|kneecaps]!',
+				fail: function(charList) {
+					if (charList[1].combat.dist(this) < 25 || charList[1].has('heroic') || charList[1].has('suicidal')) { return 0.6; }
+					return 0.25;
+				},
+				successFunc: function() {
+					this.fleeCombat();
+				}
 			});
 			
 			G.char.prototype.initiateCombat = function() {
@@ -3048,7 +3083,7 @@ G={
 							if (overseer.participants.length <= 1 || Math.random() > 1 / (count + 1)) { break; }
 							count++;
 						}
-						str += overseer.outStr;
+						str += G.parseCombatText(overseer.outStr);
 					}
 					if (me.type == 'char' && me.has('act again') && !me.combat) { me.lose('act again'); i--; }
 				}
