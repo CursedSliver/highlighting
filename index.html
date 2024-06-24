@@ -2699,6 +2699,15 @@ G={
 			G.combatOverseer.prototype.end = function() {
 				G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1);
 			}
+			G.combatOverseer.prototype.injectBack = function(content) {
+				for (let i = this.outStr.length - 1; i >= 0; i--) {
+					if (this.outStr.slice(i, i + 5) == '[BACK') {
+						this.outStr = this.outStr.slice(0, i) + content + this.outStr.slice(i, this.outStr.length);
+						return true;
+					}
+				}
+				return false; 
+			}
 			G.combatTracker = function(overseer, carrier) { //added to chars
 				this.overseer = overseer;
 				this.carrier = carrier;
@@ -2778,17 +2787,17 @@ G={
 				overseer.lastMove = m;
 				if (typeof m.fail != 'undefined') { 
 					if ((typeof m.fail == 'number' && m.fail > Math.random()) || (typeof m.fail == 'function' && (m.fail.call(this, boxCharList)) > Math.random())) { 
-						m.failFunc.call(this, boxCharList); 
 						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
+						m.failFunc.call(this, boxCharList); 
 						return this.has('fleed'); 
 					} else { 
-						m.successFunc.call(this, boxCharList); 
 						overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
+						m.successFunc.call(this, boxCharList); 
 						return this.has('fleed'); 
 					}
 				} else {
-					m.successFunc.call(this, boxCharList); 
 					overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
+					m.successFunc.call(this, boxCharList); 
 					return this.has('fleed'); 
 				}
 			}
@@ -2815,8 +2824,8 @@ G={
 				element: new G.element({ interactMin: 0, interact: 0 })
 			});
 			new G.move({
-				text: '[1] manages to flee from the fight!',
-				failText: '[1] tries to flee from the fight, but is caught by [2] before [1:they] can make it!',
+				text: '[1] runs away from the fight.',
+				failText: '[1] tries to run away from the fight, but is caught by [2] before [1:they] can make it!',
 				fail: function(charList) {
 					if (this.combat.dist(charList[1]) < Math.random() * 4 + 4) { return 0.1; }
 					if (this.combat.dist(charList[1]) < Math.random() * 6 + 8) { return 0.5; }
@@ -2896,6 +2905,7 @@ G={
 			}
 			G.char.prototype.fleeCombat = function() {
 				if (!this.combat) { return false; }
+				this.combat.overseer.injectBack('<br>[1] has fleed from the fight!'); 
 				this.combat.overseer.removeParticipant(this);
 				this.combat = null;
 			}
