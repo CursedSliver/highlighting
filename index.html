@@ -1259,7 +1259,7 @@ G={
 						if (reason) this.deathReason=reason;
 						if (this.combat) {
 							this.combat.overseer.injectBack('[RED]');
-							//this.combat.overseer.injectSkull(this.name);
+							this.combat.overseer.injectSkull(this.name);
 							this.fleeCombat(true);
 						}
 						//if (this.team) {this.team.chars.splice(this.team.chars.indexOf(this),1);this.team=0;}
@@ -2751,7 +2751,7 @@ G={
 			G.combatOverseer.prototype.injectSkull = function(name) {
 				for (let i = this.outStr.length - 1; i >= 0; i--) {
 					if (this.outStr.slice(i, i + name.length) == name) {
-						this.outStr = this.outStr.slice(0, i + name.length + 2) + '<div class="picSkull"></div>' + this.outStr.slice(i + name.length + 2, this.outStr.length);
+						this.outStr = this.outStr.slice(0, i + name.length + 3) + '<div class="picSkull"></div>' + this.outStr.slice(i + name.length + 3, this.outStr.length);
 						return true;
 					}
 				}
