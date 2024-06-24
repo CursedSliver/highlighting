@@ -2669,7 +2669,7 @@ G={
 					if (G.ongoingCombats.indexOf(this) != -1) { G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1); }
 				}
 			}
-			G.combatOverseer.prototype.addBox = function(str, chars) {
+			G.combatOverseer.prototype.addBox = function(str, chars, noCharBoxes) {
 				chars = [].concat(chars);
 				let pics = '';
 				let indexes = '';
@@ -2679,7 +2679,7 @@ G={
 					indexes += chars[i].id+'/';
 				}
 				indexes = indexes.slice(0, indexes.length - 1);
-				this.outStr += '<div class="box action green"><div>'+pics+'</div><div>'+'[FRONT]'+(this.moveCount==1?'[1] and [2] meets and, [in a bet for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|]!<br>':'')+str+'[BACK '+indexes+']'+'</div></div>';
+				this.outStr += '<div class="box action green"><div>'+(noCharBoxes?'':pics)+'</div><div>'+'[FRONT]'+(this.moveCount==1?'[1] and [2] meets and, [in a bet for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|]!<br>':'')+str+'[BACK '+indexes+']'+'</div></div>';
 			}
 			G.combatOverseer.prototype.recordMove = function() {
 				this.moveCount++;
@@ -2945,8 +2945,10 @@ G={
 					'[1] [wanders|walks|skips] around'
 						> outputs one of several options, at random
 						> note that this can be nested, ie. '[1] [eats [cake|ice cream]|looks at [2]]'
+	  				'[ALL]'
+	   					> every people and team using oxford\'s commas
 				*/
-				var input=text.split('');
+				var input=text.split(''); //seemingly just for editing purposes -CS
 				var out='';
 				var tag='';
 				var intag=0;
@@ -2960,8 +2962,17 @@ G={
 					{
 						if (tag=='RED'){out+='[RED]'}
 						else if (tag=='BLUE'){out+='[BLUE]'}
-						else if (tag.length>0)
-						{
+						else if (tag=='ALL') {
+							if (actors.length==1) { out += '<e>'+actors[0].name+'</e>'; }
+							else if (actors.length==2) { out += '<e>'+actors[0].name+'</e> and <e>'+actors[1].name+'</e>'; }
+							else {
+								for (let ii = 0; ii < actors.length - 1; ii++) {
+									out += '<e>'+actors[ii].name+'</e>, ';
+								}
+								out += 'and <e>'+actors[actors.length - 1].name+'</e>';
+							}
+						}
+						else if (tag.length>0) {
 							var bits=tag.split('|');
 							//if (!isNaN(bits[0]) && (tag.indexOf('|')==-1 || tag.indexOf(':')!=-1) && actors[parseInt(bits[0])-1])
 							if (tag.indexOf('|')==-1 || tag.indexOf(':')!=-1)
@@ -3020,6 +3031,7 @@ G={
 				
 				for (let i in G.teams){G.teams[i].acted=false;}
 				for (let i in G.chars){G.chars[i].acted=false;}
+				for (let i in G.ongoingCombats) { G.ongoingCombats[i].processed = false; G.ongoingCombats[i].outStr = ''; G.ongoingCombats[i].addBox('Continuing the fight from last round, with [ALL]...', G.ongoingCombats[i].participants, true); }
 				for (let i = 0; i < randomFloor(Math.log2(G.chars.length + 1)); i++) {
 					if (Math.random() < 0.2) {
 						//chooses someone able to initiate combat with someone else
@@ -3031,7 +3043,6 @@ G={
 						if (pool.length > 0) { choose(pool).initiateCombat(); }
 					}
 				}
-				for (let i in G.ongoingCombats) { G.ongoingCombats[i].processed = false; G.ongoingCombats[i].outStr = ''; }
 				
 				var everybody=shuffle(G.teams).concat(shuffle(G.chars));
 				for (var iAct=0;iAct<everybody.length;iAct++)
