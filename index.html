@@ -2663,7 +2663,7 @@ G={
 			G.combatOverseer.prototype.removeParticipant = function(participant) {
 				if (this.participants.indexOf(participant) != -1) { this.participants.splice(this.participants.indexOf(participant), 1); }
 				if (this.participants.length <= 1) {
-					if (this.participants[0]) { this.participants[0].fleeCombat(); }
+					if (this.participants[0]) { this.participants[0].fleeCombat(true); }
 					if (G.ongoingCombats.indexOf(this) != -1) { G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1); }
 				}
 			}
@@ -2903,9 +2903,9 @@ G={
 				if (this.combat) { return false; }
 				this.combat = new G.combatTracker(overseer, me);
 			}
-			G.char.prototype.fleeCombat = function() {
+			G.char.prototype.fleeCombat = function(silent) {
 				if (!this.combat) { return false; }
-				this.combat.overseer.injectBack('<br>[1] has fleed from the fight!'); 
+				if (!silent) { this.combat.overseer.injectBack('<br>[1] has fleed from the fight!'); }
 				this.combat.overseer.removeParticipant(this);
 				this.combat = null;
 			}
