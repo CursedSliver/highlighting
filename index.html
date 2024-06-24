@@ -2595,7 +2595,8 @@ G={
 						const key = OR[ii].split(':')[0];
 						const content = OR[ii].split(':')[1];
 						const min = (content.includes('/')?parseFloat(content.split('/')[0]):0);
-						const max = (content.includes('/')?parseFloat(content.split('/')[1]):parseFloat(content.split('/')[0]));
+						const max = (content.includes('/')?parseFloat(content.split('/')[1]):parseFloat(content));
+						console.log('c1h: '+c1h, 'c1v: '+c1v, 'c2h: '+c2h, 'c2v: '+c2v, 'key: '+key, 'min: '+min, 'max: '+max);
 						
 						if (key=='h' && (Math.abs(c1h - c2h) > min && Math.abs(c1h - c2h) < max)) { fitOR = true; break; }
 						if (key=='v' && (Math.abs(c1v - c2v) > min && Math.abs(c1v - c2v) < max)) { fitOR = true; break; }
@@ -2918,7 +2919,6 @@ G={
 				var overseer = new G.combatOverseer();
 				this.combat = new G.combatTracker(overseer, this);
 				opponent.combat = new G.combatTracker(overseer, opponent);
-				console.log(opponent.name);
 			}
 			G.char.prototype.joinCombat = function(overseer) {
 				if (this.combat) { return false; }
