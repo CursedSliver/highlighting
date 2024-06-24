@@ -1259,7 +1259,7 @@ G={
 						if (reason) this.deathReason=reason;
 						if (this.combat) {
 							this.combat.overseer.injectBack('[RED]');
-							this.combat.overseer.addSkull(this.name);
+							this.combat.overseer.injectSkull(this.name);
 							this.fleeCombat(true);
 						}
 						//if (this.team) {this.team.chars.splice(this.team.chars.indexOf(this),1);this.team=0;}
