@@ -2761,6 +2761,7 @@ G={
 					let list = deepArrCopy(boxCharList);
 
 					for (let ii = 0; ii < list.length; ii++) {
+						if (m.pReq.length == 0) { break; }
 						let fit = false;
 						for (let iii in m.pReq) {
 							if (G.checkPReq(this, list[ii], m.pReq[iii])) { fit = true; break; }
