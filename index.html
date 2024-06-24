@@ -2757,6 +2757,23 @@ G={
 				}
 				return false; 
 			}
+			G.combatOverseer.prototype.getPrompt = function() {
+				for (let i = this.outStr.length - 1; i >= 0; i--) {
+					if (this.outStr.slice(i, i + 7) == '[FRONT]') {
+						return this.outStr.slice(i + 7, this.outStr.indexOf('[BACK', i));
+					}
+				}
+				return '';
+			}
+			G.combatOverseer.prototype.replacePrompt = function(newPrompt) {
+				let promptStart = 0;
+				for (let i = this.outStr.length - 1; i >= 0; i--) {
+					if (this.outStr.slice(i, i + 7) == '[FRONT]') {
+						promptStart = i + 7; break;
+					}
+				}
+				this.outStr = this.outStr.slice(0, promptStart) + newPrompt + this.outStr.slice(this.outStr.indexOf('[BACK', promptStart), this.outStr.length - 1);
+			}
 			G.combatTracker = function(overseer, carrier) { //added to chars
 				this.overseer = overseer;
 				this.carrier = carrier;
@@ -2848,16 +2865,19 @@ G={
 				if (typeof m.fail != 'undefined') { 
 					if ((typeof m.fail == 'number' && m.fail > Math.random()) || (typeof m.fail == 'function' && (m.fail.call(this, boxCharList)) > Math.random())) { 
 						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
-						m.failFunc.call(this, boxCharList); 
+						const re = m.failFunc.call(this, boxCharList, overseer.getPrompt()); 
+						if (re) { overseer.replacePrompt(re); }
 						return this.has('fleed'); 
 					} else { 
 						overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
-						m.successFunc.call(this, boxCharList); 
+						const re = m.successFunc.call(this, boxCharList, overseer.getPrompt()); 
+						if (re) { overseer.replacePrompt(re); }
 						return this.has('fleed'); 
 					}
 				} else {
 					overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
-					m.successFunc.call(this, boxCharList); 
+					const re = m.successFunc.call(this, boxCharList, overseer.getPrompt()); 
+					if (re) { overseer.replacePrompt(re); }
 					return this.has('fleed'); 
 				}
 			}
@@ -2903,14 +2923,6 @@ G={
 				}
 			});
 			new G.move({
-				text: '[1] punches [2], right in the face!',
-				failText: '[1] tries to punch [2], but [missed|the punch was just a bit off]!',
-				fail: 0.4,
-				func: function(charList) {
-					this.combat.moveInFrontOf(charList[1], 2);
-				}
-			});
-			new G.move({
 				text: '[1] swings [1:their] big stick right down [2]\'s skull.',
 				failText: '[1] slams down [1:their] big stick at [2], but only managed to kick off dirt in all directions.',
 				element: new G.element({
@@ -2941,6 +2953,31 @@ G={
 					this.fleeCombat();
 				}
 			});
+
+			//hand to hand combat
+			let hardHeadHit = function(cl) {
+				let chance = 0.6;
+				if (cl[1].has('bulky') || cl[1].has('survivalist')) { chance -= 0.15; }
+				if (this.has('bulky')) { chance += 0.1; }
+				if (chance > Math.random()) { cl[1].gain('dazed'); }
+				else if (chance / 4 > Math.random()) { this.kill(cl[1], 'fractured skull'); }
+			}
+			let mediumHeadHit = function(cl) {
+				let chance = 0.3;
+				if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.2; }
+				if (this.has('bulky')) { chance += 0.1; }
+				if (chance > Math.random()) { cl[1].gain('dazed'); }
+			}
+			G.moveDefault.chance = 0.5;
+			new G.move({
+				text: '[1] [punches|jabs at] [2], right in the face!',
+				failText: '[1] tries to punch [2], but [missed|the punch was just a bit off]!',
+				fail: 0.4,
+				func: function(charList) {
+					this.combat.moveInFrontOf(charList[1], 2);
+				},
+				successFunc: mediumheadHit
+			});
 			new G.move({
 				text: 'Uppercut! [1] smashes [1:their] fist right into [2]\'s [jaw|chest].',
 				failText: '[1] swings [1:their] fist upward in a [crescent|magnificent] arc, but [2] falls backward, [narrowingly|barely||] avoiding the punch.',
@@ -2949,22 +2986,27 @@ G={
 					if (c1[1].has('ninja')) { chance -= 0.3; }
 					return chance;
 				},
-				successFunc: function(cl) {
-					let chance = 0.6;
-					if (cl[1].has('bulky') || cl[1].has('survivalist')) { chance -= 0.15; }
-					if (this.has('bulky')) { chance += 0.1; }
-					if (chance > Math.random()) { cl[1].gain('dazed'); }
-					else if (chance / 4 > Math.random()) { this.kill(cl[1], 'fractured skull'); }
-				},
+				element: new G.element({
+					y: 2,
+					reach: 0.5,
+					range: 1
+				}),
+				successFunc: hardHeadHit,
 				pReq: ['h:1 v:0.25'],
 				req: ['!peaceful|medic']
 			});
 			new G.move({
-				text: '[1] kills [2]!',
-				successFunc: function(cl) {
-					this.kill(cl[1], 'death');
-				}
-			});
+				text: '[1] hooks [1:their] fist onto [2]\'s [head|skull]!',
+				failText: '[1] tried to do a hook with [1:their] fist, but [went a bit too far|was not far enough]!',
+				fail: function(cl) {
+					let chance = 0.6;
+					if (c1[1].has('ninja') || c1[1].has('marksmen')) { chance -= 0.2; }
+					return chance;
+				},
+				successFunc: hardHeadHit,
+				pReq: ['h:1 v:0'],
+				req: ['!peaceful|medic']
+			})
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
