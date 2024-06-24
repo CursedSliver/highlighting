@@ -2959,6 +2959,12 @@ G={
 				pReq: ['h:1 v:0.25'],
 				req: ['!peaceful|medic']
 			});
+			new G.move({
+				text: '[1] kills [2]!',
+				successFunc: function(cl) {
+					this.kill(cl[1], 'death');
+				}
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
