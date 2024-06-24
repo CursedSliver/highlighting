@@ -1257,6 +1257,7 @@ G={
 						G.deadThisRound.push(this);
 						this.gain('dead');
 						if (reason) this.deathReason=reason;
+						this.fleeCombat(true);
 						//if (this.team) {this.team.chars.splice(this.team.chars.indexOf(this),1);this.team=0;}
 						return true;
 					}
@@ -1341,7 +1342,7 @@ G={
 			G.act=function(chance,people,text,func)
 			{
 				this.chance=chance;
-				this.people=people;
+				this.people=G.sanitizeInaction(people);
 				this.text=text;
 				this.func=func||0;
 				this.uses=0;
@@ -1504,19 +1505,19 @@ G={
 					for (let i=0;i<bigReq.length;i++)
 					{
 						//i is each person in the req
-						var req=bigReq[i].split(' '); //req now describes all statements separated by AND
+						let req=bigReq[i].split(' '); //req now describes all statements separated by AND
 						for (let ii in req) {
 							req[ii] = req[ii].split('|'); //req is now a nested array, with layer one being AND and layer two being OR
 						}
 						//if (req.indexOf('team')==-1 && req.indexOf('dead')==-1) req.unshift('!dead');
 						
-						var pool=[];
+						let pool=[];
 						if (req.indexOf('team')!=-1) pool=G.teams;
 						else pool=G.chars;
 						pool=shuffle(pool);
 						if (i==0 && pool.indexOf(me)==-1) pool=[];
 						
-						var found=false;
+						let found=false;
 						for (let ii=0;ii<pool.length;ii++)
 						{
 							//ii is iteration over all chars and teams to try match ("it")
@@ -1548,6 +1549,20 @@ G={
 					if (selected.length!=bigReq.length) return false; 
 					return selected;
 				}
+			G.sanitizeInaction = function(req) {
+				if (!req) { return ['able !out']; }
+				for (let i in req) {
+					let hasDisable = false;
+					let hasOut = false;
+					for (let ii in G.perks) {
+						if (G.perks[ii].disable && req[i].includes(ii.replaceAll(' ', '_'))) { hasDisable = true; }
+						else if (G.perks[ii].out && req[i].includes(ii.replaceAll(' ', '_'))) { hasOut = true; }
+					}
+					if (!hasDisable) { req[i] = 'able '+req[i]; }
+					if (!hasOut) { req[i] = '!out '+req[i]; }
+				}
+				return req;
+			}
 			
 			//NOTE : the first person or team in an act counts as its main actor; they cannot be the main actor of another act in the same round
 			
@@ -2444,7 +2459,7 @@ G={
 			G.move = function(obj) {
 				this.chance = obj.chance||G.moveDefault.chance;
 				this.element = obj.element||G.moveDefault.element; //element determines the nature of the attack as well as which attacks it can counter/be countered by
-				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = G.moveDefault.req; }//req is a string as the conditions to meet before the move can be considered possible in the first index, then indexes after that define reqs the opponents have to meet
+				if (obj.req) { this.req = G.sanitizeInaction([].concat(obj.req)); } else { this.req = G.sanitizeInaction(G.moveDefault.req); }//req is a string as the conditions to meet before the move can be considered possible in the first index, then indexes after that define reqs the opponents have to meet
 				//unfortunately due to not wanting to recode an entirely new set of syntaxes and having to update that one whenever updating G.act.prototype.fit ive decided to take shortcut and just use that syntax and sacrifice the ability to dynamically adjust move chances but whatev
 				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = G.moveDefault.cReq; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
 				if (obj.pReq) { this.pReq = [].concat(obj.pReq); } else { this.pReq = G.moveDefault.pReq; } //proximity requirement
@@ -2613,7 +2628,7 @@ G={
 				obj = obj||{};
 
 				this.chance = obj.chance||G.interceptDefault.chance;
-				if (obj.req) { this.req = [].concat(obj.req); } else { this.req = G.interceptDefault.req; };
+				if (obj.req) { this.req = G.sanitizeInaction([].concat(obj.req)); } else { this.req = G.sanitizeInaction(G.interceptDefault.req); };
 				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = G.interceptDefault.cReq; }; //reqs for other move/people to try to intercept this move
 				this.text = obj.text||G.interceptDefault.text; //text when intercepting OTHER moves
 				this.successFunc = obj.successFunc||G.interceptDefault.successFunc; //called when successfully intercepting
@@ -2889,8 +2904,8 @@ G={
 			new G.move({
 				text: '[1] fakes a charge at [2] before running away.',
 				failText: '[1] fakes a charge at [2] in an attempt to flee, but [2] saw right through and charged back, striking [1] on the [chest|head|heart|shoulder|kneecaps]!',
-				fail: function(charList) {
-					if (charList[1].combat.dist(this) < 25 || charList[1].has('heroic') || charList[1].has('suicidal')) { return 0.6; }
+				fail: function(cl) {
+					if (cl[1].combat.dist(this) < 25 || cl[1].has('heroic') || cl[1].has('suicidal')) { return 0.6; }
 					return 0.25;
 				},
 				successFunc: function() {
@@ -2899,10 +2914,22 @@ G={
 			});
 			new G.move({
 				text: 'Uppercut! [1] smashes [1:their] fist right into [2]\'s [jaw|chest].',
-				failText: '[1] swings [1:their] fist upward in a crescent arc, but [2] falls backward, [narrowingly|barely||] avoiding the punch.',
-				fail: 0.25,
-				pReq: ['h:1 v:0.25']
-			})
+				failText: '[1] swings [1:their] fist upward in a [crescent|magnificent] arc, but [2] falls backward, [narrowingly|barely||] avoiding the punch.',
+				fail: function(cl) {
+					let chance = 0.6;
+					if (c1[1].has('ninja')) { chance -= 0.3; }
+					return chance;
+				},
+				successFunc: function(cl) {
+					let chance = 0.6;
+					if (cl[1].has('bulky') || cl[1].has('survivalist')) { chance -= 0.15; }
+					if (this.has('bulky')) { chance += 0.1; }
+					if (chance > Math.random()) { cl[1].gain('dazed'); }
+					else if (chance / 4 > Math.random()) { this.kill(cl[1], 'fractured skull'); }
+				},
+				pReq: ['h:1 v:0.25'],
+				req: ['!peaceful|medic']
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
