@@ -2617,6 +2617,7 @@ G={
 				chance: 1,
 				req: [],
 				cReq: [],
+				pReq: [],
 				text: '',
 				successFunc: function() { },
 				failText: '',
@@ -2749,7 +2750,7 @@ G={
 
 				overseer.lastMove = m;
 				if (typeof m.fail != 'undefined') { 
-					if ((typeof m.fail == 'number' && m.fail < Math.random()) || (typeof m.fail == 'function' && (m.fail.call(this, boxCharList)) < Math.random())) { 
+					if ((typeof m.fail == 'number' && m.fail > Math.random()) || (typeof m.fail == 'function' && (m.fail.call(this, boxCharList)) > Math.random())) { 
 						m.failFunc.call(this, boxCharList); 
 						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
 						return this.has('fleed'); 
