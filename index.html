@@ -2689,9 +2689,8 @@ G={
 					let charList = charStr.split('/');
 					for (let i in charList) {
 						for (let ii in G.chars) {
-							if (G.chars[ii].id == charList[i]) { charList[i] = G.chars[ii]; break; }
+							if (G.chars[ii].id.toString() == charList[i]) { charList[i] = G.chars[ii]; break; }
 						}
-						throw 'Char not found!';
 					}
 					const snippetNew = G.parse(snippet, charList);
 					str = str.replace('[FRONT]'+snippet+'[BACK '+charStr+']', snippetNew);
