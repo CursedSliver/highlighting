@@ -2746,7 +2746,6 @@ G={
 				//returns text for display (in one box)
 				var str = '';
 				if (!this.combat) { return; }
-				this.combat.recordMove();
 				var overseer = this.combat.overseer;
 				var otherChars = overseer.participants;
 				var boxCharList = [];
@@ -2790,6 +2789,7 @@ G={
 				}
 
 				overseer.lastMove = m;
+				overseer.recordMove();
 				if (typeof m.fail != 'undefined') { 
 					if ((typeof m.fail == 'number' && m.fail > Math.random()) || (typeof m.fail == 'function' && (m.fail.call(this, boxCharList)) > Math.random())) { 
 						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
