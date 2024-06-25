@@ -3013,7 +3013,7 @@ G={
 				if (this.has('combat gear')) { chance += 0.2; }
 				if (chance > Math.random()) { cl[1].gain('dazed'); }
 			}
-			G.moveAssets.hardBodyHit = function() {
+			G.moveAssets.hardBodyHit = function(cl) {
 				if (cl[1].has('knight armor')) { return; }
 				
 				let chance = 0.2;
@@ -3025,7 +3025,7 @@ G={
 				if (chance / 3 > Math.random()) { cl[1].gain('dazed'); } 
 				if (chance / 9 > Math.random()) { this.kill(cl[1], 'overcompressed heart'); } 
 			}
-			G.moveAssets.mediumBodyHit = function() {
+			G.moveAssets.mediumBodyHit = function(cl) {
 				if (cl[1].has('knight armor')) { return; }
 				
 				let chance = 0.05;
