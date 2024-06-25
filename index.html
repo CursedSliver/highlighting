@@ -3048,19 +3048,44 @@ G={
 				}
 			});
 			new G.move({
-				chance: 4,
+				chance: 2.5,
 				text: '[1] calls for help from [2], and [2] answers[.|!]',
 				failText: '[1] tries to call for help from [2], but it seems that [2] [isn\'t responding|couldn\'t hear it]...',
-				req: ['any%0.1|peaceful%0.05|leader|vigilant%0.06|the_gift%0.1|snake_charmer\'s_flute%0.1|*able !frenzied|laughed|dizzy%0.25|dazed%0.25|able%0.5'],
+				req: ['inTeam any%0.1|peaceful%0.05|leader|vigilant%0.06|the_gift%0.1|snake_charmer\'s_flute%0.1|*able !frenzied|laughed|dizzy%0.25|dazed%0.25|able%0.5'],
 				fail: function() {
+					let count = 0;
+					for (let i in this.team.chars) {
+						if (!this.team.chars[i].combat && !this.team.chars[i].isOut()) { count++; }
+					} 
+					if (count == 0) { return 1; }
 					if (this.has('snake charmer\'s flute')) { return 0; }
 					if (this.has('leader')) { return 0.1; }
 					return 0.25;
 				},
 				successFunc: function(cl) {
 					cl[1].joinCombat(this.combat.overseer);
-				}
-				//implement same team call here
+				},
+				cReq: ['', '!out able +']
+			});
+			new G.move({
+				chance: 3.5,
+				text: '[1] calls for help from [2], and [2] answers[.|!]',
+				failText: '[1] tries to call for help from [2], but it seems that [2] [isn\'t responding|couldn\'t hear it]...',
+				req: ['noTeam any%0.1|peaceful%0.05|leader|vigilant%0.06|the_gift%0.1|snake_charmer\'s_flute%0.1|*able !frenzied|laughed|dizzy%0.25|dazed%0.25|able%0.5'],
+				fail: function() {
+					let count = 0;
+					for (let i in G.chars) {
+						if (!G.chars[i].combat && !G.chars[i].isOut()) { count++; }
+					}
+					if (count == 0) { return 1; }
+					if (this.has('snake charmer\'s flute')) { return 0; }
+					if (this.has('leader')) { return 0.1; }
+					return 0.25;
+				},
+				successFunc: function(cl) {
+					cl[1].joinCombat(this.combat.overseer);
+				},
+				cReq: ['', '!out able']
 			});
 			new G.move({
 				text: '[1] [taunts|sneers at|insults|teases|provovates] [2][, menacingly|, aggressively|, confidently||].',
