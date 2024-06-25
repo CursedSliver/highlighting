@@ -2682,6 +2682,7 @@ G={
 				*/
 				if (pReq.length == 0) { return true; }
 				if (!otherChar) { return true; }
+				if (!otherChar.combat) { return false; }
 				const c1 = char.combat;
 				const c1h = c1.horizontal;
 				const c1v = c1.vertical;
