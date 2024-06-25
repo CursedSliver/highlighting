@@ -1270,7 +1270,7 @@ G={
 				}
 				G.char.prototype.isDisabled = function() {
 					for (let i in this.perks) {
-						if (this.perks[i].disabled) { return true; }
+						if (this.perks[i].disable) { return true; }
 					}
 					return false;
 				}
