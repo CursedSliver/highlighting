@@ -1544,15 +1544,13 @@ G={
 						if (req.indexOf('team')!=-1) pool=G.teams;
 						else pool=G.chars;
 						pool=shuffle(pool);
-						if (pool.indexOf(me) != -1) { 
-							pool.splice(pool.indexOf(me), 1);
-						}
 						
 						let found=false;
 						for (let ii=0;ii<pool.length;ii++)
 						{
 							//ii is iteration over all chars and teams to try match ("it")
 							let it=pool[ii];
+							if (it==me) { continue; }
 							let fitAND = true;
 							for (let iii in req) {
 								let fitOR = false;
