@@ -2843,7 +2843,7 @@ G={
 					if (m.element.interactMin > targets.length) { continue; }
 					
 					targets = [this].concat(targets);
-					if (!G.checkCReq(this, m.cReq, overseer.lastMove, targets)) { continue; }
+					if (!G.checkCReq(this, deepArrCopy(m.cReq), overseer.lastMove, targets)) { continue; }
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
 						availableMoves.push([m, targets]);
 					}
