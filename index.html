@@ -597,6 +597,7 @@ G={
 		new G.perk({name:`plot armor`,desc:`This character is almost impossible to kill. Not for serious games.`});
 		new G.perk({name:`nerd`,desc:`Filled to the brim with obscure knowledge and technical gossips.`});
 		new G.perk({name:`vigilant`,desc:`Especially observant and keen.`});
+		new G.perk({name:`haste`,desc:`Fast and agile.`});
 		G.glob={type:'trait',def:false};
 		new G.perk({name:`any`,desc:`Applies to everyone.`});
 
@@ -1433,7 +1434,7 @@ G={
 						if (str == 'every') { return actualTrue; }
 						throw 'Special keyword not found!';
 					}
-					if (item.indexOf(':') != -1) {
+					if (item.includes(':')) {
 						let amount = item.split(':')[1];
 						let key = item.split(':')[0];
 						if (key == 'members') { 
@@ -1467,7 +1468,7 @@ G={
 					item = item.replaceAll('_', ' ');
 					if (!G.perksBN[item]) { throw '"'+item+'" is not a valid perk!'; }
 					
-					if (!G.perksBN[item].disabled && this.isDisabled()) { return actualFalse; }
+					if (!G.perksBN[item].disable && this.isDisabled()) { return actualFalse; }
 					if (!G.perksBN[item].out && this.isOut()) { return actualFalse; }
 					return this.has(item);
 				}
