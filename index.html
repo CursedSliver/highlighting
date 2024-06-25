@@ -606,6 +606,7 @@ G={
 			G.glob.disable = true;//mark the character as disabled; disabled characters cannot do any actions that don't specifically call for this perk
 			G.glob.out = false;//mark the character as out; out characters cannot do any actions that don't specifically call for this perk
 			G.glob.ailment = true; 
+			G.glob.injury = false;
 		new G.perk({name:`frenzied`,desc:`Experiencing a fit of violent rage.`});
 		new G.perk({name:`shell-shocked`,desc:`Has seen too much. May not be of much use for a while.`});
 		new G.perk({name:`dazed`,desc:`Not quite in full control of their faculties. May wander off unpredictably.`});
@@ -1297,6 +1298,18 @@ G={
 					}
 					return false;
 				}
+				G.char.prototype.isAiled = function() {
+					for (let i in this.perks) {
+						if (this.perks[i].ailment) { return true; }
+					}
+					return false;
+				}
+				G.char.prototype.isInjured = function() {
+					for (let i in this.perks) {
+						if (this.perks[i].injury) { return true; }
+					}
+					return false;
+				}
 				G.char.prototype.kill=function(other,reason,accomplices)
 				{
 					if (other.die(reason))
@@ -1431,6 +1444,8 @@ G={
 						if (str == 'noTeam') { return cNegate(actualTrue, this.team); }
 						if (str == '-') { return cNegate(actualTrue, (this.team === prevTeam)); }
 						if (str == '+') { return cNegate(actualTrue, !(this.team === prevTeam)); }
+						if (str == 'ailed') { return cNegate(actualTrue, !this.isAiled()); }
+						if (str == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
 						if (str == 'every') { return actualTrue; }
 						throw 'Special keyword not found!';
 					}
@@ -1519,6 +1534,10 @@ G={
 								> must not have a perk marked .out (dead, sheep, comatose etc)
 							'!able'
 								> must have a perk marked .disable (trapped, shell-shocked etc)
+		`					'ailed'
+  								> must have a perk marked .ailment
+		  					'injured'
+		 						> must have a perk marked .injury
 							'any'
 								> can be abled or disabled (still doesn't accept out)
 							'every'
@@ -3065,9 +3084,10 @@ G={
 				text: '[1] takes out [1:their] batch of [freshly baked|] cookies and [gorges on|devours|eats] them, recovering from [1:their] ailments!',
 				successFunc: function() {
 					this.cureAilments();
+					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('batch of cookies'); this.injectBack('<br>[1] has eaten all of [1:their] cookies.'); }
 				},
 				element: G.moveAssets.elements.alone,
-				req: ['batch_of_cookies']
+				req: ['batch_of_cookies any%0.05|ailed']
 			});
 			new G.move({
 				chance: 1,
