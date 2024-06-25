@@ -3056,6 +3056,9 @@ G={
 					if (this.has('snake charmer\'s flute')) { return 0; }
 					if (this.has('leader')) { return 0.1; }
 					return 0.25;
+				},
+				successFunc: function(cl) {
+					cl[1].joinCombat(this.combat.overseer);
 				}
 				//implement same team call here
 			});
