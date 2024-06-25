@@ -1501,7 +1501,7 @@ G={
 			   				put '%N' after any perk to signify a chance for that to be true, where N is the chance
 					*/
 					var bigReq = null;
-					if (toMatch) { bigReq = toMatch; } else { bigReq = this.people; }
+					if (toMatch) { bigReq = deepArrCopy(toMatch); } else { bigReq = deepArrCopy(this.people); }
 					
 					var selected=[];
 					
