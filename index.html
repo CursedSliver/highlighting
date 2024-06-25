@@ -2900,10 +2900,13 @@ G={
 				if (int.fail && int.fail()) { int.failFunc(); return int.failText; } else { int.successFunc(); return int.text; }
 			}
 
+			G.moveAssets = {};
+			G.moveAssets.elements = {};
+			G.moveAssets.elements.alone = new G.element({ interact: 0, interactMin: 0 });
 			new G.move({
 				text: '[1] does something ????????',
 				chance: 0.001,
-				element: new G.element({ interactMin: 0, interact: 0 })
+				element: G.moveAssets.elements.alone
 			});
 			new G.move({
 				text: '[1] runs away.',
@@ -2963,24 +2966,63 @@ G={
 				req: ['any%0.5|lunatic%0.5|annoying|devious'],
 				cReq: ['m:taunt|m:taunt2']
 			});
+			new G.move({
+				text: '[1] seems a little bored.',
+				element: G.moveAssets.elements.alone,
+				cReq: ['interact:0'],
+				req: ['any%0.5|suicidal|naive|kind|unstable|sociopath|vigilant']
+			});
 
 			//hand to hand combat
-			G.moveAssets = {};
 			G.moveAssets.hardHeadHit = function(cl) {
+				if (cl[1].has('knight armor')) { return; }
+				
 				let chance = 0.6;
-				if (cl[1].has('bulky') || cl[1].has('survivalist')) { chance -= 0.15; }
-				if (this.has('bulky')) { chance += 0.1; }
-				if (chance > Math.random()) { cl[1].gain('dazed'); }
+				if (cl[1].has('bulky') || cl[1].has('survivalist')) { chance -= 0.15; } 
+				if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
+				if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
+				if (this.has('combat gear')) { chance += 0.2; }
+				if (chance > Math.random()) { cl[1].gain('dazed'); cl[1].gain('bruised'); }
 				else if (chance / 4 > Math.random()) { this.kill(cl[1], 'fractured skull'); }
 			}
 			G.moveAssets.mediumHeadHit = function(cl) {
+				if (cl[1].has('knight armor')) { return; }
+				
 				let chance = 0.3;
 				if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.2; }
-				if (this.has('bulky')) { chance += 0.1; }
+				if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
+				if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
+				if (this.has('combat gear')) { chance += 0.2; }
 				if (chance > Math.random()) { cl[1].gain('dazed'); }
+			}
+			G.moveAssets.hardBodyHit = function() {
+				if (cl[1].has('knight armor')) { return; }
+				
+				let chance = 0.2;
+				if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.1; }
+				if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
+				if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
+				if (this.has('combat gear')) { chance += 0.2; }
+				if (chance > Math.random()) { cl[1].gain('bruised'); } 
+				if (chance / 3 > Math.random()) { cl[1].gain('dazed'); } 
+				if (chance / 9 > Math.random()) { this.kill(cl[1], 'overcompressed heart'); } 
+			}
+			G.moveAssets.mediumBodyHit = function() {
+				if (cl[1].has('knight armor')) { return; }
+				
+				let chance = 0.05;
+				if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.05; }
+				if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
+				if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
+				if (this.has('combat gear')) { chance += 0.2; }
+				if (chance > Math.random()) { cl[1].gain('bruised'); }
 			}
 			G.moveAssets.readyForPunch = function(cl) {
 				this.combat.moveInFrontOf(cl[1], 1);
+			}
+			G.moveAssets.readyToWrestle = function(cl) {
+				this.combat.moveInFrontOf(cl[1], 0.5);
+				this.combat.vertical -= 0.1;
 			}
 			G.moveDefault.chance = 0.5;
 			new G.move({
@@ -2992,6 +3034,7 @@ G={
 				successFunc: G.moveAssets.mediumheadHit
 			});
 			new G.move({
+				chance: 0.75,
 				text: 'Uppercut! [1] smashes [1:their] fist right into [2]\'s [jaw|chest].',
 				failText: '[1] swings [1:their] fist upward in a [crescent|magnificent] arc, but [2] falls backward, [narrowingly|barely||] avoiding the punch.',
 				fail: function(cl) {
@@ -3010,7 +3053,8 @@ G={
 				req: ['!peaceful|medic']
 			});
 			new G.move({
-				text: '[1] hooks [1:their] fist onto [2]\'s [head|skull]!',
+				chance: 0.75,
+				text: '[1] hooks [1:their] fist onto [2]\'s [head|skull].',
 				failText: '[1] tried to do a hook with [1:their] fist, but [went a bit too far|was not far enough]!',
 				fail: function(cl) {
 					let chance = 0.6;
@@ -3021,7 +3065,38 @@ G={
 				successFunc: G.moveAssets.hardHeadHit,
 				pReq: ['h:2 v:0'],
 				req: ['!peaceful|medic']
-			})
+			});
+			new G.move({
+				text: '[1] makes a powerful punch at [2]\'s [chest|neck].',
+				failText: '[1] throws [1:their] fist at [2]\'s [check|neck], but [2] dodged out of the way before it can hit.',
+				fail: 0.35,
+				func: G.moveAssets.readyForPunch,
+				successFunc: G.moveAssets.mediumBodyHit,
+				pReq: ['h:3 v:0.5'],
+			});
+			new G.move({
+				chance: 2,
+				text: '[1] grabs [2] by [2:their] shoulders, and began pushing them backwards[S].',
+				failText: '[1] grabs [2] by [2:their] shoulders, but [2:they] did the same thing simultaneously, locking them in place.',
+				fail: function(cl) {
+					let chance = 0.4;
+					if (cl[1].has('bulky') || cl[1].has('knight armor')) { chance -= 0.2; }
+					if (this.has('bulky')) { chance += 0.3; }
+					return chance;
+				},
+				func: G.moveAssets.readyToWrestle,
+				successFunc: function(cl, text) {
+					let chance = 0.3;
+					if (this.has('bulky') || this.has('combat gear') || this.has('frenzied')) { chance += 0.3; }
+					if (cl[1].has('bulky') || cl[1].has('combat gear')) { chance -= 0.2; }
+					if (cl[1].has('knight armor')) { chance += 0.15; if (cl[1].has('stubborn') || cl[1].has('meek')) { chance += 0.1; } }
+					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', ' causing [2] to fall!'); }
+					return text.replace('[S]', '');
+				},
+				pReq: ['h:2 v:0'],
+				req: ['any%0.5|bulky|the_gift'],
+				cReq: ['delay:4/1']
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
