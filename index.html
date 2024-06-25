@@ -1463,7 +1463,7 @@ G={
 						throw 'Special variable keyword not found!';
 					} 
 					//finally, perks
-					if (this.type == 'team') { return false; }
+					if (this.type == 'team') { return actualFalse; }
 					item = item.replaceAll('_', ' ');
 					if (!G.perksBN[item]) { throw '"'+item+'" is not a valid perk!'; }
 					
