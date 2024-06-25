@@ -3317,7 +3317,7 @@ G={
 					if (G.teams[i] == this.team) { continue; }
 					charList = charList.concat(G.teams[i].chars);
 				}
-				for (let i in charList) {
+				for (let i = 0; i < charList.length; i++) {
 					if (charList[i].combat || charList[i].isDisabled() || charList[i].isOut()) { charList.splice(i, 1); i--; }
 				}
 				var opponent = null;
