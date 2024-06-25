@@ -3330,7 +3330,7 @@ G={
 			}
 			G.char.prototype.joinCombat = function(overseer) {
 				if (this.combat) { return false; }
-				this.combat = new G.combatTracker(overseer, me);
+				this.combat = new G.combatTracker(overseer, this);
 				this.combat.horizontal = ((Math.random() - 0.5) * 40);
 			}
 			G.char.prototype.fleeCombat = function(silent) {
