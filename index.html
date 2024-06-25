@@ -3004,7 +3004,7 @@ G={
 				else if (chance / 4 > Math.random()) { this.kill(cl[1], 'fractured skull'); }
 				return text.replace('[S]', '');
 			}
-			G.moveAssets.mediumHeadHit = function(cltext) {
+			G.moveAssets.mediumHeadHit = function(cl, text) {
 				if (cl[1].has('knight armor')) { return; }
 				
 				let chance = 0.3;
@@ -3015,7 +3015,7 @@ G={
 				if (chance > Math.random()) { cl[1].gain('dazed'); return text.replace('[S]', ', stunning [2].'); }
 				return text.replace('[S]', '');
 			}
-			G.moveAssets.hardBodyHit = function(cl) {
+			G.moveAssets.hardBodyHit = function(cl, text) {
 				if (cl[1].has('knight armor')) { return; }
 				
 				let chance = 0.2;
@@ -3028,7 +3028,7 @@ G={
 				if (chance / 9 > Math.random()) { this.kill(cl[1], 'overcompressed heart'); } 
 				return text.replace('[S]', '');
 			}
-			G.moveAssets.mediumBodyHit = function(cl) {
+			G.moveAssets.mediumBodyHit = function(cl, text) {
 				if (cl[1].has('knight armor')) { return; }
 				
 				let chance = 0.05;
