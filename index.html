@@ -1431,7 +1431,7 @@ G={
 				//refactored TW's code to be much more sensible - CS
 				let conditionTester = function(str, prevTeam, negate) {
 					//individual expressions, without AND or OR
-					if (!str) { return false; } 
+					if (!str || this.combat) { return false; } 
 					let chance = str.split('%')[1]; 
 					let item = str.split('%')[0];
 					let actualTrue = true;
