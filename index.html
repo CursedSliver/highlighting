@@ -1274,6 +1274,16 @@ G={
 					}
 					return false;
 				}
+				G.char.prototype.cureAilments = function() {
+					for (let i in this.perks) {
+						if (this.perks[i].ailment) { this.lose(i); }
+					}
+				}
+				G.char.prototype.healInjuries = function() {
+					for (let i in this.perks) {
+						if (this.perks[i].injury) { this.lose(i); }
+					}
+				}
 				G.char.prototype.isDisabled = function() {
 					for (let i in this.perks) {
 						if (this.perks[i].disable) { return true; }
