@@ -3080,7 +3080,7 @@ G={
 				failFunc: function(cl, text) {
 					let pool = [];
 					for (let i in this.team.chars) {
-						pool.push(this.team.chars[i]); 
+						if (!this.combat.overseer.participants.includes(this.team.chars[i])) { pool.push(this.team.chars[i]); }
 					}
 					let char = choose(pool);
 					if (char) { return text.replaceAll('[S]', '<e>'+char.name+'</e>'); }
