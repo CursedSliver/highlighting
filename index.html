@@ -1506,11 +1506,35 @@ G={
 					var selected=[];
 					
 					var prevTeam=0;
-					
-					for (let i=0;i<bigReq.length;i++)
+
+					let req = bigReq[0].split(' ');
+					for (let i in req) {
+						req[i] = req[i].split('|');
+					} 
+					let fitANDMe = true;
+					for (let i in req) {
+						let fitORMe = false;
+						let neg = false;
+						if (req[i][0][0] == '!') {
+							req[i][0] = req[i][0].slice(1, req[i][0].length);
+							neg = true;
+						}
+						for (let ii in req[i]) {
+							if (me.testCond(req[i][ii], prevTeam, neg)) { fitORMe = true; break; }
+						} 
+						if (!fitORMe) { fitANDMe = false; break; }
+					} 
+					if (fitANDMe) {
+						selected.push(me);
+						prevTeam = me.team;
+						found = me;
+					} else {
+						return false;
+					}
+					for (let i=1;i<bigReq.length;i++)
 					{
 						//i is each person in the req
-						let req=bigReq[i].split(' '); //req now describes all statements separated by AND
+						req=bigReq[i].split(' '); //req now describes all statements separated by AND
 						for (let ii in req) {
 							req[ii] = req[ii].split('|'); //req is now a nested array, with layer one being AND and layer two being OR
 						}
@@ -1520,7 +1544,9 @@ G={
 						if (req.indexOf('team')!=-1) pool=G.teams;
 						else pool=G.chars;
 						pool=shuffle(pool);
-						if (i==0 && pool.indexOf(me)==-1) pool=[];
+						if (pool.indexOf(me) != -1) { 
+							pool.splice(pool.indexOf(me), 1);
+						}
 						
 						let found=false;
 						for (let ii=0;ii<pool.length;ii++)
@@ -2870,20 +2896,17 @@ G={
 					if ((typeof m.fail == 'number' && m.fail > Math.random()) || (typeof m.fail == 'function' && (m.fail.call(this, boxCharList)) > Math.random())) { 
 						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
 						const re = m.failFunc.call(this, boxCharList, overseer.getPrompt()); 
-						console.log(re);
 						if (re) { overseer.replacePrompt(re); }
 						return this.has('fleed'); 
 					} else { 
 						overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
 						const re = m.successFunc.call(this, boxCharList, overseer.getPrompt()); 
-						console.log(re);
 						if (re) { overseer.replacePrompt(re); }
 						return this.has('fleed'); 
 					}
 				} else {
 					overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
-					const re = m.successFunc.call(this, boxCharList, overseer.getPrompt()); 
-					console.log(re);
+					const re = m.successFunc.call(this, boxCharList, overseer.getPrompt());
 					if (re) { overseer.replacePrompt(re); }
 					return this.has('fleed'); 
 				}
