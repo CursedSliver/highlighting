@@ -1559,7 +1559,7 @@ G={
 					let hasDisable = false;
 					let hasOut = false;
 					if (req[i].includes('!able')) { hasDisable = true; }
-					if (req[i].includes('out') && !req[i].includes('!out') { hasOut = true; }
+					if (req[i].includes('out') && !req[i].includes('!out')) { hasOut = true; }
 					for (let ii in G.perks) {
 						if (G.perks[ii].disable && req[i].includes(ii.replaceAll(' ', '_'))) { hasDisable = true; }
 						else if (G.perks[ii].out && req[i].includes(ii.replaceAll(' ', '_'))) { hasOut = true; }
