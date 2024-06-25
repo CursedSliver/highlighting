@@ -1555,7 +1555,7 @@ G={
 					return selected;
 				}
 			G.sanitizeInaction = function(req) {
-				if (!req) { return ['able !out']; }
+				if (!req || req.length == 0) { return ['able !out']; }
 				for (let i in req) {
 					let hasDisable = false;
 					let hasOut = false;
