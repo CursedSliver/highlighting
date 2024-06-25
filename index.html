@@ -1411,7 +1411,7 @@ G={
 					return this.chars.length - this.getAliveCharsN();
 				}
 				//refactored TW's code to be much more sensible - CS
-				G.char.prototype.testCond = function(str, prevTeam, negate) {
+				let conditionTester = function(str, prevTeam, negate) {
 					//individual expressions, without AND or OR
 					if (!str) { return false; } 
 					let chance = str.split('%')[1]; 
@@ -1458,6 +1458,7 @@ G={
 						throw 'Special variable keyword not found!';
 					} 
 					//finally, perks
+					if (this.type == 'team') { return false; }
 					item = item.replaceAll('_', ' ');
 					if (!G.perksBN[item]) { throw '"'+item+'" is not a valid perk!'; }
 					
@@ -1465,6 +1466,8 @@ G={
 					if (!G.perksBN[item].out && this.isOut()) { return actualFalse; }
 					return this.has(item);
 				}
+				G.char.prototype.testCond = conditionTester;
+				G.team.prototype.testCond = conditionTester;
 				G.act.prototype.fit=function(me, toMatch)
 				{
 					/*
