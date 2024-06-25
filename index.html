@@ -1502,6 +1502,8 @@ G={
 					*/
 					var bigReq = null;
 					if (toMatch) { bigReq = deepArrCopy(toMatch); } else { bigReq = deepArrCopy(this.people); }
+
+					if (!me instanceof G.char) { console.log(me); throw 'The above is not an instance of char!'; }
 					
 					var selected=[];
 					
