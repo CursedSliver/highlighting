@@ -2545,6 +2545,7 @@ G={
 				this.element = obj.element||G.moveDefault.element; //element determines the nature of the attack as well as which attacks it can counter/be countered by
 				if (obj.req) { this.req = G.sanitizeInaction([].concat(obj.req), true); } else { this.req = G.sanitizeInaction(G.moveDefault.req, true); }//req is a string as the conditions to meet before the move can be considered possible in the first index, then indexes after that define reqs the opponents have to meet
 				//unfortunately due to not wanting to recode an entirely new set of syntaxes and having to update that one whenever updating G.act.prototype.fit ive decided to take shortcut and just use that syntax and sacrifice the ability to dynamically adjust move chances but whatev
+				this.reqFunc = obj.reqFunc||G.moveDefault.reqFunc;
 				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = G.moveDefault.cReq; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
 				if (obj.pReq) { this.pReq = [].concat(obj.pReq); } else { this.pReq = G.moveDefault.pReq; } //proximity requirement
 				this.text = obj.text||G.moveDefault.text; 
@@ -2569,6 +2570,7 @@ G={
 				successFunc: function() { },
 				failFunc: function() { },
 				func: function() { },
+				reqFunc: null,
 				id: null
 			};
 			G.elementDefault = {
@@ -2726,6 +2728,7 @@ G={
 				this.failText = obj.failText||G.interceptDefault.failText; //text when failing to intercept OTHER moves
 				this.fail = obj.fail||G.interceptDefault.fail; //function returning whether the intercept fails
 				this.failFunc = obj.failFunc||G.interceptDefault.failFunc; //called when failing to intercept
+				this.reqFunc = obj.reqFunc||G.interceptDefault.reqFunc;
 			} 
 			G.interceptDefault = {
 				chance: 1,
@@ -2736,7 +2739,8 @@ G={
 				successFunc: function() { },
 				failText: '',
 				fail: function() { return false; },
-				failFunc: function() { }
+				failFunc: function() { },
+				reqFunc: null
 			};
 			G.parseEle = function(str, otherMove) {
 				let arr = str.split(':');
@@ -2932,6 +2936,7 @@ G={
 
 					if (!G.checkCReq(this, deepArrCopy(m.cReq), overseer.lastMove, targets)) { continue; }
 					targets = [this].concat(targets);
+					if (m.reqFunc && !m.reqFunc.call(this, targets)) { continue; }
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
 						availableMoves.push([m, targets]);
 					}
@@ -3007,6 +3012,18 @@ G={
 					return 0.85;
 				},
 				successFunc: function() { this.fleeCombat(); }
+			});
+			new G.move({
+				chance: 2,
+				text: 'Seeing that [1:their] enemies have either fleed or is dead, [1] stops fighting.',
+				successFunc: function() { this.fleeCombat(true); },
+				element: G.moveAssets.elements.alone,
+				reqFunc: function() {
+					for (let i in this.combat.overseer.participants) {
+						if (this.combat.overseer.participants[i].team != this.team || !this.combat.overseer.participants[i].team) { return false; }
+					}
+					return true;
+				}
 			});
 			new G.move({
 				text: '[1] stands still, vigilant and awaiting [2]\'s next move...'
