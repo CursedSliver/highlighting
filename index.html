@@ -2883,7 +2883,7 @@ G={
 				//returns text for display (in one box)
 				let str = '';
 				if (!this.combat) { return; }
-				if ((Math.random() > 0.95 && !this.has('haste')) || (this.isDisabled() && Math.random() > 0.85)) { return this.has('fleed'); } //everyone can just be slow sometimes
+				if ((Math.random() > 0.95 && !this.has('haste')) || (this.isDisabled() && Math.random() > 0.85) || (this.isInjured() && Math.random() > 0.9) || (this.isAiled() && Math.random() > 0.95)) { return this.has('fleed'); } //everyone can just be slow sometimes
 				let overseer = this.combat.overseer;
 				let otherChars = overseer.participants;
 				let boxCharList = [];
