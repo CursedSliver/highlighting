@@ -2562,7 +2562,7 @@ G={
 						
 						let result = G.parseEle(it[ii], otherMove);
 						if (NOT) { result = !result; }
-						
+						if (result) { pass = true; break; }
 					}
 					if (!pass) { fit = false; break; }
 				}
