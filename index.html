@@ -1435,8 +1435,8 @@ G={
 					if (negate) { actualTrue = !actualTrue; actualFalse = !actualFalse; }
 					if (item[0] == '*') { actualTrue = !actualTrue; actualFalse = !actualFalse; item = item.slice(1, str.length); }
 					if (chance) { if (!(Math.random() < chance)) { return actualFalse; } }
-					if (str == 'team') { return cNegate(actualTrue, this.type == 'team'); }
-					else if (G.actReqKeywords.includes(str) && this.type == 'char') {
+					if (item == 'team') { return cNegate(actualTrue, this.type == 'team'); }
+					else if (G.actReqKeywords.includes(item) && this.type == 'char') {
 						if (str == 'any') { return cNegate(actualTrue, this.isOut()); } 
 						if (str == 'able') { return cNegate(actualTrue, this.isDisabled()); }
 						if (str == 'out') { return cNegate(actualTrue, !this.isOut()); }
