@@ -2779,7 +2779,7 @@ G={
 					indexes += chars[i].id+'/';
 				}
 				indexes = indexes.slice(0, indexes.length - 1);
-				this.outStr += '<div class="box action [COLOR]"><div>'+(noCharBoxes?'':pics)+'</div><div>'+'[FRONT]'+(this.moveCount==1?'[1] and [2] meets and, [in a bid for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|]!<br>':'')+str+'[BACK '+indexes+']'+'</div></div>';
+				this.outStr += '<div class="box action [COLOR]"><div>'+(noCharBoxes?'':pics)+'</div><div>'+'[FRONT]'+(this.moveCount==1?'[1] and [2] meets and, [in a bid for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|begins a bloody fight]!<br>':'')+str+'[BACK '+indexes+']'+'</div></div>';
 			}
 			G.combatOverseer.prototype.recordMove = function() {
 				this.moveCount++;
