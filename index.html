@@ -2648,6 +2648,7 @@ G={
 				people = deepArrCopy(people);
 				for (let i = 1; i < cReq.length; i++) {
 					let pass = false;
+					if (people.length == 0) { pass = true; }
 					for (let ii in people) {
 						if (G.checkReq(people[ii], cReq[i])) { pass = true; people.splice(ii, 1); break; } 
 					}
@@ -2923,9 +2924,9 @@ G={
 						list.splice(list.indexOf(chosen), 1);
 					}
 					if (m.element.interactMin > targets.length) { continue; }
-					
-					targets = [this].concat(targets);
+
 					if (!G.checkCReq(this, deepArrCopy(m.cReq), overseer.lastMove, targets)) { continue; }
+					targets = [this].concat(targets);
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
 						availableMoves.push([m, targets]);
 					}
@@ -2985,6 +2986,7 @@ G={
 			G.moveAssets = {};
 			G.moveAssets.elements = {};
 			G.moveAssets.elements.alone = new G.element({ interact: 0, interactMin: 0 });
+			G.moveDefault.cReq = ['', '-'];
 			new G.move({
 				text: '[1] does something ????????',
 				chance: 0.001,
@@ -3137,7 +3139,7 @@ G={
 				successFunc: function() {
 					this.lose('dazed');
 				},
-				//element: G.moveAssets.elements.alone,
+				element: G.moveAssets.elements.alone,
 				req: ['dazed']
 			});
 			new G.move({
