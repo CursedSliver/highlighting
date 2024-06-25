@@ -1494,7 +1494,7 @@ G={
 				}
 				G.char.prototype.testCond = conditionTester;
 				G.team.prototype.testCond = conditionTester;
-				G.act.prototype.fit=function(me, toMatch)
+				G.act.prototype.fit=function(me, toMatch, lastSelected)
 				{
 					/*
 						returns one or more people/team who fit the given conditions
@@ -1558,6 +1558,7 @@ G={
 					
 					var prevTeam=0;
 
+					if (lastSelected) { prevTeam = lastSelected.team; }
 					let req = bigReq[0].split(' ');
 					for (let i in req) {
 						req[i] = req[i].split('|');
@@ -2610,9 +2611,9 @@ G={
 				this.magic = obj.magic||G.elementDefault.magic; //magical?
 			}
 			G.moveDefault.element = new G.element();
-			G.checkReq = function(char, req) {
+			G.checkReq = function(char, req, lastSelected) {
 				if (!req || !char) { return true; }
-				let list = G.act.prototype.fit(char, req);
+				let list = G.act.prototype.fit(char, req, lastSelected);
 				if (!list) { return false; } else { return true; }
 			}; //extreme lazy ahhhh (performance can go die)
 			G.checkCReq = function(char, cReq, otherMove, people) {
@@ -2652,7 +2653,8 @@ G={
 					let pass = false;
 					if (people.length == 0) { pass = true; }
 					for (let ii in people) {
-						if (G.checkReq(people[ii], cReq[i])) { pass = true; people.splice(ii, 1); break; } 
+						const result = G.checkReq(people[ii], cReq[i], char);
+						if (result) { pass = true; people.splice(ii, 1); break; } 
 					}
 					if (!pass) { fit = false; break; }
 				}
