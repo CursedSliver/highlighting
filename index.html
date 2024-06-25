@@ -2628,7 +2628,7 @@ G={
 				with chance: (affix) :number
 				*/
 				for (let i in me) {
-					if (!me) { break; }
+					if (!me[0]) { break; }
 					let it = me[i].split('|');
 					let pass = false;
 					if (!it.length) { continue; }
