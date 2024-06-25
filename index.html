@@ -2791,7 +2791,7 @@ G={
 			}
 			G.combatTracker.prototype.moveToward = function(target, dist) {
 				let h = target.combat.horizontal;
-				if (this.horizontal < h) { this.horizontal += dist; } else { this.horizontal -= dist; }
+				if (this.horizontal < h) { this.horizontal = Math.min(this.horizontal + dist, h - 0.1); } else { this.horizontal = Math.max(this.horizontal - dist, h + 0.1); }
 			}
 			G.combatTracker.prototype.dist = function(target) {
 				//describes a function amount of effort requires for this character to reach another character
@@ -2911,6 +2911,7 @@ G={
 				element: G.moveAssets.elements.alone
 			});
 			new G.move({
+				chance: 0.01, //for testing
 				text: '[1] runs away.',
 				failText: '[1] tries to run away, but is caught by [2] before [1:they] can make it!',
 				fail: function(charList) {
@@ -2928,6 +2929,20 @@ G={
 				func: function(charList) {
 					this.combat.moveToward(charList[1], 2);
 				}
+			});
+			new G.move({
+				text: 'In a fit of [unrelenting|] rage, [1] runs at [2] full force, [screaming on the top of [1:their] lungs|hysterically flailing [1:their] arms|staring down [2]\'s soul].',
+				fail: 0.2,
+				failText: 'In a fit of [unrelenting|] rage, [1] runs at [2] full force, only to trip on the way there[S]',
+				successFunc: function(cl) {
+					this.combat.moveToward(cl[1], 20);
+				},
+				failFunc: function(cl, text) {
+					this.combat.moveToward(cl[1], Math.random() * 10);
+					if (Math.random() < 0.2) { this.gain('fallen'); return text.replace('[S]', ', causing [1:them] to fall on their face!'); }
+					return text.replace('[S]', ', luckily avoiding a [deadly|crippling] fall.');
+				},
+				pReq: ['e:10/100'];
 			});
 			new G.move({
 				text: '[1] swings [1:their] big stick right down [2]\'s skull.',
@@ -2951,6 +2966,14 @@ G={
 				req: ['any%0.5|sociopath|lunatic%0.5']
 			});
 			new G.move({
+				chance: 2,
+				text: '[1] taunts [2] back with colorful words.',
+				id: 'taunt2',
+				req: ['any%0.5|lunatic%0.5|annoying|devious'],
+				cReq: ['m:taunt|m:taunt2']
+			});
+			new G.move({
+				chance: 0.01, //testing
 				text: '[1] fakes a charge at [2] before running away.',
 				failText: '[1] fakes a charge at [2] in an attempt to flee, but [2] saw right through and charged back, striking [1] on the [chest|head|heart|shoulder|kneecaps]!',
 				fail: function(cl) {
@@ -2960,13 +2983,6 @@ G={
 				successFunc: function() {
 					this.fleeCombat();
 				}
-			});
-			new G.move({
-				chance: 2,
-				text: '[1] taunts [2] back with colorful words.',
-				id: 'taunt2',
-				req: ['any%0.5|lunatic%0.5|annoying|devious'],
-				cReq: ['m:taunt|m:taunt2']
 			});
 			new G.move({
 				text: '[1] seems a little bored.',
