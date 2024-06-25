@@ -1629,7 +1629,7 @@ G={
 				for (let i in req) {
 					let hasDisable = false;
 					let hasOut = false;
-					if (req[i].includes('!able')) { hasDisable = true; }
+					if (req[i].includes('!able') || req[i].includes('any')) { hasDisable = true; }
 					if (req[i].includes('out') && !req[i].includes('!out')) { hasOut = true; }
 					for (let ii in G.perks) {
 						if (G.perks[ii].disable && req[i].includes(G.perks[ii].name.toLowerCase().replaceAll(' ', '_'))) { hasDisable = true; }
@@ -2984,7 +2984,7 @@ G={
 				element: G.moveAssets.elements.alone
 			});
 			new G.move({
-				chance: 0.01, //for testing
+				chance: 0.2,
 				text: '[1] runs away.',
 				failText: '[1] tries to run away, but is caught by [2] before [1:they] can make it!',
 				fail: function(charList) {
@@ -3044,19 +3044,31 @@ G={
 				}
 			});
 			new G.move({
-				text: '[1] taunts [2], [menacingly|aggressively|confidently].',
+				chance: 10,
+				text: '[1] calls for help from [2], and [2] answers[.|!]',
+				failText: '[1] tries to call for help from [2], but it seems that [2] [isn\'t responding|couldn\'t hear it]...',
+				req: ['any%0.04|peaceful%0.02|leader|vigilant%0.04|the_gift%0.1|snake_charmer\'s_flute%0.1|*able%0.25 !frenzied|laughed|dizzy%0.25|dazed%0.25'],
+				fail: function() {
+					if (this.has('snake charmer\'s flute')) { return 0; }
+					if (this.has('leader')) { return 0.1; }
+					return 0.25;
+				}
+				//implement same team call here
+			});
+			new G.move({
+				text: '[1] [taunts|sneers at|insults|teases|provovates] [2][, menacingly|, aggressively|, confidently||].',
 				id: 'taunt',
 				req: ['any%0.5|sociopath|lunatic%0.5']
 			});
 			new G.move({
 				chance: 2,
-				text: '[1] taunts [2] back with colorful words.',
+				text: '[1] [taunts|throws insults at|teases|ridicules] [2] back[ with [colorful|horrific|threatening] words|].',
 				id: 'taunt2',
 				req: ['any%0.5|lunatic%0.5|annoying|devious'],
 				cReq: ['m:taunt|m:taunt2']
 			});
 			new G.move({
-				chance: 0.01, //testing
+				chance: 0.1,
 				text: '[1] fakes a charge at [2] before running away.',
 				failText: '[1] fakes a charge at [2] in an attempt to flee, but [2] saw right through and charged back, striking [1] on the [chest|head|heart|shoulder|kneecaps]!',
 				fail: function(cl) {
@@ -3065,6 +3077,9 @@ G={
 				},
 				successFunc: function() {
 					this.fleeCombat();
+				},
+				failFunc: function() {
+					if (Math.random() < 0.25) { this.gain('fallen'); this.combat.overseer.injectBack('<br>[1] falls from the strike.'); }
 				}
 			});
 			new G.move({
@@ -3081,7 +3096,7 @@ G={
 			});
 			new G.move({
 				chance: 2,
-				text: '[1] takes out [1:their] batch of [freshly baked|] cookies and [gorges on|devours|eats] them, recovering from [1:their] ailments!',
+				text: '[1] takes out [1:their] batch of [freshly baked |]cookies and [gorges on|devours|eats] them, recovering from [1:their] ailments!',
 				successFunc: function() {
 					this.cureAilments();
 					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('batch of cookies'); this.injectBack('<br>[1] has eaten all of [1:their] cookies.'); }
