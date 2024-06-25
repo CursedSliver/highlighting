@@ -3057,7 +3057,7 @@ G={
 				failText: '[1] swings [1:their] fist upward in a [crescent|magnificent] arc, but [2] falls backward, [narrowingly|barely||] avoiding the punch.',
 				fail: function(cl) {
 					let chance = 0.6;
-					if (c1[1].has('ninja')) { chance -= 0.3; }
+					if (cl[1].has('ninja')) { chance -= 0.3; }
 					return chance;
 				},
 				element: new G.element({
@@ -3076,7 +3076,7 @@ G={
 				failText: '[1] tried to do a hook with [1:their] fist, but [went a bit too far|was not far enough]!',
 				fail: function(cl) {
 					let chance = 0.6;
-					if (c1[1].has('ninja') || c1[1].has('marksmen')) { chance -= 0.2; }
+					if (cl[1].has('ninja') || cl[1].has('marksmen')) { chance -= 0.2; }
 					return chance;
 				},
 				func: G.moveAssets.readyForPunch,
