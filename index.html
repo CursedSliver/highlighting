@@ -2620,7 +2620,7 @@ G={
 				//each item in array is a condition of the opposing move or char that determines whether the move is possible
 				if (cReq.length == 0 || !cReq) { return true; }
 				let me = cReq[0].split(' '); //the move parameters
-				let otherPeople = cReq.splice(0, 1);
+				let otherPeople = cReq.slice(0, 1);
 				let fit = true;
 				/* syntax: 
 				AND operator: [space]
