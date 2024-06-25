@@ -1424,8 +1424,8 @@ G={
 					if (G.actReqKeywords.includes(str)) {
 						if (str == 'team') { return cNegate(actualTrue, this.type == 'team'); }
 						if (str == 'any') { return cNegate(actualTrue, this.isOut()); } 
-						if (str == 'able') { return cNegate(actualTrue, this.isDisabled()); }
-						if (str == 'out') { return cNegate(actualTrue, !this.isOut()); }
+						if (str == 'able' && this.type == 'char') { return cNegate(actualTrue, this.isDisabled()); }
+						if (str == 'out' && this.type == 'char') { return cNegate(actualTrue, !this.isOut()); }
 						if (str == 'inTeam') { return cNegate(actualTrue, !this.team); }
 						if (str == 'noTeam') { return cNegate(actualTrue, this.team); }
 						if (str == '-') { return cNegate(actualTrue, (this.team === prevTeam)); }
