@@ -2594,6 +2594,7 @@ G={
 					if (!pass) { fit = false; break; }
 				}
 
+				if (!people || people.length == 0) { return fit; } 
 				var target = choose(people);
 
 				for (let i = 1; i < cReq.length; i++) {
