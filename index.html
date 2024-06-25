@@ -1407,7 +1407,7 @@ G={
 					else if (!op && val==cond) return true;
 					else return false;
 				}
-				G.actReqKeywords = ['any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', 'every', 'ailed', 'injured'];
+				G.actReqKeywords = ['any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', 'every', 'ailed', 'injured', 'inCombat'];
 				G.getAliveCharsN = function() {
 					let amount = 0;
 					for (let i in G.chars) {
@@ -1431,7 +1431,7 @@ G={
 				//refactored TW's code to be much more sensible - CS
 				let conditionTester = function(str, prevTeam, negate) {
 					//individual expressions, without AND or OR
-					if (!str || this.combat) { return false; } 
+					if (!str) { return false; } 
 					let chance = str.split('%')[1]; 
 					let item = str.split('%')[0];
 					let actualTrue = true;
@@ -1450,6 +1450,7 @@ G={
 						if (item == '+') { return cNegate(actualTrue, !(this.team === prevTeam)); }
 						if (item == 'ailed') { return cNegate(actualTrue, !this.isAiled()); }
 						if (item == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
+						if (item == 'inCombat') { return cNegate(actualTrue, !this.combat); }
 						if (item == 'every') { return actualTrue; }
 						throw 'Special keyword not found!';
 					}
@@ -1628,8 +1629,8 @@ G={
 					if (selected.length!=bigReq.length) return false; 
 					return selected;
 				}
-			G.sanitizeInaction = function(req) {
-				if (!req || req.length == 0) { return ['!out able']; }
+			G.sanitizeInaction = function(req, fitForCombat) {
+				if (!req || req.length == 0) { return [(fitForCombat?'':'!inCombat ')+'!out able']; }
 				for (let i in req) {
 					let hasDisable = false;
 					let hasOut = false;
@@ -1641,6 +1642,7 @@ G={
 					}
 					if (!hasDisable) { req[i] = 'able '+req[i]; }
 					if (!hasOut) { req[i] = '!out '+req[i]; }
+					if (!req[i].includes('inCombat') && !fitForCombat) { req[i] = '!inCombat'+req[i]; }
 				}
 				return req;
 			}
@@ -2540,7 +2542,7 @@ G={
 			G.move = function(obj) {
 				this.chance = obj.chance||G.moveDefault.chance;
 				this.element = obj.element||G.moveDefault.element; //element determines the nature of the attack as well as which attacks it can counter/be countered by
-				if (obj.req) { this.req = G.sanitizeInaction([].concat(obj.req)); } else { this.req = G.sanitizeInaction(G.moveDefault.req); }//req is a string as the conditions to meet before the move can be considered possible in the first index, then indexes after that define reqs the opponents have to meet
+				if (obj.req) { this.req = G.sanitizeInaction([].concat(obj.req), true); } else { this.req = G.sanitizeInaction(G.moveDefault.req, true); }//req is a string as the conditions to meet before the move can be considered possible in the first index, then indexes after that define reqs the opponents have to meet
 				//unfortunately due to not wanting to recode an entirely new set of syntaxes and having to update that one whenever updating G.act.prototype.fit ive decided to take shortcut and just use that syntax and sacrifice the ability to dynamically adjust move chances but whatev
 				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = G.moveDefault.cReq; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
 				if (obj.pReq) { this.pReq = [].concat(obj.pReq); } else { this.pReq = G.moveDefault.pReq; } //proximity requirement
@@ -2715,7 +2717,7 @@ G={
 				obj = obj||{};
 
 				this.chance = obj.chance||G.interceptDefault.chance;
-				if (obj.req) { this.req = G.sanitizeInaction([].concat(obj.req)); } else { this.req = G.sanitizeInaction(G.interceptDefault.req); };
+				if (obj.req) { this.req = G.sanitizeInaction([].concat(obj.req), true); } else { this.req = G.sanitizeInaction(G.interceptDefault.req, true); };
 				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = G.interceptDefault.cReq; }; //reqs for other move/people to try to intercept this move
 				this.text = obj.text||G.interceptDefault.text; //text when intercepting OTHER moves
 				this.successFunc = obj.successFunc||G.interceptDefault.successFunc; //called when successfully intercepting
