@@ -3086,7 +3086,9 @@ G={
 						if (!this.combat.overseer.participants.includes(this.team.chars[i])) { pool.push(this.team.chars[i]); }
 					}
 					let char = choose(pool);
-					if (char) { return text.replaceAll('[S]', '<e>'+char.name+'</e>'); }
+					if (pool.length > 0) { return text.replaceAll('[S]', '<e>'+choose(pool)+'</e>'); } else {
+						return '[1] tries to call for help, only to realize that there is no one left to help [1:them]...';
+					}
 				}
 			});
 			new G.move({
