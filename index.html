@@ -3253,6 +3253,7 @@ G={
 				text: 'Uppercut! [1] smashes [1:their] fist right into [2]\'s [jaw|chest][S].',
 				failText: '[1] swings [1:their] fist upward in a [crescent|magnificent] arc, but [2] falls backward, [narrowingly|barely||] avoiding the punch.',
 				fail: function(cl) {
+					if (cl[1].isDisabled() || cl[1].has('fallen')) { return 0; }
 					let chance = 0.6;
 					if (cl[1].has('ninja')) { chance -= 0.3; }
 					return chance;
