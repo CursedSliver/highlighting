@@ -602,25 +602,28 @@ G={
 
 		
 		G.glob={type:'status'};
-			G.glob.disable=true;//mark the character as disabled; disabled characters cannot do any actions that don't specifically call for this perk
-			G.glob.out=false;//mark the character as out; out characters cannot do any actions that don't specifically call for this perk
+			G.glob.disable = true;//mark the character as disabled; disabled characters cannot do any actions that don't specifically call for this perk
+			G.glob.out = false;//mark the character as out; out characters cannot do any actions that don't specifically call for this perk
+			G.glob.ailment = true; 
 		new G.perk({name:`frenzied`,desc:`Experiencing a fit of violent rage.`});
 		new G.perk({name:`shell-shocked`,desc:`Has seen too much. May not be of much use for a while.`});
 		new G.perk({name:`dazed`,desc:`Not quite in full control of their faculties. May wander off unpredictably.`});
-		new G.perk({name:`heroic`,desc:`Having a moment of heroism. Resolved and unstoppable.`});
-		new G.perk({name:`terrified`,desc:`Running away from somethig horrifying.`});
-		new G.perk({name:`has killed`,desc:`Caused someone's death.`,disable:false});
-		new G.perk({name:`revived`,desc:`Has been revived before.`});
-		new G.perk({name:`set trap`,desc:`Laid down some traps that others may get caught in...`,disable:false});
-		
+		new G.perk({name:`heroic`,desc:`Having a moment of heroism. Resolved and unstoppable.`,ailment:false});
+		new G.perk({name:`terrified`,desc:`Running away from something horrifying.`});
+		new G.perk({name:`has killed`,desc:`Caused someone's death.`,disable:false,ailment:false});
+		new G.perk({name:`revived`,desc:`Has been revived before.`,ailment:false});
+		new G.perk({name:`set trap`,desc:`Laid down some traps that others may get caught in...`,disable:false,ailment:false});
+
+		G.glob.injury = true;
+		G.glob.ailment = false;
 		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false}); // Removed Disabled
 		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`});
 		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false});
 		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false});
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
-		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false}); // Removed Disabled
-		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`});
+		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true}); // Removed Disabled
+		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true});
 		new G.perk({name:`missing leg`,desc:`Missing a whole leg!`});
 		new G.perk({name:`missing arm`,desc:`Missing a whole arm!`,disable:false}); // Temporarily Removed until better handled.
 		new G.perk({name:`trapped`,desc:`Stuck in a trap, and waiting to be freed, if something doesn't kill them first.`});
@@ -629,17 +632,20 @@ G={
 		new G.perk({name:`dead`,desc:`Dead and gone. Sorry!`,out:true});
 		new G.perk({name:`ghost`,desc:`Brought back from the dead in a mischievous incorporeal form.`,out:true});
 		new G.perk({name:`zombie`,desc:`Brought back from the dead in a smelly, mindless form.`,out:true});
-		new G.perk({name:`sheep`,desc:`Has been turned into a sheep through some magical mean.`,out:true});
-		new G.perk({name:`duck`,desc:`Has been turned into a duck by a magical incantation.`,out:true});
+		new G.perk({name:`sheep`,desc:`Has been turned into a sheep through some magical mean.`,out:true,ailment:true});
+		new G.perk({name:`duck`,desc:`Has been turned into a duck by a magical incantation.`,out:true,ailment:true});
         //Additional flags/statuses -TW
+		G.glob.injury = false;
+		G.glob.ailment = true;
 		new G.perk({name:`sick`,desc:`Is feeling ill and feverish.`,disable:false});
 		new G.perk({name:`dizzy`,desc:`Has suffered recent head trauma making it harder to think.`,disable:false});
-		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false});
+		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:true,ailment:false});
 		new G.perk({name:`broken`,desc:`Something's broken, but its not an arm or a leg.`,disable:false});
 		new G.perk({name:`shot`,desc:`Has been shot by an arrow or bullet.`,disable:false});
 		new G.perk({name:`bitten`,desc:`Becoming a zombie isn't infectious, right?`,disable:false});
-		new G.perk({name:`blind`,desc:`Has lost their glasses.`});
+		new G.perk({name:`blind`,desc:`Has lost their glasses.`,ailment:false});
 		new G.perk({name:`gremlin`,desc:`Has gone into gremlin mode, causing chaos everywhere.`});
+		G.glob.ailment = false;
         new G.perk({name:`laughed`,desc:`AH HA HA HA HA -Tidus`});
 		new G.perk({name:`act again`,desc:`Act another time in the same round!`});
 		new G.perk({name:`fleed`,desc:`Has managed to successfully flee from combat!`});
@@ -2850,6 +2856,7 @@ G={
 				for (let i in G.moves) {
 					const m = G.moves[i];
 					if (m.element.interactMin > boxCharList.length) { continue; }
+					if (overseer.moveCount == 0 && m.element.interact == 0) { continue; }
 					if (!G.checkReq(this, m.req)) { continue; }
 					let list = deepArrCopy(boxCharList);
 
@@ -3026,6 +3033,37 @@ G={
 				element: G.moveAssets.elements.alone,
 				cReq: ['interact:0'],
 				req: ['any%0.5|suicidal|naive|kind|unstable|sociopath|vigilant']
+			});
+			new G.move({
+				chance: 0.5,
+				text: '[1] struggles [helplessly|uselessly|painfully] against [1:their] injuries.',
+				element: G.moveAssets.elements.alone,
+				req: ['!able']
+			});
+			new G.move({
+				chance: 2,
+				text: '[1] takes out [1:their] batch of [freshly baked|] cookies and [gorges on|devours|eats] them, recovering from [1:their] ailments!',
+				successFunc: function() {
+					this.cureAilments();
+				},
+				element: G.moveAssets.elements.alone,
+				req: ['batch_of_cookies']
+			});
+			new G.move({
+				chance: 1,
+				text: '[1] [manages to shake|shakes] off [1:their] dizziness and stands up.',
+				failText: '[1] [[tries [1:their] best to [stand up|recover]|tries to muster up the strength to stand], but just can\'t quite do it.|[struggles to recover, but failing.|is having trouble [recovering|standing up].]]',
+				fail: function() {
+					let chance = 0.8;
+					if (this.has('survivalist') || this.has('medic')) { chance -= 0.15; }
+					if (this.has('analytical') || this.has('medic')) { chance -= 0.1; }
+					return chance;
+				},
+				successFunc: function() {
+					this.lose('dazed');
+				},
+				element: G.moveAssets.elements.alone,
+				req: ['dazed']
 			});
 
 			//hand to hand combat
