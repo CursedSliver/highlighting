@@ -1520,6 +1520,7 @@ G={
 					if (toMatch) { bigReq = deepArrCopy(toMatch); } else { bigReq = deepArrCopy(this.people); }
 
 					if (!me instanceof G.char) { console.log(me); throw 'The above is not an instance of char!'; }
+					console.log(me);
 					
 					var selected=[];
 					
@@ -2577,7 +2578,7 @@ G={
 			}
 			G.moveDefault.element = new G.element();
 			G.checkReq = function(char, req) {
-				if (!req) { return true; }
+				if (!req || !char) { return true; }
 				let list = G.act.prototype.fit(char, req);
 				if (!list) { return false; } else { return true; }
 			}; //extreme lazy ahhhh (performance can go die)
