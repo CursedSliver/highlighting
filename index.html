@@ -3023,29 +3023,33 @@ G={
 					return text.replace('[S]', '');
 				}
 			}
-			G.moveAssets.hardBodyHit = function(cl, text) {
-				if (cl[1].has('knight armor')) { return; }
-				
-				let chance = 0.2;
-				if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.1; }
-				if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
-				if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
-				if (this.has('combat gear')) { chance += 0.2; }
-				if (chance > Math.random()) { cl[1].gain('bruised'); return text.replace('[S]', ', heavily bruising [2].'); } 
-				if (chance / 3 > Math.random()) { cl[1].gain('dazed'); return text.replace('[S]', ', stunning [2].'); } 
-				if (chance / 9 > Math.random()) { this.kill(cl[1], 'overcompressed heart'); } 
-				return text.replace('[S]', '');
+			G.moveAssets.hardBodyHit = function() {
+				return function(cl, text) {
+					if (cl[1].has('knight armor')) { return; }
+					
+					let chance = 0.2;
+					if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.1; }
+					if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
+					if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
+					if (this.has('combat gear')) { chance += 0.2; }
+					if (chance > Math.random()) { cl[1].gain('bruised'); return text.replace('[S]', ', heavily bruising [2].'); } 
+					if (chance / 3 > Math.random()) { cl[1].gain('dazed'); return text.replace('[S]', ', stunning [2].'); } 
+					if (chance / 9 > Math.random()) { this.kill(cl[1], 'overcompressed heart'); } 
+					return text.replace('[S]', '');
+				}
 			}
-			G.moveAssets.mediumBodyHit = function(cl, text) {
-				if (cl[1].has('knight armor')) { return; }
-				
-				let chance = 0.05;
-				if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.05; }
-				if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
-				if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
-				if (this.has('combat gear')) { chance += 0.2; }
-				if (chance > Math.random()) { cl[1].gain('bruised'); return text.replace('[S]', ', bruising [2].'); }
-				return text.replace('[S]', '');
+			G.moveAssets.mediumBodyHit = function() {
+				return function(cl, text) {
+					if (cl[1].has('knight armor')) { return; }
+					
+					let chance = 0.05;
+					if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.05; }
+					if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
+					if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
+					if (this.has('combat gear')) { chance += 0.2; }
+					if (chance > Math.random()) { cl[1].gain('bruised'); return text.replace('[S]', ', bruising [2].'); }
+					return text.replace('[S]', '');
+				}
 			}
 			G.moveAssets.readyForPunch = function(cl) {
 				this.combat.moveInFrontOf(cl[1], 1);
@@ -3101,7 +3105,7 @@ G={
 				failText: '[1] throws [1:their] fist at [2]\'s [check|neck], but [2] dodged out of the way before it can hit.',
 				fail: 0.35,
 				func: G.moveAssets.readyForPunch,
-				successFunc: G.moveAssets.mediumBodyHit,
+				successFunc: G.moveAssets.mediumBodyHit(),
 				pReq: ['h:3 v:0.5'],
 			});
 			new G.move({
