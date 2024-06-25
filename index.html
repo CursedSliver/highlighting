@@ -2776,7 +2776,7 @@ G={
 						promptStart = i + 7; break;
 					}
 				}
-				this.outStr = this.outStr.slice(0, promptStart) + newPrompt + this.outStr.slice(this.outStr.indexOf('[BACK', promptStart), this.outStr.length - 1);
+				this.outStr = this.outStr.slice(0, promptStart) + newPrompt + this.outStr.slice(this.outStr.indexOf('[BACK', promptStart), this.outStr.length);
 			}
 			G.combatTracker = function(overseer, carrier) { //added to chars
 				this.overseer = overseer;
