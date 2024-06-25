@@ -1438,6 +1438,7 @@ G={
 						let key = item.split(':')[0];
 						if (key == 'members') { 
 							if (this.team) { return cNegate(actualFalse, G.testVariableCond(this.team.chars.length, amount)); }
+							else if (this.type == 'team') { return cNegate(actualFalse, G.testVariableCond(this.chars.length, amount)); } 
 							else { return actualFalse; }
 						}
 						if (key == 'alive') {
@@ -1450,10 +1451,14 @@ G={
 							return cNegate(actualFalse, G.testVariableCond(G.deaths, amount));
 						}
 						if (key == 'teamalive') {
-							return cNegate(actualFalse, G.testVariableCond(this.team.getAliveCharsN(), amount));
+							if (this.team) { return cNegate(actualFalse, G.testVariableCond(this.team.getAliveCharsN(), amount)); }
+							else if (this.type == 'team') { return cNegate(actualFalse, G.testVariableCond(this.getAliveCharsN(), amount)); }
+							else { return actualFalse; }
 						}
 						if (key == 'teamdeaths') {
-							return cNegate(actualFalse, G.testVariableCond(this.team.getDeadCharsN(), amount));
+							if (this.team) { return cNegate(actualFalse, G.testVariableCond(this.team.getDeadCharsN(), amount)); }
+							else if (this.type == 'team') { return cNegate(actualFalse, G.testVariableCond(this.getDeadCharsN(), amount)); }
+							else { return actualFalse; }
 						}
 						throw 'Special variable keyword not found!';
 					} 
