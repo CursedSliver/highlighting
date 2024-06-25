@@ -2730,6 +2730,7 @@ G={
 					const snippetNew = G.parse(snippet.replace('[BLUE]', '').replace('[RED]', ''), charList);
 					str = str.replace('[FRONT]'+snippet+'[BACK '+charStr+']', snippetNew);
 				}
+				return str;
 			}
 			G.combatOverseer.prototype.end = function() {
 				G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1);
@@ -2870,17 +2871,20 @@ G={
 					if ((typeof m.fail == 'number' && m.fail > Math.random()) || (typeof m.fail == 'function' && (m.fail.call(this, boxCharList)) > Math.random())) { 
 						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
 						const re = m.failFunc.call(this, boxCharList, overseer.getPrompt()); 
+						console.log(re);
 						if (re) { overseer.replacePrompt(re); }
 						return this.has('fleed'); 
 					} else { 
 						overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
 						const re = m.successFunc.call(this, boxCharList, overseer.getPrompt()); 
+						console.log(re);
 						if (re) { overseer.replacePrompt(re); }
 						return this.has('fleed'); 
 					}
 				} else {
 					overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
 					const re = m.successFunc.call(this, boxCharList, overseer.getPrompt()); 
+					console.log(re);
 					if (re) { overseer.replacePrompt(re); }
 					return this.has('fleed'); 
 				}
