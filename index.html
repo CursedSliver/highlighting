@@ -1389,7 +1389,7 @@ G={
 					else if (!op && val==cond) return true;
 					else return false;
 				}
-				G.actReqKeywords = ['team', 'any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', 'every'];
+				G.actReqKeywords = ['any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', 'every'];
 				G.getAliveCharsN = function() {
 					let amount = 0;
 					for (let i in G.chars) {
@@ -1421,11 +1421,11 @@ G={
 					if (negate) { actualTrue = !actualTrue; actualFalse = !actualFalse; }
 					if (item[0] == '*') { actualTrue = !actualTrue; actualFalse = !actualFalse; item = item.slice(1, str.length); }
 					if (chance) { if (!(Math.random() < chance)) { return actualFalse; } }
-					if (G.actReqKeywords.includes(str)) {
-						if (str == 'team') { return cNegate(actualTrue, this.type == 'team'); }
+					if (str == 'team') { return cNegate(actualTrue, this.type == 'team'); }
+					else if (G.actReqKeywords.includes(str) && this.type == 'char') {
 						if (str == 'any') { return cNegate(actualTrue, this.isOut()); } 
-						if (str == 'able' && this.type == 'char') { return cNegate(actualTrue, this.isDisabled()); }
-						if (str == 'out' && this.type == 'char') { return cNegate(actualTrue, !this.isOut()); }
+						if (str == 'able') { return cNegate(actualTrue, this.isDisabled()); }
+						if (str == 'out') { return cNegate(actualTrue, !this.isOut()); }
 						if (str == 'inTeam') { return cNegate(actualTrue, !this.team); }
 						if (str == 'noTeam') { return cNegate(actualTrue, this.team); }
 						if (str == '-') { return cNegate(actualTrue, (this.team === prevTeam)); }
