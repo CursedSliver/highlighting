@@ -2940,6 +2940,7 @@ G={
 			});
 			new G.move({
 				text: '[1] taunts [2], [menacingly|aggressively|confidently].',
+				id: 'taunt',
 				req: ['any%0.5|sociopath|lunatic%0.5']
 			});
 			new G.move({
@@ -2952,6 +2953,13 @@ G={
 				successFunc: function() {
 					this.fleeCombat();
 				}
+			});
+			new G.move({
+				chance: 2,
+				text: '[1] taunts [2] back with colorful words.',
+				id: 'taunt2',
+				req: ['any%0.5|lunatic%0.5|annoying|devious'],
+				cReq: ['m:taunt|m:taunt2']
 			});
 
 			//hand to hand combat
