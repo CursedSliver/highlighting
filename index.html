@@ -2890,7 +2890,7 @@ G={
 				//returns text for display (in one box)
 				let str = '';
 				if (!this.combat) { return; }
-				if ((Math.random() > 0.95 && !this.has('haste')) || (this.isDisabled() && Math.random() > 0.85) || (this.isInjured() && Math.random() > 0.9) || (this.isAiled() && Math.random() > 0.95)) { return this.has('fleed'); } //everyone can just be slow sometimes
+				if ((Math.random() < 0.05 && !this.has('haste')) || (this.isDisabled() && Math.random() < 0.15) || (this.isInjured() && Math.random() < 0.1) || (this.isAiled() && Math.random() < 0.05)) { return this.has('fleed'); } //everyone can just be slow sometimes
 				let overseer = this.combat.overseer;
 				let otherChars = overseer.participants;
 				let boxCharList = [];
@@ -3091,7 +3091,7 @@ G={
 				cReq: ['', '!out able']
 			});
 			new G.move({
-				text: '[1] [taunts|sneers at|insults|teases|provovates] [2][, menacingly|, aggressively|, confidently||].',
+				text: '[1] [taunts|sneers at|insults|teases] [2][, menacingly|, aggressively|, confidently||].',
 				id: 'taunt',
 				req: ['any%0.5|sociopath|lunatic%0.5']
 			});
