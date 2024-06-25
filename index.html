@@ -1437,16 +1437,16 @@ G={
 					if (chance) { if (!(Math.random() < chance)) { return actualFalse; } }
 					if (item == 'team') { return cNegate(actualTrue, this.type == 'team'); }
 					else if (G.actReqKeywords.includes(item) && this.type == 'char') {
-						if (str == 'any') { return cNegate(actualTrue, this.isOut()); } 
-						if (str == 'able') { return cNegate(actualTrue, this.isDisabled()); }
-						if (str == 'out') { return cNegate(actualTrue, !this.isOut()); }
-						if (str == 'inTeam') { return cNegate(actualTrue, !this.team); }
-						if (str == 'noTeam') { return cNegate(actualTrue, this.team); }
-						if (str == '-') { return cNegate(actualTrue, (this.team === prevTeam)); }
-						if (str == '+') { return cNegate(actualTrue, !(this.team === prevTeam)); }
-						if (str == 'ailed') { return cNegate(actualTrue, !this.isAiled()); }
-						if (str == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
-						if (str == 'every') { return actualTrue; }
+						if (item == 'any') { return cNegate(actualTrue, this.isOut()); } 
+						if (item == 'able') { return cNegate(actualTrue, this.isDisabled()); }
+						if (item == 'out') { return cNegate(actualTrue, !this.isOut()); }
+						if (item == 'inTeam') { return cNegate(actualTrue, !this.team); }
+						if (item == 'noTeam') { return cNegate(actualTrue, this.team); }
+						if (item == '-') { return cNegate(actualTrue, (this.team === prevTeam)); }
+						if (item == '+') { return cNegate(actualTrue, !(this.team === prevTeam)); }
+						if (item == 'ailed') { return cNegate(actualTrue, !this.isAiled()); }
+						if (item == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
+						if (item == 'every') { return actualTrue; }
 						throw 'Special keyword not found!';
 					}
 					if (item.includes(':')) {
