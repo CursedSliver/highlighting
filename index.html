@@ -2855,6 +2855,7 @@ G={
 				//returns text for display (in one box)
 				let str = '';
 				if (!this.combat) { return; }
+				if ((Math.random() > 0.95 && !this.has('haste')) || (this.isDisabled() && Math.random() > 0.85)) { return this.has('fleed'); } //everyone can just be slow sometimes
 				let overseer = this.combat.overseer;
 				let otherChars = overseer.participants;
 				let boxCharList = [];
@@ -3067,6 +3068,7 @@ G={
 					let chance = 0.8;
 					if (this.has('survivalist') || this.has('medic')) { chance -= 0.15; }
 					if (this.has('analytical') || this.has('medic')) { chance -= 0.1; }
+					if (this.has('clumsy')) { chance += 0.1; }
 					return chance;
 				},
 				successFunc: function() {
@@ -3074,6 +3076,24 @@ G={
 				},
 				element: G.moveAssets.elements.alone,
 				req: ['dazed']
+			});
+			new G.move({
+				chance: 1,
+				text: '[1] manages to [fairly quickly |]get up again.',
+				failText: '[1] tries to get up, but [[1:they] stumbled while doing so and fell again|[1:they] couldn\'t quite do it|was too shaken to stand properly and fell again]!',
+				fail: function() {
+					let chance = 0.3;
+					if (this.has('clumsy')) { chance += 0.3; }
+					if (this.has('ninja')) { chance -= 0.2; }
+					if (this.has('haste')) { chance -= 0.1; }
+					if (this.has('bulky')) { chance += 0.1; }
+					return chance;
+				},
+				successFunc: function() {
+					this.lose('fallen');
+				},
+				element: G.moveAssets.elements.alone,
+				req: ['fallen']
 			});
 
 			//hand to hand combat
@@ -3191,7 +3211,7 @@ G={
 			});
 			new G.move({
 				chance: 2,
-				text: '[1] grabs [2] by [2:their] shoulders, and began pushing them backwards[S].',
+				text: '[1] grabs [2] by [2:their] shoulders, and began pushing [2:them] backwards[S].',
 				failText: '[1] grabs [2] by [2:their] shoulders, but [2:they] did the same thing simultaneously, locking them in place.',
 				fail: function(cl) {
 					let chance = 0.4;
@@ -3205,7 +3225,7 @@ G={
 					if (this.has('bulky') || this.has('combat gear') || this.has('frenzied')) { chance += 0.3; }
 					if (cl[1].has('bulky') || cl[1].has('combat gear')) { chance -= 0.2; }
 					if (cl[1].has('knight armor')) { chance += 0.15; if (cl[1].has('stubborn') || cl[1].has('meek')) { chance += 0.1; } }
-					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', ' causing [2] to fall!'); }
+					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', ', causing [2] to fall'); }
 					return text.replace('[S]', '');
 				},
 				pReq: ['h:2 v:0'],
