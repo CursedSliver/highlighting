@@ -1324,6 +1324,7 @@ G={
 						if (this.has('bruised')) { pow += 0.1; }
 						if (this.has('frenzied')) { pow -= 0.2; }
 						if (this.has('ninja')) { pow -= 0.05; }
+						if (this.has('clumsy')) { pow += 0.25; }
 						if (this.has('plot armor')) { pow += 0.5; }
 						if (this.has('dazed')) { pow += 0.25; }
 						if (this.has('dizzy')) { pow += 0.2; }
@@ -3025,6 +3026,11 @@ G={
 				element: G.moveAssets.elements.alone
 			});
 			new G.move({
+				text: '[1] baahs softly.',
+				element: G.moveAssets.elements.alone,
+				req: ['sheep']
+			});
+			new G.move({
 				chance: 0.2,
 				text: '[1] runs away from [2].',
 				failText: '[1] tries to run away, but is caught by [2] before [1:they] can make it!',
@@ -3286,10 +3292,15 @@ G={
 			}
 			G.moveAssets.readyForPunch = function(cl) {
 				this.combat.moveInFrontOf(cl[1], Math.random() * 2 + 0.5);
+				this.combat.vertical = cl[1].combat.vertical;
 			}
 			G.moveAssets.readyToWrestle = function(cl) {
 				this.combat.moveInFrontOf(cl[1], 0.5);
-				this.combat.vertical -= 0.1;
+				this.combat.vertical = cl[1].combat.vertical - 0.1;
+			}
+			G.moveAssets.veryCloseCombat = function(cl) {
+				this.combat.moveInFrontOf(cl[1], (Math.random() - 0.5));
+				this.combat.vertical = cl[1].combat.vertical + 0.05;
 			}
 			G.moveDefault.chance = 0.5;
 			new G.move({
@@ -3401,9 +3412,51 @@ G={
 							return G.moveAssets.hardHeadHit().call(this, cl, text);
 						}
 					}
+					if (this.has('knight armor') && cl[1].has('knight armor')) {
+						if (Math.random() < 0.5) {
+							this.lose('knight armor');
+							cl[1].lose('knight armor');
+							return text.replace('[S]', ', and breaking both\'s knight armor');
+						}
+						if (Math.random() < 0.5) {
+							cl[1].lose('knight armor');
+							return text.replace('[S]', ', also breaking [2:their] knight armor');
+						}
+						if (Math.random() < 0.5) {
+							this.lose('knight armor'); 
+							return text.replace('[S]', ', but breaking [1]\'s knight armor in the process');
+						} 
+					}
 					return text.replace('[S]', '');
 				}
 			});
+			new G.move({
+				chance: 3,
+				text: 'Seeing [2]\'s weakness, [1] stomps on [2:them][S]!',
+				failText: 'Seeing [2]\'s weakness, [1] stomps on [2:them], but somehow [2:they] manages to roll out of the way!',
+				fail: function() { return this.adjust(0.2); },
+				func: G.moveAssets.veryCloseCombat,
+				successFunc: function(cl, text) {
+					let chance = 0.5;
+					if (this.has('knight armor')) { chance += 0.2; }
+					if (this.has('bulky')) { chance += 0.1; }
+					if (cl[1].has('knight armor')) { chance -= 0.1; }
+					if (cl[1].has('bulky')) { chance -= 0.1; }
+					if (Math.random() < chance) {
+						cl[1].gain('bruised');
+						return text.replace('[S]', ', greatly bruising [2]');
+					}
+					if (Math.random() < chance / 2) {
+						cl[1].gain('broken');
+						return text.replace('[S]', ', breaking [2:their] [ribs|neck]');
+					}
+					if (Math.random() < chance / 3) {
+						this.kill(cl[1], 'Counterproductive CPR');
+						return text.replace('[S]', ', causing [2:their] death!');
+					}
+				},
+				req: ['any%0.5|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5']
+			})
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
