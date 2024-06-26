@@ -2620,6 +2620,7 @@ G={
 			}; //extreme lazy ahhhh (performance can go die)
 			G.checkCReq = function(char, cReq, otherMove, people) {
 				//each item in array is a condition of the opposing move or char that determines whether the move is possible
+				//returns array of chars that fit the creq array (functionally the new boxCharList)
 				if (cReq.length == 0 || !cReq) { return true; }
 				let me = cReq[0].split(' '); //the move parameters
 				let fit = true;
@@ -2648,6 +2649,7 @@ G={
 				}
 
 				if (!people || people.length == 0) { return fit; } 
+				let selected = [char];
 
 				people = deepArrCopy(people);
 				for (let i = 1; i < cReq.length; i++) {
@@ -2655,11 +2657,11 @@ G={
 					if (people.length == 0) { pass = true; }
 					for (let ii in people) {
 						const result = G.checkReq(people[ii], cReq[i], char);
-						if (result) { pass = true; people.splice(ii, 1); break; } 
+						if (result) { pass = true; selected.push(people.splice(ii, 1)); break; } 
 					}
 					if (!pass) { fit = false; break; }
 				}
-				return fit;
+				return selected;
 			}
 			G.checkPReq = function(char, otherChar, pReq) {
 				/* pReq is a string for an actor pair
@@ -2924,18 +2926,18 @@ G={
 						}
 						if (!fit) { list.splice(ii, 1); ii--; }
 					} //ik with this you can have some funny stuff going on but cant be bothered to fix such a relatively rare event
-					
-					let targets = [];
-					for (let ii = 0; ii < m.element.interact; ii++) {
-						if (list.length == 0) { break; }
-						let chosen = choose(list);
-						targets.push(chosen);
-						list.splice(list.indexOf(chosen), 1);
-					}
-					if (m.element.interactMin > targets.length) { continue; }
 
-					if (!G.checkCReq(this, deepArrCopy(m.cReq), overseer.lastMove, targets)) { continue; }
-					targets = [this].concat(targets);
+					let targets = G.checkCReq(this, deepArrCopy(m.cReq), overseer.lastMove, list);
+					if (!targets) { continue; }
+					if (m.element.interactMin + 1 > targets.length) { continue; }
+					if (m.element.interact + 1 < targets.length) {
+						targets.shift();
+						for (let ii = 0; ii < m.element.interact - targets.length; i++) {
+							targets.splice(Math.floor(Math.random() * targets.length), 1);
+						}
+						target.unshift(this);
+					}
+					
 					if (m.reqFunc && !m.reqFunc.call(this, targets)) { continue; }
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
 						availableMoves.push([m, targets]);
