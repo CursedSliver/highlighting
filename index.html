@@ -2656,7 +2656,7 @@ G={
 					if (people.length == 0) { pass = true; }
 					for (let ii in people) {
 						const result = G.checkReq(people[ii], cReq[i], char);
-						if (result) { pass = true; selected.push(people.splice(ii, 1)); break; } 
+						if (result) { pass = true; selected.push(people[ii]); people.splice(ii, 1); break; } 
 					}
 					if (!pass) { return false; }
 				}
