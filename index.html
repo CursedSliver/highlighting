@@ -3375,9 +3375,8 @@ G={
 				func: G.moveAssets.readyForPunch,
 				successFunc: G.moveAssets.mediumBodyHit(),
 				fail: function() {
-					if (this.has('frenzied')) { return 0.6; }
-					chance = this.adjust(chance);
-					return 0.3;
+					if (this.has('frenzied')) { return this.adjust(0.6); }
+					return this.adjust(0.3);
 				},
 				failFunc: function(cl, text) {
 					if (Math.random() < this.has('frenzied')?0.1:0.3) { this.gain('fallen'); return text.replace('[S]', ', bringing [1:themself] onto the ground in the process'); }
