@@ -6,9 +6,8 @@
 		<!--
 		
 		Code and graphics copyright Orteil, 2018
-		Feel free to alter this code to your liking, but please do not re-host it, do not profit from it and do not present it as your own.
-		
-		Please note : this was made in like 3 days, code structure is a big old mess
+		Modified and improved by TrueWolves for the first and second edition of the Dashnet murder games in the Dashnet forums discord server
+		Modified and improved by CursedSliver for the third edition of the Dashnet murder games
 		
 		//TODO :
 			-more trait events
@@ -1607,15 +1606,16 @@ G={
 					for (let i=1;i<bigReq.length;i++)
 					{
 						//i is each person in the req
+						let pool=[];
+						if (req.indexOf('team')!=-1) pool=G.teams;
+						else pool=G.chars;
+						
 						req=bigReq[i].split(' '); //req now describes all statements separated by AND
 						for (let ii in req) {
 							req[ii] = req[ii].split('|'); //req is now a nested array, with layer one being AND and layer two being OR
 						}
 						//if (req.indexOf('team')==-1 && req.indexOf('dead')==-1) req.unshift('!dead');
 						
-						let pool=[];
-						if (req.indexOf('team')!=-1) pool=G.teams;
-						else pool=G.chars;
 						pool=shuffle(pool);
 						
 						let found=false;
@@ -2636,7 +2636,7 @@ G={
 			G.moveDefault.element = new G.element();
 			G.checkReq = function(char, req, lastSelected) {
 				if (!req || !char) { return true; }
-				let list = G.act.prototype.fit(char, req, lastSelected);
+				let list = G.act.prototype.fit(char, [].concat(req), lastSelected);
 				if (!list) { return false; } else { return true; }
 			}; //extreme lazy ahhhh (performance can go die)
 			G.checkCReq = function(char, cReq, otherMove, people) {
