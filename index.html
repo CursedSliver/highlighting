@@ -2147,9 +2147,6 @@ G={
 			new G.act(baseItemLoss*0.00125,['pet_hawk clumsy%0.2|naive%0.2|sociopath%0.5|any%0.5 !scrappy%0.2|animal_ken%0.5|survivalist%0.2|peaceful%0.2|kind%0.2'],`[RED][1]'s hawk flew too close to the sun...`,p=>{p[1].lose('pet hawk');});
 			new G.act(baseItemLoss*0.005,['pet_rock clumsy%0.5|naive%0.2|sociopath%0.5|glasses%0.2|any%0.5 !scrappy%0.5|annoying%0.5|analytical%0.2|artist%0.2'],`[RED][1] accidentally picked up the wrong rock, only realizing that [1:their] pet is gone hours after...`,p=>{p[1].lose('pet rock');});
 			
-			//todo : scrappy, rich, inventor
-            //Done and done, including adding weights to traits. -TW
-			
 			//Trait-based actions
 			// - Lunatic
 			// - - Gain Traits
@@ -2994,19 +2991,17 @@ G={
 						overseer.addBox(m.failText + (str?('<br>'+str):''), boxCharList); 
 						const re = m.failFunc.call(this, boxCharList, overseer.getPrompt()); 
 						if (re) { overseer.replacePrompt(re); }
-						return this.has('fleed'); 
 					} else { 
 						overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
 						const re = m.successFunc.call(this, boxCharList, overseer.getPrompt()); 
 						if (re) { overseer.replacePrompt(re); }
-						return this.has('fleed'); 
 					}
 				} else {
 					overseer.addBox(m.text + (str?('<br>'+str):''), boxCharList); 
 					const re = m.successFunc.call(this, boxCharList, overseer.getPrompt());
 					if (re) { overseer.replacePrompt(re); }
-					return this.has('fleed'); 
 				}
+				return this.has('fleed');
 			}
 			G.char.prototype.makeIntercept = function() {
 				//returns string to add, or null if chooses to not intercept at all
@@ -3048,7 +3043,7 @@ G={
 					if (cl[1].combat.dist(this) < Math.random() * 6 + 8) { return this.adjust(0.5); }
 					return this.adjust(0.1);
 				},
-				successFunc: function() { this.fleeCombat(); }
+				successFunc: function() { this.gain('fleed'); }
 			});
 			new G.move({
 				chance: 2,
@@ -3180,7 +3175,7 @@ G={
 					return this.adjust(0.25);
 				},
 				successFunc: function() {
-					this.fleeCombat();
+					this.gain('fleed');
 				},
 				failFunc: function() {
 					if (Math.random() < 0.25) { this.gain('fallen'); this.combat.overseer.injectBack('<br>[1] falls from the strike.'); }
