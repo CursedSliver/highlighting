@@ -1459,7 +1459,8 @@ G={
 					let actualTrue = true;
 					let actualFalse = false;
 					if (negate) { actualTrue = !actualTrue; actualFalse = !actualFalse; }
-					if (item[0] == '*') { actualTrue = !actualTrue; actualFalse = !actualFalse; item = item.slice(1, str.length); }
+					if (item[0] == '!') { item = item.slice(1, item.length); }
+					if (item[0] == '*') { actualTrue = !actualTrue; actualFalse = !actualFalse; item = item.slice(1, item.length); }
 					if (chance) { if (!(Math.random() < chance)) { return actualFalse; } }
 					if (item == 'team') { return cNegate(actualTrue, this.type == 'team'); }
 					else if (G.actReqKeywords.includes(item) && this.type == 'char') {
@@ -1630,7 +1631,6 @@ G={
 								let fitOR = false;
 								let neg = false;
 								if (req[iii][0][0] == '!') {
-									req[iii][0] = req[iii][0].slice(1, req[iii][0].length);
 									neg = true;
 								}
 								for (let iiii in req[iii]) {
