@@ -2934,7 +2934,7 @@ G={
 					console.log(targets);
 					if (m.element.interact + 1 < targets.length) {
 						targets.shift();
-						for (let ii = 0; ii < m.element.interact - targets.length; i++) {
+						for (let ii = 0; ii < targets.length - m.element.interact; i++) {
 							targets.splice(Math.floor(Math.random() * targets.length), 1);
 						}
 						target.unshift(this);
