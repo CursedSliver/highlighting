@@ -1609,20 +1609,19 @@ G={
 					{
 						//i is each person in the req
 						let pool=[];
-						if (req.indexOf('team')!=-1) pool=G.teams;
-						else pool=G.chars;
+						req = bigReq[i];
+						if (req.includes('team')) { pool = deepArrCopy(G.teams); }
+						else { pool = deepArrCopy(G.chars); }
 						
-						req=bigReq[i].split(' '); //req now describes all statements separated by AND
+						req = req.split(' '); //req now describes all statements separated by AND
 						for (let ii in req) {
 							req[ii] = req[ii].split('|'); //req is now a nested array, with layer one being AND and layer two being OR
 						}
-						//if (req.indexOf('team')==-1 && req.indexOf('dead')==-1) req.unshift('!dead');
-						
+
 						pool=shuffle(pool);
 						
 						let found=false;
-						for (let ii=0;ii<pool.length;ii++)
-						{
+						for (let ii = 0; ii < pool.length; ii++) {
 							//ii is iteration over all chars and teams to try match ("it")
 							let it=pool[ii];
 							if (it==me) { continue; }
