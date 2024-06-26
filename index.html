@@ -2596,8 +2596,8 @@ G={
 				obj = obj||{};
 				
 				this.y = obj.y||G.elementDefault.y; //(from) straight-up [4], above [2], level [0], below [-2], straight-down [-4]
-				this.interact = obj.interact||G.elementDefault.interact; //the maximum amount of other people that this move interacts with
-				this.interactMin = obj.interactMin||G.elementDefault.interactMin; //the minimum amount of other people required
+				this.interact = (typeof obj.interact == 'undefined'?G.elementDefault.interact:obj.interact); //the maximum amount of other people that this move interacts with
+				this.interactMin = (typeof obj.interactMin == 'undefined'?G.elementDefault.interactMin:obj.interactMin); //the minimum amount of other people required
 				this.temp = obj.temp||G.elementDefault.temp; //molten [4], glowing [3], boiling [2], hot [1], rom temp [0], chilly [-1], freezing [-2], on-touch frostbite [-3]
 				this.state = obj.state||G.elementDefault.state; //plasma [3], gas [2], liquid [1], solid [0]
 				this.reach = obj.reach||G.elementDefault.reach; //the number of one-sixteenth of circles of area (roughly)
