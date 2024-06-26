@@ -1599,7 +1599,6 @@ G={
 					if (fitANDMe) {
 						selected.push(me);
 						prevTeam = me.team;
-						found = me;
 					} else {
 						return false;
 					}
@@ -1648,7 +1647,7 @@ G={
 						}
 						if (!found) return false;
 					}
-					if (selected.length!=bigReq.length) return false; 
+					if (selected.length!=bigReq.length) { console.log('selected length is not equal to req length!'); return false; }
 					return selected;
 				}
 			G.sanitizeInaction = function(req, fitForCombat) {
