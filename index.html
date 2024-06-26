@@ -616,7 +616,7 @@ G={
 			G.glob.out = false;//mark the character as out; out characters cannot do any actions that don't specifically call for this perk
 			G.glob.ailment = true; 
 			G.glob.injury = false;
-		new G.perk({name:`frenzied`,desc:`Experiencing a fit of violent rage.`});
+		new G.perk({name:`frenzied`,desc:`Experiencing a fit of violent rage and, when met with trouble, an incredible surge of adrenaline.`});
 		new G.perk({name:`shell-shocked`,desc:`Has seen too much. May not be of much use for a while.`});
 		new G.perk({name:`dazed`,desc:`Not quite in full control of their faculties. May wander off unpredictably.`});
 		new G.perk({name:`heroic`,desc:`Having a moment of heroism. Resolved and unstoppable.`,ailment:false});
@@ -638,6 +638,7 @@ G={
 		new G.perk({name:`missing leg`,desc:`Missing a whole leg!`});
 		new G.perk({name:`missing arm`,desc:`Missing a whole arm!`,disable:false}); // Temporarily Removed until better handled.
 		new G.perk({name:`trapped`,desc:`Stuck in a trap, and waiting to be freed, if something doesn't kill them first.`});
+		new G.perk({name:`unconscious`,desc:`Not quite comatose, but almost there.`});
 		new G.perk({name:`comatose`,desc:`Unconscious, and unable to speak or move.`,out:true});
 		new G.perk({name:`revived`,desc:`Was just resurrected through some miracle or other.`,out:true});
 		new G.perk({name:`dead`,desc:`Dead and gone. Sorry!`,out:true});
@@ -3011,6 +3012,8 @@ G={
 					const re = m.successFunc.call(this, boxCharList, overseer.getPrompt());
 					if (re) { overseer.replacePrompt(re); }
 				}
+				
+				if (this.has('frenzied') && Math.random() < 0.25) { return this.makeMove(); }
 				return this.has('fleed');
 			}
 			G.char.prototype.makeIntercept = function() {
