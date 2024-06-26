@@ -466,7 +466,17 @@ function deepArrCopy(arr) {
 function cNegate(bool, negate) {
 	if (negate) { return !bool; } else { return bool; }
 }
-
+function oxfordsConcat(strs) {
+	if (strs.length == 0) { return ''; }
+	if (strs.length == 1) { return strs[0]; }
+	if (strs.length == 2) { return strs[0] + ' and ' + strs[1]; }
+	let str = '';
+	for (let i = 0; i < strs.length - 1; i++) {
+		str += strs[i] + ', ';
+	}
+	str += 'and ' + strs[strs.length - 1];
+	return str;
+}
 
 SmoothToggles=function()
 {
@@ -3448,7 +3458,7 @@ G={
 				}
 			});
 			new G.move({
-				chance: 3,
+				chance: 6,
 				text: 'Seeing [2]\'s weakness, [1] stomps on [2:them][S]!',
 				failText: 'Seeing [2]\'s weakness, [1] stomps on [2:them], but somehow [2:they] manages to roll out of the way!',
 				fail: function() { return this.adjust(0.2); },
@@ -3503,6 +3513,34 @@ G={
 				cReq: ['', '- !able inCombat !out']
 			});
 			new G.move({
+				chance: 1,
+				text: '[1] throws several quick punches at [2][S].',
+				func: G.moveAssets.readyForPunch,
+				successFunc: function(cl, text) {
+					let landings = 0;
+					let count = Math.floor(Math.random() * 4) + 4 + (this.has('ninja')?4:0) + (this.has('frenzied')?8:0);
+					let chance = 0.25;
+					if (this.has('ninja')) { chance += 0.1; }
+					if (this.has('bulky')) { chance -= 0.15; }
+					if (this.has('clumsy')) { chance -= 0.15; }
+					chance = this.adjust(chance);
+					for (let i = 0; i < count; i++) {
+						if (Math.random() < chance) { landings++; } //fUnNy
+					}
+					let thresholds = [3, 6, 9, 12, 18];
+					if (this.has('bulky')) { for (let i in thresholds) { thresholds[i] -= i * 2; } }
+					if (cl[1].has('bulky')) { for (let i in thresholds) { thresholds[i] += 2; } }
+					if (landings > thresholds[0]) { cl[1].gain('bruised'); return text.replace('[S]', ', which nets [2:them] several bruises.'); }
+					if (landings > thresholds[1]) { cl[1].gain('dizzy'); return text.replace('[S]', ', making [2:them] quite dizzy.'); }
+					if (landings > thresholds[2]) { cl[1].gain('bruised'); cl[1].gain('dizzy'); return text.replace('[S]', ', bruising [2:them] severely.'); }
+					if (landings > thresholds[3]) { cl[1].gain('fallen'); cl[1].gain('bruised'); return text.replace('[S]', ', making [2:them] fall onto the ground.'); }
+					if (landings > thresholds[4]) { this.kill(cl[1], 'cranial spillage'); return text.replace('[S]', ', causing [2]\'s death.'); }
+				},
+				req: ['any%0.5|ninja%0.6|frenzied|suicidal%0.5']
+			});
+
+			//savage kill methods (devious/sociopath path) - CS
+			new G.move({
 				chance: 0.5,
 				text: 'Seeing [2]\'s weakness, [1] puts a tourniquet around [2]\'s neck[S]!',
 				failText: 'Seeing [2]\'s weakness, [1] tries to grab [2:them], but somehow [2:they] manages to roll out of the way!',
@@ -3517,7 +3555,7 @@ G={
 					}
 					this.combat.overseer.injectBack(' Luckily, [2] manages to remove it before its too late.');
 				},
-				req: ['sociopath|devious|inventor%0.3 tourniquet !peaceful|meek%0.5|clumsy%0.5'],
+				req: ['sociopath|devious%0.6|inventor%0.3 tourniquet !peaceful|meek%0.5|clumsy%0.5'],
 				cReq: ['', '- !able inCombat !out']
 			});
 			
@@ -3581,14 +3619,11 @@ G={
 						if (tag=='RED'){out+='[RED]'}
 						else if (tag=='BLUE'){out+='[BLUE]'}
 						else if (tag=='ALL') {
-							if (actors.length==1) { out += '<e>'+actors[0].name+'</e>'; }
-							else if (actors.length==2) { out += '<e>'+actors[0].name+'</e> and <e>'+actors[1].name+'</e>'; }
-							else {
-								for (let ii = 0; ii < actors.length - 1; ii++) {
-									out += '<e>'+actors[ii].name+'</e>, ';
-								}
-								out += 'and <e>'+actors[actors.length - 1].name+'</e>';
+							let list = [];
+							for (let i in actors) {
+								list.push('<e>'+actors[i].name+'</e>');
 							}
+							out += oxfordsConcat(list);
 						}
 						else if (tag.length>0) {
 							var bits=tag.split('|');
