@@ -2622,8 +2622,8 @@ G={
 				//each item in array is a condition of the opposing move or char that determines whether the move is possible
 				//returns array of chars that fit the creq array (functionally the new boxCharList)
 				if (cReq.length == 0 || !cReq) { return true; }
+				if (!people || people.length == 0) { return [char]; } 
 				let me = cReq[0].split(' '); //the move parameters
-				let fit = true;
 				/* syntax: 
 				AND operator: [space]
 				OR operator: |
@@ -2645,12 +2645,10 @@ G={
 						if (NOT) { result = !result; }
 						if (result) { pass = true; break; }
 					}
-					if (!pass) { fit = false; break; }
+					if (!pass) { return false; }
 				}
 
-				if (!fit) { return false; }
 				let selected = [char];
-				if (!people || people.length == 0) { return selected; } 
 
 				people = deepArrCopy(people);
 				for (let i = 1; i < cReq.length; i++) {
@@ -2660,7 +2658,7 @@ G={
 						const result = G.checkReq(people[ii], cReq[i], char);
 						if (result) { pass = true; selected.push(people.splice(ii, 1)); break; } 
 					}
-					if (!pass) { fit = false; break; }
+					if (!pass) { return false; }
 				}
 				return selected;
 			}
