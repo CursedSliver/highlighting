@@ -2648,6 +2648,7 @@ G={
 					if (!pass) { fit = false; break; }
 				}
 
+				if (!fit) { return false; }
 				let selected = [char];
 				if (!people || people.length == 0) { return selected; } 
 
