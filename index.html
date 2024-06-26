@@ -2931,7 +2931,6 @@ G={
 					let targets = G.checkCReq(this, deepArrCopy(m.cReq), overseer.lastMove, list);
 					if (!targets) { continue; }
 					if (m.element.interactMin + 1 > targets.length) { continue; }
-					console.log(targets);
 					if (m.element.interact + 1 < targets.length) {
 						targets.shift();
 						for (let ii = 0; ii < targets.length - m.element.interact; i++) {
@@ -2939,6 +2938,8 @@ G={
 						}
 						target.unshift(this);
 					}
+					console.log(m.element.interact);
+					console.log(targets);
 					
 					if (m.reqFunc && !m.reqFunc.call(this, targets)) { continue; }
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
