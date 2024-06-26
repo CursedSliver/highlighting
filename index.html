@@ -1314,6 +1314,26 @@ G={
 					}
 					return false;
 				}
+				G.char.prototype.adjust = function(chance, type) {
+					if (!type) { type = 'overall'; }
+					return G.adjustFuncs[type].call(this, chance);
+				}
+				G.adjustFuncs = {
+					overall: function(c) {
+						let pow = 1;
+						if (this.has('bruised')) { pow += 0.1; }
+						if (this.has('frenzied')) { pow -= 0.2; }
+						if (this.has('ninja')) { pow -= 0.05; }
+						if (this.has('plot armor')) { pow += 0.5; }
+						if (this.has('dazed')) { pow += 0.25; }
+						if (this.has('dizzy')) { pow += 0.2; }
+						if (this.isDisabled()) { pow += 0.1; }
+						if (this.isAiled()) { pow += 0.15; }
+						if (this.has('blind')) { pow += 0.35; }
+
+						return 1 - Math.pow(1 - c, pow);
+					}
+				}
 				G.char.prototype.kill=function(other,reason,accomplices)
 				{
 					if (other.die(reason))
@@ -3008,10 +3028,10 @@ G={
 				chance: 0.2,
 				text: '[1] runs away from [2].',
 				failText: '[1] tries to run away, but is caught by [2] before [1:they] can make it!',
-				fail: function(charList) {
-					if (this.combat.dist(charList[1]) < Math.random() * 4 + 4) { return 0.1; }
-					if (this.combat.dist(charList[1]) < Math.random() * 6 + 8) { return 0.5; }
-					return 0.85;
+				fail: function(cl) {
+					if (cl[1].combat.dist(this) < Math.random() * 4 + 4) { return this.adjust(0.85); }
+					if (cl[1].combat.dist(this) < Math.random() * 6 + 8) { return this.adjust(0.5); }
+					return this.adjust(0.1);
 				},
 				successFunc: function() { this.fleeCombat(); }
 			});
@@ -3047,7 +3067,11 @@ G={
 			});
 			new G.move({
 				text: 'In a fit of [unrelenting|] rage, [1] runs at [2] full force, [screaming on the top of [1:their] lungs|hysterically flailing [1:their] arms|staring down [2]\'s soul].',
-				fail: 0.2,
+				fail: function(cl) {
+					let chance = 0.2;
+					chance = this.adjust(chance);
+					return chance;
+				},
 				failText: 'In a fit of [unrelenting|] rage, [1] runs at [2] full force, only to trip on the way there[S]',
 				successFunc: function(cl) {
 					this.combat.moveToward(cl[1], 20);
@@ -3136,8 +3160,8 @@ G={
 				text: '[1] fakes a charge at [2] before running away.',
 				failText: '[1] fakes a charge at [2] in an attempt to flee, but [2] saw right through and charged back, striking [1] on the [chest|head|heart|shoulder|kneecaps]!',
 				fail: function(cl) {
-					if (cl[1].combat.dist(this) < 25 || cl[1].has('heroic') || cl[1].has('suicidal')) { return 0.6; }
-					return 0.25;
+					if (cl[1].combat.dist(this) < 25 || cl[1].has('heroic') || cl[1].has('suicidal')) { return this.adjust(0.6);; }
+					return this.adjust(0.25);
 				},
 				successFunc: function() {
 					this.fleeCombat();
@@ -3261,7 +3285,7 @@ G={
 				}
 			}
 			G.moveAssets.readyForPunch = function(cl) {
-				this.combat.moveInFrontOf(cl[1], 1);
+				this.combat.moveInFrontOf(cl[1], Math.random() * 2 + 0.5);
 			}
 			G.moveAssets.readyToWrestle = function(cl) {
 				this.combat.moveInFrontOf(cl[1], 0.5);
@@ -3284,6 +3308,7 @@ G={
 					if (cl[1].isDisabled() || cl[1].has('fallen')) { return 0; }
 					let chance = 0.6;
 					if (cl[1].has('ninja')) { chance -= 0.3; }
+					chance = this.adjust(chance);
 					return chance;
 				},
 				element: new G.element({
@@ -3303,6 +3328,7 @@ G={
 				fail: function(cl) {
 					let chance = 0.6;
 					if (cl[1].has('ninja') || cl[1].has('marksmen')) { chance -= 0.2; }
+					chance = this.adjust(chance);
 					return chance;
 				},
 				func: G.moveAssets.readyForPunch,
@@ -3326,6 +3352,7 @@ G={
 					let chance = 0.4;
 					if (cl[1].has('bulky') || cl[1].has('knight armor')) { chance -= 0.2; }
 					if (this.has('bulky')) { chance += 0.3; }
+					chance = this.adjust(chance);
 					return chance;
 				},
 				func: G.moveAssets.readyToWrestle,
@@ -3349,13 +3376,34 @@ G={
 				successFunc: G.moveAssets.mediumBodyHit(),
 				fail: function() {
 					if (this.has('frenzied')) { return 0.6; }
+					chance = this.adjust(chance);
 					return 0.3;
 				},
 				failFunc: function(cl, text) {
-					if (Math.random() < this.has('frenzied')?0.1:0.3) { return text.replace('[S]', ', bringing [1:themself] onto the ground in the process'); }
+					if (Math.random() < this.has('frenzied')?0.1:0.3) { this.gain('fallen'); return text.replace('[S]', ', bringing [1:themself] onto the ground in the process'); }
 					return text.replace('[S]', '');
 				},
 				req: ['any%0.5|bulky|cursed_knife|frenzied']
+			});
+			new G.move({
+				chance: 1.5,
+				text: '[1] head bonks [2]\'s head[S].',
+				failText: '[1] head bonks [2], but [2] is prepared and [avoids it|smashes right back].',
+				func: G.moveAssets.readyForPunch,
+				successFunc: function(cl, text) {
+					let chance = 0.3;
+					if (this.has('knight armor')) { chance += 0.3; }
+					if (cl[1].has('knight armor')) { chance -= 0.75; }
+					if (cl[1].has('kite shield')) { chance -= 0.1; }
+					if (Math.random() < chance) {
+						if (Math.random() < 0.4) {
+							return G.moveAssets.hardBodyHit().call(this, cl, text);
+						} else {
+							return G.moveAsssets.hardHeadHit().call(this, cl, text);
+						}
+					}
+					return text.replace('[S]', '');
+				}
 			});
 			
 			G.char.prototype.initiateCombat = function() {
