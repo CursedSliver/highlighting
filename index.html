@@ -2752,7 +2752,7 @@ G={
 				if (arr[0] == 'm') {
 					if (otherMove.id == arr[1]) { return true; } else { return false; }
 				}
-				if (!otherMove.element[arr[0]]) { throw 'element property not found! Property: '+arr[0]; }
+				if (typeof otherMove.element[arr[0]] == 'undefined') { throw 'element property not found! Property: '+arr[0]; }
 				if (othermove.element[arr[0]] <= parseFloat(arr[1]) && othermove.element[arr[0]] >= parseFloat(arr[2])) { return true; } else { return false; }
 			}
 			G.moveHistItem = function(move, performers, opponents) {
@@ -2782,7 +2782,6 @@ G={
 			}
 			G.combatOverseer.prototype.addBox = function(str, chars, noCharBoxes) {
 				chars = [].concat(chars);
-				console.log(chars);
 				let pics = '';
 				let indexes = '';
 				for (let i in chars) {
@@ -2938,8 +2937,6 @@ G={
 						}
 						targets.unshift(this);
 					}
-					console.log(m.element.interact);
-					console.log(targets);
 					
 					if (m.reqFunc && !m.reqFunc.call(this, targets)) { continue; }
 					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
