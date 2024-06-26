@@ -2928,6 +2928,7 @@ G={
 						if (!fit) { list.splice(ii, 1); ii--; }
 					} //ik with this you can have some funny stuff going on but cant be bothered to fix such a relatively rare event
 
+					console.log(list);
 					let targets = G.checkCReq(this, deepArrCopy(m.cReq), overseer.lastMove, list);
 					if (!targets) { continue; }
 					if (m.element.interactMin + 1 > targets.length) { continue; }
