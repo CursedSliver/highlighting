@@ -3545,6 +3545,7 @@ G={
 			G.char.prototype.fleeCombat = function(silent) {
 				if (!this.combat) { return false; }
 				if (!silent) { this.combat.overseer.injectBack('<br>[1] has fleed from the fight!'); }
+				this.lose('fleed');
 				this.combat.overseer.removeParticipant(this);
 				this.combat = null;
 			}
