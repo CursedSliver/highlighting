@@ -2753,7 +2753,7 @@ G={
 					if (otherMove.id == arr[1]) { return true; } else { return false; }
 				}
 				if (typeof otherMove.element[arr[0]] == 'undefined') { throw 'element property not found! Property: '+arr[0]; }
-				if (othermove.element[arr[0]] <= parseFloat(arr[1]) && othermove.element[arr[0]] >= parseFloat(arr[2])) { return true; } else { return false; }
+				if (otherMove.element[arr[0]] <= parseFloat(arr[1]) && otherMove.element[arr[0]] >= parseFloat(arr[2])) { return true; } else { return false; }
 			}
 			G.moveHistItem = function(move, performers, opponents) {
 				this.move = move;
@@ -3340,6 +3340,22 @@ G={
 				pReq: ['h:2 v:0'],
 				req: ['any%0.5|bulky|the_gift'],
 				cReq: ['delay:4/1']
+			});
+			new G.move({
+				chance: 1.5,
+				text: '[1] kicks [2]\'s [chest|left leg|right leg|groin] hard[S]!',
+				failText: '[1] kicks [2], only to [unfortunately |]miss[S]!',
+				func: G.moveAssets.readyForPunch,
+				successFunc: G.moveAssets.mediumBodyHit(),
+				fail: function() {
+					if (this.has('frenzied')) { return 0.6; }
+					return 0.3;
+				},
+				failFunc: function(cl, text) {
+					if (Math.random() < this.has('frenzied')?0.1:0.3) { return text.replace('[S]', ', bringing [1:themself] onto the ground in the process'); },
+					return text.replace('[S]', '');
+				},
+				req: ['any%0.5|bulky|cursed_knife|frenzied']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
