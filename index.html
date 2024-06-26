@@ -2648,8 +2648,8 @@ G={
 					if (!pass) { fit = false; break; }
 				}
 
-				if (!people || people.length == 0) { return fit; } 
 				let selected = [char];
+				if (!people || people.length == 0) { return selected; } 
 
 				people = deepArrCopy(people);
 				for (let i = 1; i < cReq.length; i++) {
