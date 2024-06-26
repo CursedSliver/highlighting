@@ -2871,7 +2871,7 @@ G={
 			G.combatOverseer.prototype.injectColor = function(className) {
 				for (let i = this.outStr.length - 1; i >= 0; i--) {
 					if (this.outStr.slice(i, i + 7) == '[COLOR]') {
-						this.outStr = this.outStr.slice(0, i) + className + this.outStr.slice(i, this.outStr.length);
+						this.outStr = this.outStr.slice(0, i) + className + this.outStr.slice(i + 7, this.outStr.length);
 						return true;
 					}
 				}
@@ -3123,7 +3123,7 @@ G={
 			new G.move({
 				chance: 2.5,
 				text: '[1] calls for [help from [S]|reinforcements], and [S] answers[.|!]',
-				failText: '[1] tries to call for help from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...',
+				failText: '[1] tries to call for help[ from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...|, but no one hears [1]...|, but no one hears [1]...|, but nothing happens...|, but nothing happens...]',
 				req: ['inTeam any%0.06|peaceful%0.04|leader|vigilant%0.04|the_gift%0.06|snake_charmer\'s_flute%0.1|*able !frenzied|laughed|dizzy%0.25|dazed%0.25|able%0.5'],
 				element: G.moveAssets.elements.alone,
 				fail: function() {
@@ -3461,7 +3461,7 @@ G={
 					}
 				},
 				req: ['any%0.5|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5'],
-				cReq: ['', '- fallen']
+				cReq: ['', '- fallen inCombat !out']
 			})
 			
 			G.char.prototype.initiateCombat = function() {
