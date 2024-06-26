@@ -2928,7 +2928,7 @@ G={
 				//returns text for display (in one box)
 				let str = '';
 				if (!this.combat) { return; }
-				if ((Math.random() < 0.05 && !this.has('haste')) || (this.isDisabled() && Math.random() < 0.15) || (this.isInjured() && Math.random() < 0.1) || (this.isAiled() && Math.random() < 0.05)) { return this.has('fleed'); } //everyone can just be slow sometimes
+				if (!this.has('frenzied') && !this.has('haste') && ((Math.random() < 0.05) || (this.isDisabled() && Math.random() < 0.15) || (this.isInjured() && Math.random() < 0.1) || (this.isAiled() && Math.random() < 0.05))) { return this.has('fleed'); } //everyone can just be slow sometimes
 				let overseer = this.combat.overseer;
 				let otherChars = overseer.participants;
 				let boxCharList = [];
@@ -3083,7 +3083,7 @@ G={
 					chance = this.adjust(chance);
 					return chance;
 				},
-				failText: 'In a fit of [unrelenting|] rage, [1] runs at [2] full force, only to trip on the way there[S]',
+				failText: 'In a fit of [unrelenting|] [rage|anger|frustration], [1] runs at [2] full force, only to trip on the way there[S]',
 				successFunc: function(cl) {
 					this.combat.moveToward(cl[1], 20);
 				},
@@ -3092,11 +3092,23 @@ G={
 					if (Math.random() < 0.2) { this.gain('fallen'); return text.replace('[S]', ', causing [1:them] to fall on their face!'); }
 					return text.replace('[S]', ', luckily avoiding a [deadly|crippling] fall.');
 				},
-				pReq: ['e:10/100']
+				pReq: ['e:10/100'],
+				req: ['any%0.1|lunatic|annoying']
+			});
+			new G.move({
+				chance: 1,
+				text: 'Something inside [1] [snaps|breaks|changes with turbulance], and [a smile of [death|pain]|a barrage of muscle twitches|a fiery stare] signifies [1:their] [descent into madness|enraged mind]...',
+				successFunc: function(cl) {
+					this.gain('frenzied');
+					this.combat.overseer.injectColor('red');
+				},
+				element: G.moveAssets.elements.alone,
+				req: ['any%0.2|cursed_knife%0.5|unstable%0.2|leader%0.2|sociopath%0.2|devious%0.2|no_item%0.2|devious%0.2|pyromania%0.1'],
+				cReq: ['m:taunt|m:taunt2']
 			});
 			new G.move({
 				text: '[1] swings [1:their] big stick right down [2]\'s skull[S].',
-				failText: '[1] slams down [1:their] big stick at [2], but only managed to kick off dirt in all directions.',
+				failText: '[1] slams down [1:their] big stick at [2], but only managed to [kick off dirt in all directions|hit the ground].',
 				element: new G.element({
 					y: 2,
 					reach: 1, 
@@ -3381,8 +3393,7 @@ G={
 					return text.replace('[S]', '');
 				},
 				pReq: ['h:2 v:0'],
-				req: ['any%0.5|bulky|the_gift'],
-				cReq: ['delay:4/1']
+				req: ['any%0.5|bulky|the_gift']
 			});
 			new G.move({
 				chance: 1.5,
@@ -3462,7 +3473,51 @@ G={
 				},
 				req: ['any%0.5|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5'],
 				cReq: ['', '- fallen inCombat !out']
-			})
+			});
+			new G.move({
+				chance: 1,
+				text: 'Seeing [2]\'s weakness, [1] grabs [2] in a choke hold with [1:their] bare hands[S]!',
+				failText: 'Seeing [2]\'s weakness, [1] tries to grab [2:them], but somehow [2:they] manages to roll out of the way!',
+				fail: function() { return this.adjust(0.2); },
+				func: G.moveAssets.veryCloseCombat,
+				successFunc: function(cl, text) {
+					let chance = 0.5;
+					if (this.has('frenzied')) { chance += 0.1; }
+					if (this.has('bulky')) { chance += 0.1; }
+					if (cl[1].has('bulky')) { chance -= 0.1; }
+					if (Math.random() < chance) {
+						cl[1].gain('dizzy');
+						return text.replace('[S]', ', making [2] very dizzy');
+					}
+					if (Math.random() < chance / 3) {
+						cl[1].gain('comatose');
+						return text.replace('[S]', ', eventually sending [2] into a coma, but not being able to quite kill [2:them]');
+					}
+					if (Math.random() < chance / 4) {
+						this.kill(cl[1], 'Suffocation');
+						return text.replace('[S]', ', suffocating [2:them] to death!');
+					}
+				},
+				req: ['any%0.2|frenzied%0.5|sociopath|bulky%0.2|medic%0.2 !peaceful|meek%0.5|clumsy%0.5'],
+				cReq: ['', '- !able inCombat !out']
+			});
+			new G.move({
+				chance: 0.5,
+				text: 'Seeing [2]\'s weakness, [1] puts a tourniquet around [2]\'s neck[S]!',
+				failText: 'Seeing [2]\'s weakness, [1] tries to grab [2:them], but somehow [2:they] manages to roll out of the way!',
+				fail: function() { return this.adjust(0.25); },
+				func: G.moveAssets.veryCloseCombat,
+				successFunc: function(cl, text) {
+					let chance = 0.4;
+					if (Math.random() < chance) {
+						this.kill(cl[1], 'Suffocation');
+						return text.replace('[S]', ', killing [2:them]');
+					}
+					this.combat.overseer.injectBack(' Luckily, [2] manages to remove it before its too late.');
+				},
+				req: ['sociopath|devious|inventor%0.3 tourniquet !peaceful|meek%0.5|clumsy%0.5'],
+				cReq: ['', '- !able inCombat !out']
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
