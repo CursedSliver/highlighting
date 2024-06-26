@@ -1220,7 +1220,9 @@ G={
 				for (var i in o){this[i]=o[i];}
 				this.id = G.chars.length;
 				G.chars.push(this);
+				G.charsBN[this.name] = this;
 			}
+			G.charsBN = {}; //Do not use for code, just convenient for testing
 				G.char.prototype.has=function(perk)
 				{
 					if (typeof perk==='string')
