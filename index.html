@@ -3508,8 +3508,9 @@ G={
 				fail: function() { return this.adjust(0.25); },
 				func: G.moveAssets.veryCloseCombat,
 				successFunc: function(cl, text) {
-					let chance = 0.4;
+					let chance = 0.6;
 					if (Math.random() < chance) {
+						this.lose('tourniquet');
 						this.kill(cl[1], 'Suffocation');
 						return text.replace('[S]', ', killing [2:them]');
 					}
