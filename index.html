@@ -3038,7 +3038,15 @@ G={
 				text: '[1] carefully approaches [2]...',
 				func: function(charList) {
 					this.combat.moveToward(charList[1], 2);
-				}
+				},
+				pReq: 'h:1/100 v:1'
+			});
+			new G.move({
+				text: '[1] runs toward [2].',
+				func: function(cl) {
+					this.combat.moveToward(cl[1], Math.random() * 3 + 4);
+				},
+				pReq: 'h:5/100 v:1'
 			});
 			new G.move({
 				text: 'In a fit of [unrelenting|] rage, [1] runs at [2] full force, [screaming on the top of [1:their] lungs|hysterically flailing [1:their] arms|staring down [2]\'s soul].',
@@ -3334,7 +3342,7 @@ G={
 				},
 				pReq: ['h:2 v:0'],
 				req: ['any%0.5|bulky|the_gift'],
-				//cReq: ['delay:4/1']
+				cReq: ['delay:4/1']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
