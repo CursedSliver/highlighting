@@ -3465,7 +3465,8 @@ G={
 						return text.replace('[S]', ', causing [2:their] death!');
 					}
 				},
-				req: ['any%0.5|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5']
+				req: ['any%0.5|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5'],
+				cReq: ['', '- fallen']
 			})
 			
 			G.char.prototype.initiateCombat = function() {
