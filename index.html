@@ -2800,7 +2800,7 @@ G={
 				this.performers = [].concat(performers);
 				this.opponents = [].concat(opponents);
 			}
-			G.box = function(charList, text, color) {
+			G.box = function(charList, text, color, hideChars) {
 				this.charList = [];
 				if (charList) { charList = [].concat(charList); } else { charList = []; }
 				for (let i in charList) {
@@ -2808,6 +2808,7 @@ G={
 				}
 				this.color = color||'';
 				this.text = text;
+				this.hideChars = hideChars||false;
 			};
 			G.charIcon = function(char) {
 				this.pic = char.pic;
@@ -2843,7 +2844,7 @@ G={
 				}
 			}
 			G.combatOverseer.prototype.addBox = function(str, chars, noCharBoxes) {
-				this.out.push(new G.box(noCharBoxes?[]:chars, str, 'green'));
+				this.out.push(new G.box(chars, str, 'green', noCharBoxes));
 				if (this.moveCount == 1) { this.injectFront('[1] and [2] meets and, [in a bid for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|begins a bloody fight]!<br>'); }
 			}
 			G.combatOverseer.prototype.recordMove = function() {
@@ -2855,11 +2856,11 @@ G={
 					let box = arr[i];
 					str += '<div class="box action '+box.color+'"><div>';
 					let realList = [];
-					for (let ii in box.charList) {
+					if (!box.hideChars) { for (let ii in box.charList) {
 						str += '<img src="'+box.charList[ii].pic+'" class="pic" title="'+box.charList[ii].char.name+'">';
 						if (box.charList[ii].widgets.includes('skull')) { str += '<div class="picSkull"></div>'; }
 						realList.push(box.charList[ii].char);
-					}
+					} }
 					str += '</div><div>';
 					str += G.parse(box.text.replaceAll('[S]'), realList);
 					str += '</div></div>';
