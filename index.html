@@ -3152,32 +3152,6 @@ G={
 				cReq: ['m:taunt|m:taunt2']
 			});
 			new G.move({
-				text: '[1] swings [1:their] big stick right down [2]\'s skull[S].',
-				failText: '[1] slams down [1:their] big stick at [2], but only managed to [kick off dirt in all directions|hit the ground].',
-				element: new G.element({
-					y: 2,
-					reach: 1, 
-					range: 1,
-					delay: 1.5,
-					size: 2
-				}),
-				fail: 0.8,
-				req: ['big_stick'],
-				func: function(charList) {
-					this.combat.moveInFrontOf(charList[1], Math.floor(Math.random() * 3 + 1));
-				},
-				successFunc: function(cl, text) {
-					let chance = 0.9; //chance to do stuff idk
-					if (cl[1].has('combat gear') || cl[1].has('bulky')) { chance -= 0.1; }
-					if (cl[1].has('knight armor')) { chance /= 2; }
-					if (Math.random() < chance) {
-						if (cl[1].has('knight armor')) { cl[1].lose('knight armor'); return text.replace('[S]', ', breaking [2:their] knight armor in the process!'); }
-						if (Math.random() < chance / 3) { this.kill(cl[1], 'fractured skull'); return; }
-						cl[1].gain('dazed'); return text.replace('[S]', ', [sending [2:them] into unconsciousness|knocking [2:them] out]');
-					}
-				}
-			});
-			new G.move({
 				chance: 2.5,
 				text: '[1] calls for [help from [S]|reinforcements], and [S] answers[.|!]',
 				failText: '[1] tries to call for help[ from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...|, but no one hears [1]...|, but no one hears [1]...|, but nothing happens...|, but nothing happens...]',
@@ -3604,7 +3578,7 @@ G={
 				if (this.isAiled()) { pow += 0.15; }
 				if (this.has('blind')) { pow += 2; }
 				
-				return 1 - Math.pow(1 - c, pow);
+				return 1 - Math.pow(1 - chance, pow);
 			};
 			G.adjustFuncs.dodge = function(chance) {
 				//modifies chance based on how well they are at dodging (NOTE: higher pow = better dodging)
@@ -3622,7 +3596,7 @@ G={
 				if (this.has('survivalist')) { pow += 0.3; }
 				if (this.has('vigilant')) { pow += 0.4; }
 
-				return 1 - Math.pow(1 - c, pow);
+				return 1 - Math.pow(1 - chance, pow);
 			};
 			G.moveAssets.checkTryGrab = function(cl) { return cl[1].adjust(this.adjust(0.4, 'tryGrab'), 'dodge'); };
 			new G.move({
@@ -3686,6 +3660,99 @@ G={
 				pReq: ['h:6 v:1'],
 				req: [deviousKiller+' AED', '- fallen']
 			});
+
+			//stick & pitchfork
+			G.adjustFuncs.useSpearhead = function(chance) {
+				let pow = 1;
+				//remember, more pow = less chance to succeed
+				if (this.has('analytical')) { pow -= 0.35; }
+				if (this.has('marksmen')) { pow -= 0.2; }
+				if (this.has('ninja')) { pow -= 0.1; }
+				if (this.has('haste')) { pow -= 0.2; }
+				//bulky is generally equal
+				if (this.has('frenzied')) { pow -= 0.3; }
+				if (this.has('heroic')) { pow -= 0.15; }
+
+				if (this.has('clumsy')) { pow += 0.3; }
+				if (this.has('cowardly')) { pow += 0.1; }
+				if (this.has('plot armor')) { pow += 0.5; }
+				if (this.has('dazed')) { pow += 0.3; }
+				if (this.has('dizzy')) { pow += 0.2; }
+				if (this.isDisabled()) { pow += 0.2; }
+				if (this.isAiled()) { pow += 0.15; }
+				if (this.has('blind')) { pow += 1; }
+	
+				return 1 - Math.pow(1 - chance, pow);
+			};
+			G.adjustFuncs.swing = function(chance) {
+				let pow = 1;
+				//remember, more pow = less chance to succeed
+				if (this.has('analytical')) { pow -= 0.15; }
+				if (this.has('marksmen')) { pow -= 0.1; }
+				if (this.has('ninja')) { pow -= 0.2; }
+				if (this.has('haste')) { pow -= 0.2; }
+				if (this.has('bulky')) { pow -= 0.4;}
+				if (this.has('frenzied')) { pow -= 0.35; }
+				if (this.has('heroic')) { pow -= 0.2; }
+
+				if (this.has('clumsy')) { pow += 0.3; }
+				if (this.has('cowardly')) { pow += 0.1; }
+				if (this.has('plot armor')) { pow += 0.5; }
+				if (this.has('dazed')) { pow += 0.3; }
+				if (this.has('dizzy')) { pow += 0.2; }
+				if (this.isDisabled()) { pow += 0.2; }
+				if (this.isAiled()) { pow += 0.15; }
+				if (this.has('blind')) { pow += 0.25; }
+	
+				return 1 - Math.pow(1 - chance, pow);
+			};
+			new G.move({
+				text: '[1] slams [1:their] big stick right down [2]\'s [skull|head][S].',
+				failText: '[1] slams down [1:their] big stick at [2], but only managed to [kick off dirt in all directions|hit the ground].',
+				element: new G.element({
+					y: 2,
+					reach: 1, 
+					range: 1,
+					delay: 1.5,
+					size: 2
+				}),
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.65, 'useSpearhead'), 'dodge'); },
+				req: ['big_stick'],
+				func: function(charList) {
+					this.combat.moveInFrontOf(charList[1], Math.floor(Math.random() * 3 + 1));
+				},
+				successFunc: function(cl, text) {
+					let chance = 0.9; //chance to do stuff idk
+					if (cl[1].has('combat gear') || cl[1].has('bulky')) { chance -= 0.1; }
+					if (cl[1].has('knight armor')) { chance /= 2; }
+					if (Math.random() < chance) {
+						if (cl[1].has('knight armor')) { cl[1].lose('knight armor'); return text.replace('[S]', ', breaking [2:their] knight armor in the process!'); }
+						if (Math.random() < chance / 3) { this.kill(cl[1], 'fractured skull'); return; }
+						cl[1].gain('dazed'); return text.replace('[S]', ', [sending [2:them] into unconsciousness|knocking [2:them] out]');
+					}
+				},
+				pReq: ['e:10']
+			});
+			new G.move({
+				text: '[1] [swings|flails] [1:their] big stick at [2][S].',
+				failText: '[1] [swings|flails] [1:their] big stick at [2], but it missed and hit nothing.',
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'swing'), 'dodge'); },
+				req: ['big_stick'],
+				func: function(cl) {
+					this.combat.moveInFrontOf(charList[1], Math.floor(Math.random() * 5 + 2));
+				},
+				successFunc: function(cl, text) {
+					let chance = 0.5; 
+					if (cl[1].has('combat gear') || cl[1].has('bulky')) { chance -= 0.1; }
+					if (cl[1].has('knight armor')) { chance /= 2; }
+					if (Math.random() < chance) {
+						if (cl[1].has('knight armor') && Math.random() < chance) { cl[1].lose('knight armor'); return text.replace('[S]', ', breaking [2:their] knight armor in the process!'); }
+						cl[1].gain('fallen'); return text.replace('[S]', ', [[knocking|catapulting] [2:them] onto the [ground|floor]!]');
+					}
+				},
+				pReq: ['e:15']
+			});
+			
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
