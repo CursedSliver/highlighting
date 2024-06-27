@@ -2589,7 +2589,7 @@ G={
 			G.moves = [];
 			G.moveGlobAgainstEnemy = true; //whether to automatically sanitize stuff to fit for enemy
 			G.sanitizeMove = function(arr, interact) {
-				for (let i = 0; i < interact; i++) {
+				for (let i = 0; i < interact + 1; i++) {
 					if (i >= arr.length) { arr.push(''); }
 				}
 				if (G.moveGlobAgainstEnemy) {
