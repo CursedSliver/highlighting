@@ -3012,6 +3012,7 @@ G={
 					}
 				}
 				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', [this]); return this.has('fleed'); }
+				console.log(availableMoves);
 				
 				let m = choose(availableMoves);
 				boxCharList = m[1];
