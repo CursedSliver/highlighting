@@ -1544,7 +1544,7 @@ G={
 				}
 				G.char.prototype.testCond = conditionTester;
 				G.team.prototype.testCond = conditionTester;
-				G.act.prototype.fit=function(me, toMatch, lastSelected, interactMin)
+				G.act.prototype.fit=function(me, toMatch, lastSelected, interactMin, forcePool)
 				{
 					/*
 						returns one or more people/team who fit the given conditions
@@ -1639,8 +1639,12 @@ G={
 						//i is each person in the req
 						let pool=[];
 						req = bigReq[i];
-						if (req.includes('team')) { pool = deepArrCopy(G.teams); }
-						else { pool = deepArrCopy(G.chars); }
+						if (!forcePool) {
+							if (req.includes('team')) { pool = deepArrCopy(G.teams); }
+							else { pool = deepArrCopy(G.chars); }
+						} else {
+							pool = forcePool;
+						}
 						
 						req = req.split(' '); //req now describes all statements separated by AND
 						for (let ii in req) {
@@ -2594,7 +2598,13 @@ G={
 				}
 				if (G.moveGlobAgainstEnemy) {
 					for (let i = 1; i < arr.length; i++) {
-						if (!arr[i].includes('-')) { arr[i] = '- '+arr[i]; }
+						if (!arr[i].includes('-')) { 
+							if (arr[i] == '') {
+								arr[i] = '-';
+							} else {
+								arr[i] = '- '+arr[i]; 
+							}
+						}
 					}
 				}
 				return arr;
@@ -2682,7 +2692,7 @@ G={
 				let list = G.act.prototype.fit(char, [].concat(req), lastSelected);
 				if (!list) { return false; } else { return true; }
 			}; //extreme lazy ahhhh (performance can go die)
-			G.checkCReq = function(char, cReq, otherMove, people) {
+			G.checkCReq = function(char, cReq, otherMove) {
 				//each item in array is a condition of the opposing move or char that determines whether the move is possible
 				//returns array of chars that fit the creq array (functionally the new boxCharList)
 				if (cReq.length == 0 || !cReq) { return true; }
@@ -2712,19 +2722,7 @@ G={
 					if (!pass) { return false; }
 				}
 
-				let selected = [char];
-
-				people = deepArrCopy(people);
-				for (let i = 1; i < cReq.length; i++) {
-					let pass = false;
-					if (people.length == 0) { pass = true; }
-					for (let ii in people) {
-						const result = G.checkReq(people[ii], cReq[i], char);
-						if (result) { pass = true; selected.push(people[ii]); people.splice(ii, 1); break; } 
-					}
-					if (!pass) { return false; }
-				}
-				return selected;
+				return true;
 			}
 			G.checkPReq = function(char, otherChar, pReq) {
 				/* pReq is a string for an actor pair
@@ -2981,6 +2979,8 @@ G={
 					const m = G.moves[i];
 					if (m.element.interactMin > boxCharList.length) { continue; }
 					if (overseer.moveCount == 0 && m.element.interact == 0) { continue; }
+					if (!G.checkCReq(this, m.cReq, overseer.lastMove)) { continue; }
+					
 					let list = deepArrCopy(boxCharList);
 
 					for (let ii = 0; ii < list.length; ii++) {
@@ -2993,10 +2993,10 @@ G={
 					} //ik with this you can have some funny stuff going on but cant be bothered to fix such a relatively rare event
 
 					if (list.length == 0) { continue; }
-					list = G.act.prototype.fit(this, m.req, null, m.element.interactMin);
-					if (!list) { continue; }
+					let targets = G.act.prototype.fit(this, m.req, null, m.element.interactMin, list);
+					if (!targets) { continue; }
+					console.log(targets);
 	
-					let targets = G.checkCReq(this, deepArrCopy(m.cReq), overseer.lastMove, list);
 					if (!targets) { continue; }
 					if (m.element.interactMin + 1 > targets.length) { continue; }
 					if (m.element.interact + 1 < targets.length) {
