@@ -2824,8 +2824,13 @@ G={
 				this.out = []; //each item is a box object
 				this.lastMove = null;
 				this.moveCount = 0;
+				this.roundCount = 0;
 				
 				G.ongoingCombats.push(this);
+			}
+			G.combatOverseer.prototype.clearOut = function(addContinuation) {
+				this.out = [];
+				this.outStr = '';
 			}
 			G.combatOverseer.prototype.addParticipant = function(participant) {
 				this.participants.push(participant);
@@ -2839,8 +2844,8 @@ G={
 			}
 			G.combatOverseer.prototype.addBox = function(str, chars, noCharBoxes) {
 				this.out.push(new G.box(noCharBoxes?[]:chars, str, 'green'));
+				if (this.moveCount == 1) { this.injectFront('[1] and [2] meets and, [in a bid for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|begins a bloody fight]!<br>'); }
 			}
-			//'[1] and [2] meets and, [in a bid for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|begins a bloody fight]!<br>'
 			G.combatOverseer.prototype.recordMove = function() {
 				this.moveCount++;
 			}
@@ -3686,7 +3691,7 @@ G={
 				
 				for (let i in G.teams){G.teams[i].acted=false;}
 				for (let i in G.chars){G.chars[i].acted=false;}
-				for (let i in G.ongoingCombats) { G.ongoingCombats[i].processed = false; G.ongoingCombats[i].outStr = ''; G.ongoingCombats[i].addBox('Continuing the fight from last round, with [ALL]...', G.ongoingCombats[i].participants, true); }
+				for (let i in G.ongoingCombats) { G.ongoingCombats[i].processed = false; G.ongoingCombats[i].roundCount++; G.combatOverseer.prototype.clearOut(); G.ongoingCombats[i].addBox('Continuing the fight from last round, with [ALL]...', G.ongoingCombats[i].participants, true); }
 				for (let i = 0; i < randomFloor(Math.log2(G.chars.length + 1)); i++) {
 					if (Math.random() < 0.2) {
 						//chooses someone able to initiate combat with someone else
