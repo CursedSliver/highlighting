@@ -2696,7 +2696,6 @@ G={
 				//each item in array is a condition of the opposing move or char that determines whether the move is possible
 				//returns array of chars that fit the creq array (functionally the new boxCharList)
 				if (cReq.length == 0 || !cReq) { return true; }
-				if (!people || people.length == 0) { return [char]; } 
 				let me = cReq[0].split(' '); //the move parameters
 				/* syntax: 
 				AND operator: [space]
