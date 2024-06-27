@@ -570,7 +570,7 @@ G={
 			this.perk = perk;
 			this.owner = owner; 
 			if (obj) { for (let i in obj) { this[i] = obj[i]; } }
-			if (this.perk.init) { this.perk.init.call(this); }
+			if (this.perk.init) { for (let i in this.perk.init) { this[i] = this.perk.init[i]; } }
 		}
 		
 		G.glob={type:'trait',def:true};
@@ -636,7 +636,8 @@ G={
 		G.glob.ailment = false;
 		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false}); // Removed Disabled
 		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`});
-		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false});
+		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
+		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`});
 		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false});
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
@@ -1261,8 +1262,9 @@ G={
 						if (!G.perksBN[perk]) {console.log('No perk named','"'+perk+'"');return false;}
 						perk=G.perksBN[perk];
 					}
-					if (perk.type=='item' || !this.has(perk)) this.perks.push(new G.perkToken(perk, this));
-					if (this.perks[this.perks.length - 1].onGain) { this.perks[this.perks.length - 1].onGain.call(this.perks[this.perks.length - 1]); }
+					let alreadyHasPerk = false;
+					if (perk.type=='item' || !this.has(perk)) { this.perks.push(new G.perkToken(perk, this)); } else if (this.has(perk)) { alreadyHasPerk = true; }
+					if (this.perks[this.perks.length - 1].onGain) { this.perks[this.perks.length - 1].onGain.call(this.perks[this.perks.length - 1], alreadyHasPerk); }
 				}
 				G.char.prototype.lose=function(perk)
 				{
@@ -1355,6 +1357,7 @@ G={
 						if (this.has('plot armor')) { pow += 0.5; }
 						if (this.has('dazed')) { pow += 0.25; }
 						if (this.has('dizzy')) { pow += 0.2; }
+						if (this.has('crippled')) { pow += 0.35; }
 						if (this.isDisabled()) { pow += 0.1; }
 						if (this.isAiled()) { pow += 0.15; }
 						if (this.has('blind')) { pow += 0.35; }
@@ -3587,6 +3590,7 @@ G={
 			G.adjustFuncs.tryGrab = function(chance) {
 				let pow = 1;
 				if (this.has('bruised')) { pow += 0.1; }
+				if (this.has('crippled')) { pow += 0.5; }
 				if (this.has('frenzied')) { pow -= 0.35; }
 				if (this.has('haste')) { pow -= 0.1; }
 				if (this.has('ninja')) { pow -= 0.2; }
@@ -3610,7 +3614,7 @@ G={
 				if (this.has('dazed')) { pow -= 0.15; }
 				if (this.has('dizzy')) { pow -= 0.1; }
 				if (this.isDisabled()) { pow -= 0.3; }
-				if (this.has('blind')) { pow -= 0.9; }
+				if (this.has('blind') || this.has('crippled') || this.has('missing leg')) { pow -= 1; }
 				if (this.has('bulky')) { pow -= 0.1; }
 				if (this.has('cute') || this.has('seductive') || this.has('artist')) { pow += 0.05; }
 				if (this.has('haste')) { pow += 0.1; }
@@ -3638,6 +3642,19 @@ G={
 				},
 				pReq: ['h:6 v:1'],
 				req: [deviousKiller+' tourniquet', '- fallen'],
+			});
+			new G.move({
+				chance: 1,
+				text: 'Seeing [2]\'s weakness, [1] grabs a hold of [2:them] and shoves [1:their] freezing sapphire down [2:their] throat! [1] breaks out an evil smile as crystals of ice begin growing out of [2]\'s lifeless corpse...',
+				failText: 'Seeing [2]\'s weakness, [1] tries to grab a hold of [2:them], but [[2] desperately fought back, eventually managing to get [1] off [2:them]!|[2] [rolls|crawls] out of the way.]',
+				fail: G.moveAssets.checkTryGrab,
+				successFunc: function(cl) {
+					this.lose('freezing sapphire');
+					this.kill(cl[1], 'glacial stasis');
+				},
+				func: G.moveAssets.veryCloseCombat,
+				pReq: ['h:6 v:1'],
+				req: [deviousKiller+' freezing sapphire', '- fallen']
 			});
 			new G.move({
 				chance: 1,
@@ -3815,6 +3832,10 @@ G={
 				for (var iAct=0;iAct<everybody.length;iAct++)
 				{
 					var me=everybody[iAct];
+
+					if (me.type == 'char') { for (let i in me.perks) {
+						if (me.perks[i].perk.update) { me.perks[i].perk.update.call(me.perks[i]); }
+					} }
 					
 					if (!me.combat && (me.tier==0 || (Math.random()<1/5))) {
 						var acts=[];
