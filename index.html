@@ -743,6 +743,7 @@ G={
 		// Additional items - CS
 		new G.perk({name:`snake charmer\'s flute`,desc:``});
 		new G.perk({name:`respawn anchor`,desc:``});
+		new G.perk({name:`freezing sapphire`,desc:``});
 		
 		//creator
 		G.setupData=0;
@@ -3628,7 +3629,7 @@ G={
 				},
 				func: G.moveAssets.veryCloseCombat,
 				pReq: ['h:6 v:1'],
-				req: [deviousKiller+' freezing sapphire', '- fallen']
+				req: [deviousKiller+' freezing_sapphire', '- fallen']
 			});
 			new G.move({
 				chance: 1,
