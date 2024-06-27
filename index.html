@@ -2597,6 +2597,7 @@ G={
 						if (!arr[i].includes('-')) { arr[i] = '- '+arr[i]; }
 					}
 				}
+				return arr;
 			}
 			G.move = function(obj) {
 				this.chance = obj.chance||G.moveDefault.chance;
