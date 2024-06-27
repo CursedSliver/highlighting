@@ -1306,35 +1306,35 @@ G={
 				}
 				G.char.prototype.cureAilments = function() {
 					for (let i in this.perks) {
-						if (this.perks[i].ailment) { this.lose(i); }
+						if (this.perks[i].perk.ailment) { this.lose(i); }
 					}
 				}
 				G.char.prototype.healInjuries = function() {
 					for (let i in this.perks) {
-						if (this.perks[i].injury) { this.lose(i); }
+						if (this.perks[i].perk.injury) { this.lose(i); }
 					}
 				}
 				G.char.prototype.isDisabled = function() {
 					for (let i in this.perks) {
-						if (this.perks[i].disable) { return true; }
+						if (this.perks[i].perk.disable) { return true; }
 					}
 					return false;
 				}
 				G.char.prototype.isOut = function() {
 					for (let i in this.perks) {
-						if (this.perks[i].out) { return true; }
+						if (this.perks[i].perk.out) { return true; }
 					}
 					return false;
 				}
 				G.char.prototype.isAiled = function() {
 					for (let i in this.perks) {
-						if (this.perks[i].ailment) { return true; }
+						if (this.perks[i].perk.ailment) { return true; }
 					}
 					return false;
 				}
 				G.char.prototype.isInjured = function() {
 					for (let i in this.perks) {
-						if (this.perks[i].injury) { return true; }
+						if (this.perks[i].perk.injury) { return true; }
 					}
 					return false;
 				}
@@ -3211,7 +3211,7 @@ G={
 			new G.move({
 				text: '[1] [taunts|sneers at|insults|teases] [2][, menacingly|, aggressively|, confidently||].',
 				id: 'taunt',
-				req: ['any%0.5|sociopath|lunatic%0.5']
+				req: ['sociopath%0.6|devious%0.6|annoying%0.6|able%0.15 !peaceful|meek%0.5|clumsy%0.5']
 			});
 			new G.move({
 				chance: 2,
@@ -3253,6 +3253,16 @@ G={
 				successFunc: function() {
 					this.cureAilments();
 					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('batch of cookies'); this.injectBack('<br>[1] has eaten all of [1:their] cookies.'); }
+				},
+				element: G.moveAssets.elements.alone,
+				req: ['batch_of_cookies any%0.05|ailed']
+			});
+			new G.move({
+				chance: 2,
+				text: '[1] takes out [1:their] [hot |steaming |fragrant |magical |]hot chocolateand [consumes|drinks|drains] it, recovering from [1:their] injuries!',
+				successFunc: function() {
+					this.healInjuries();
+					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('hot chocolate'); this.injectBack('<br>[1] has drank all of [1:their] hot chocolate.'); }
 				},
 				element: G.moveAssets.elements.alone,
 				req: ['batch_of_cookies any%0.05|ailed']
@@ -3486,7 +3496,8 @@ G={
 						} 
 					}
 					return text.replace('[S]', '');
-				}
+				},
+				pReq: ['h:6 v:1'],
 			});
 			new G.move({
 				chance: 7,
@@ -3513,6 +3524,7 @@ G={
 						return text.replace('[S]', ', causing [2:their] death!');
 					}
 				},
+				pReq: ['h:6 v:1'],
 				req: ['able%0.6|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5', '- fallen inCombat !out'],
 			});
 			new G.move({
@@ -3539,6 +3551,7 @@ G={
 						return text.replace('[S]', ', suffocating [2:them] to death!');
 					}
 				},
+				pReq: ['h:6 v:1'],
 				req: ['able%0.2|frenzied%0.5|sociopath|bulky%0.2|medic%0.2 !peaceful|meek%0.5|clumsy%0.5', '- !able inCombat !out'],
 			});
 			new G.move({
@@ -3565,15 +3578,54 @@ G={
 					if (landings > thresholds[3]) { cl[1].gain('fallen'); cl[1].gain('bruised'); return text.replace('[S]', ', making [2:them] fall onto the ground.'); }
 					if (landings > thresholds[4]) { this.kill(cl[1], 'cranial spillage'); return text.replace('[S]', ', causing [2]\'s death.'); }
 				},
+				pReq: ['h:6 v:1'],
 				req: ['any%0.5|ninja%0.6|frenzied|suicidal%0.5']
 			});
 
 			//savage kill methods (devious/sociopath path) - CS
+			let deviousKiller = 'sociopath|devious%0.6|inventor%0.3|able%0.02 !peaceful|meek%0.5|clumsy%0.5'];
+			G.adjustFuncs.tryGrab = function(chance) {
+				let pow = 1;
+				if (this.has('bruised')) { pow += 0.1; }
+				if (this.has('frenzied')) { pow -= 0.35; }
+				if (this.has('haste')) { pow -= 0.1; }
+				if (this.has('ninja')) { pow -= 0.2; }
+				if (this.has('marksmen')) { pow -= 0.2; }
+				if (this.has('clumsy')) { pow += 0.5; }
+				if (this.has('cowardly')) { pow += 0.1; }
+				if (this.has('plot armor')) { pow += 0.5; }
+				if (this.has('dazed')) { pow += 0.5; }
+				if (this.has('dizzy')) { pow += 0.35; }
+				if (this.isDisabled()) { pow += 0.2; }
+				if (this.isAiled()) { pow += 0.15; }
+				if (this.has('blind')) { pow += 2; }
+				
+				return 1 - Math.pow(1 - c, pow);
+			};
+			G.adjustFuncs.dodge = function(chance) {
+				//modifies chance based on how well they are at dodging (NOTE: higher pow = better dodging)
+				let pow = 1;
+				if (this.has('frenzied')) { pow -= 0.2; }
+				if (this.has('bruised')) { pow -= 0.1; }
+				if (this.has('dazed')) { pow -= 0.15; }
+				if (this.has('dizzy')) { pow -= 0.1; }
+				if (this.isDisabled()) { pow -= 0.3; }
+				if (this.has('blind')) { pow -= 0.9; }
+				if (this.has('bulky')) { pow -= 0.1; }
+				if (this.has('cute') || this.has('seductive') || this.has('artist')) { pow += 0.05; }
+				if (this.has('haste')) { pow += 0.1; }
+				if (this.has('ninja')) { pow += 0.2; }
+				if (this.has('survivalist')) { pow += 0.3; }
+				if (this.has('vigilant')) { pow += 0.4; }
+
+				return 1 - Math.pow(1 - c, pow);
+			};
+			G.moveAssets.checkTryGrab = function(cl) { return cl[1].adjust(this.adjust(0.4, 'tryGrab'), 'dodge'); };
 			new G.move({
-				chance: 0.5,
+				chance: 1,
 				text: 'Seeing [2]\'s weakness, [1] puts a tourniquet around [2]\'s neck[S]!',
 				failText: 'Seeing [2]\'s weakness, [1] tries to grab [2:them], but somehow [2:they] manages to roll out of the way!',
-				fail: function() { return this.adjust(0.25); },
+				fail: G.moveAssets.checkTryGrab,
 				func: G.moveAssets.veryCloseCombat,
 				successFunc: function(cl, text) {
 					let chance = 0.6;
@@ -3584,7 +3636,38 @@ G={
 					}
 					this.combat.overseer.injectBack(' Luckily, [2] manages to remove it before its too late.');
 				},
-				req: ['sociopath|devious%0.6|inventor%0.3 tourniquet !peaceful|meek%0.5|clumsy%0.5', '- !able inCombat !out'],
+				pReq: ['h:6 v:1'],
+				req: [deviousKiller+' tourniquet', '- fallen'],
+			});
+			new G.move({
+				chance: 1,
+				text: 'Seeing [2]\'s weakness, [1] grabs a hold of [2:them] and uses [1:their] AED on [2:them], briefly hotwiring it for the highest voltage, breaking the AED in the process.',
+				failText: 'Seeing [2]\'s weakness, [1] tries to grab a hold of [2:them], but [[2] desperately fought back, eventually managing to get [1] off [2:them]!|[2] [rolls|crawls] out of the way.]',
+				fail: G.moveAssets.checkTryGrab,
+				successFunc: function(cl) {
+					this.lose('AED');
+					this.kill(cl[1], 'malicious resuscitation');
+				},
+				func: G.moveAssets.veryCloseCombat,
+				pReq: ['h:6 v:1'],
+				req: [deviousKiller+' AED', '- fallen']
+			});
+			new G.move({
+				chance: 1,
+				text: 'Seeing [2]\'s weakness, [1] wrestles [2:them] to immobility and drains [1:their] entire cabinet of medicines down [2]\'s gut! [S]',
+				failText: 'Seeing [2]\'s weakness, [1] tries to grab a hold of [2:them], but [[2] desperately fought back, eventually managing to get [1] off [2:them]!|[2] [rolls|crawls] out of the way.]',
+				fail: G.moveAssets.checkTryGrab,
+				successFunc: function(cl, text) {
+					this.lose('medicine');
+					if (Math.random() < 0.5) {
+						cl[1].gain('dizzy');
+						return text.replace('[S]', 'Luckily, [2] manages to [vomit|throw up] most of the medicine before the chaos can get to [2:their] bloodstream, but the small fraction that did manage to infilterate [2:their] body still leaves [2:them] dizzy.');
+					}
+					this.kill(cl[1], 'overdose');
+				},
+				func: G.moveAssets.veryCloseCombat,
+				pReq: ['h:6 v:1'],
+				req: [deviousKiller+' AED', '- fallen']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
