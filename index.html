@@ -2852,7 +2852,7 @@ G={
 					let realList = [];
 					for (let ii in box.charList) {
 						str += '<img src="'+box.charList[ii].pic+'" class="pic" title="'+box.charList[ii].char.name+'">';
-						if (box.charList[ii].widget.includes('skull')) { str += '<div class="picSkull"></div>'; }
+						if (box.charList[ii].widgets.includes('skull')) { str += '<div class="picSkull"></div>'; }
 						realList.push(box.charList[ii].char);
 					}
 					str += '</div><div>';
