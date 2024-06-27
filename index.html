@@ -2800,13 +2800,13 @@ G={
 				this.performers = [].concat(performers);
 				this.opponents = [].concat(opponents);
 			}
-			G.box = function(charList, text) {
+			G.box = function(charList, text, color) {
 				this.charList = [];
 				if (charList) { charList = [].concat(charList); } else { charList = []; }
 				for (let i in charList) {
 					this.charList.push(new G.charIcon(charList[i]));
 				}
-				this.color = '';
+				this.color = color||'';
 				this.text = text;
 			};
 			G.charIcon = function(char) {
@@ -2838,7 +2838,7 @@ G={
 				}
 			}
 			G.combatOverseer.prototype.addBox = function(str, chars, noCharBoxes) {
-				this.out.push(new G.box(noCharBoxes?[]:chars, str));
+				this.out.push(new G.box(noCharBoxes?[]:chars, str, 'green'));
 			}
 			//'[1] and [2] meets and, [in a bid for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|begins a bloody fight]!<br>'
 			G.combatOverseer.prototype.recordMove = function() {
