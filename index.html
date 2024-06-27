@@ -1544,7 +1544,7 @@ G={
 				}
 				G.char.prototype.testCond = conditionTester;
 				G.team.prototype.testCond = conditionTester;
-				G.act.prototype.fit=function(me, toMatch, lastSelected)
+				G.act.prototype.fit=function(me, toMatch, lastSelected, matchMin)
 				{
 					/*
 						returns one or more people/team who fit the given conditions
@@ -1601,6 +1601,8 @@ G={
 					*/
 					var bigReq = null;
 					if (toMatch) { bigReq = deepArrCopy(toMatch); } else { bigReq = deepArrCopy(this.people); }
+
+					if (!interactMin) { interactMin = bigReq.length - 1; }
 
 					if (!me instanceof G.char) { console.log(me); throw 'The above is not an instance of char!'; }
 					
@@ -1673,9 +1675,9 @@ G={
 								break;
 							}
 						}
-						if (!found) return false;
+						if (!found && i <= interactMin) { return false; }
 					}
-					if (selected.length!=bigReq.length) { console.log('selected length is not equal to req length!'); return false; }
+					//if (selected.length!=bigReq.length) { console.log('selected length is not equal to req length!'); return false; }
 					return selected;
 				}
 			G.sanitizeInaction = function(req, fitForCombat) {
@@ -2585,10 +2587,25 @@ G={
 
 			//Descriptive combat system by CS
 			G.moves = [];
+			G.moveGlobAgainstEnemy = true; //whether to automatically sanitize stuff to fit for enemy
+			G.sanitizeMove = function(arr, interact) {
+				for (let i = 0; i < interact; i++) {
+					if (i >= arr.length) { arr.push(''); }
+				}
+				if (moveGlobAgainstEnemy) {
+					for (let i = 1; i < arr.length; i++) {
+						if (!arr[i].includes('-')) { arr[i] = '- '+arr[i]; }
+					}
+				}
+			}
 			G.move = function(obj) {
 				this.chance = obj.chance||G.moveDefault.chance;
 				this.element = obj.element||G.moveDefault.element; //element determines the nature of the attack as well as which attacks it can counter/be countered by
-				if (obj.req) { this.req = G.sanitizeInaction([].concat(obj.req), true); } else { this.req = G.sanitizeInaction(G.moveDefault.req, true); }//req is a string as the conditions to meet before the move can be considered possible in the first index, then indexes after that define reqs the opponents have to meet
+				if (obj.req) { 
+					this.req = G.sanitizeInaction(G.sanitizeMove([].concat(obj.req), this.element.interact), true); 
+				} else { 
+					this.req = G.sanitizeInaction(G.sanitizeMove(G.moveDefault.req, this.element.interact), true); 
+				}//req is a string as the conditions to meet before the move can be considered possible in the first index, then indexes after that define reqs the opponents have to meet
 				//unfortunately due to not wanting to recode an entirely new set of syntaxes and having to update that one whenever updating G.act.prototype.fit ive decided to take shortcut and just use that syntax and sacrifice the ability to dynamically adjust move chances but whatev
 				this.reqFunc = obj.reqFunc||G.moveDefault.reqFunc;
 				if (obj.cReq) { this.cReq = [].concat(obj.cReq); } else { this.cReq = G.moveDefault.cReq; } //the requirements for the opposing move (first item) and person(people) that made the move (every other item, logical AND) to have their move countered 
@@ -2975,7 +2992,7 @@ G={
 					} //ik with this you can have some funny stuff going on but cant be bothered to fix such a relatively rare event
 
 					if (list.length == 0) { continue; }
-					list = G.act.prototype.fit(this, m.req);
+					list = G.act.prototype.fit(this, m.req, null, m.element.interactMin);
 					if (!list) { continue; }
 	
 					let targets = G.checkCReq(this, deepArrCopy(m.cReq), overseer.lastMove, list);
@@ -3049,7 +3066,6 @@ G={
 			G.moveAssets = {};
 			G.moveAssets.elements = {};
 			G.moveAssets.elements.alone = new G.element({ interact: 0, interactMin: 0 });
-			G.moveDefault.cReq = ['', '-'];
 			new G.move({
 				text: '[1] does something ????????',
 				chance: 0.001,
@@ -3081,8 +3097,7 @@ G={
 						if (this.combat.overseer.participants[i].team != this.team || !this.combat.overseer.participants[i].team) { return false; }
 					}
 					return true;
-				},
-				cReq: ['']
+				}
 			});
 			new G.move({
 				text: '[1] [stands still, vigilant and awaiting|awaits|awaits for] [2]\'s next move...',
@@ -3201,8 +3216,8 @@ G={
 				chance: 2,
 				text: '[1] [taunts|throws insults at|teases|ridicules] [2] back[ with [colorful|horrific|threatening] words|].',
 				id: 'taunt2',
-				req: ['any%0.5|lunatic%0.5|annoying|devious'],
-				cReq: ['m:taunt|m:taunt2', '-']
+				req: ['any%0.5|lunatic%0.5|annoying|devious', '-'],
+				cReq: ['m:taunt|m:taunt2']
 			});
 			new G.move({
 				chance: 0.1,
@@ -3419,8 +3434,7 @@ G={
 					return text.replace('[S]', '');
 				},
 				pReq: ['h:2 v:0'],
-				req: ['any%0.5|bulky|the_gift'],
-				cReq: ['', '- able']
+				req: ['any%0.5|bulky|the_gift', '- able']
 			});
 			new G.move({
 				chance: 1.5,
@@ -3498,8 +3512,7 @@ G={
 						return text.replace('[S]', ', causing [2:their] death!');
 					}
 				},
-				req: ['any%0.6|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5'],
-				cReq: ['', '- fallen inCombat !out']
+				req: ['any%0.6|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5', '- fallen inCombat !out'],
 			});
 			new G.move({
 				chance: 1,
@@ -3525,8 +3538,7 @@ G={
 						return text.replace('[S]', ', suffocating [2:them] to death!');
 					}
 				},
-				req: ['any%0.2|frenzied%0.5|sociopath|bulky%0.2|medic%0.2 !peaceful|meek%0.5|clumsy%0.5'],
-				cReq: ['', '- !able inCombat !out']
+				req: ['any%0.2|frenzied%0.5|sociopath|bulky%0.2|medic%0.2 !peaceful|meek%0.5|clumsy%0.5', '- !able inCombat !out'],
 			});
 			new G.move({
 				chance: 1,
@@ -3571,8 +3583,7 @@ G={
 					}
 					this.combat.overseer.injectBack(' Luckily, [2] manages to remove it before its too late.');
 				},
-				req: ['sociopath|devious%0.6|inventor%0.3 tourniquet !peaceful|meek%0.5|clumsy%0.5'],
-				cReq: ['', '- !able inCombat !out']
+				req: ['sociopath|devious%0.6|inventor%0.3 tourniquet !peaceful|meek%0.5|clumsy%0.5', '- !able inCombat !out'],
 			});
 			
 			G.char.prototype.initiateCombat = function() {
