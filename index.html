@@ -2855,12 +2855,14 @@ G={
 				for (let i in arr) {
 					let box = arr[i];
 					str += '<div class="box action '+box.color+'"><div>';
-					let realList = [];
 					if (!box.hideChars) { for (let ii in box.charList) {
 						str += '<img src="'+box.charList[ii].pic+'" class="pic" title="'+box.charList[ii].char.name+'">';
 						if (box.charList[ii].widgets.includes('skull')) { str += '<div class="picSkull"></div>'; }
-						realList.push(box.charList[ii].char);
 					} }
+					let realList = [];
+					for (let ii in box.charList) {
+						realList.push(box.charList[ii].char);
+					}
 					str += '</div><div>';
 					str += G.parse(box.text.replaceAll('[S]'), realList);
 					str += '</div></div>';
