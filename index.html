@@ -2885,7 +2885,7 @@ G={
 						realList.push(box.charList[ii].char);
 					}
 					str += '</div><div>';
-					str += G.parse(box.text.replaceAll('[S]'), realList);
+					str += G.parse(box.text.replaceAll('[S]', ''), realList);
 					str += '</div></div>';
 				}
 				return str;
