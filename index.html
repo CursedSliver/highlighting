@@ -566,6 +566,12 @@ G={
 			G.perks.push(this);
 			G.perksBN[this.name]=this;
 		}
+		G.perkToken = function(perk, owner, obj) {
+			this.perk = perk;
+			this.owner = owner; 
+			if (obj) { for (let i in obj) { this[i] = obj[i]; } }
+			if (this.perk.init) { this.perk.init.call(this); }
+		}
 		
 		G.glob={type:'trait',def:true};
 		new G.perk({name:`no perk`,desc:`No perk selected.`});
@@ -616,6 +622,7 @@ G={
 			G.glob.out = false;//mark the character as out; out characters cannot do any actions that don't specifically call for this perk
 			G.glob.ailment = true; 
 			G.glob.injury = false;
+			G.glob.combat = false; //whether this applies to combat only; any perks marked with this will be removed after fleeing from combat
 		new G.perk({name:`frenzied`,desc:`Experiencing a fit of violent rage and, when met with trouble, an incredible surge of adrenaline.`});
 		new G.perk({name:`shell-shocked`,desc:`Has seen too much. May not be of much use for a while.`});
 		new G.perk({name:`dazed`,desc:`Not quite in full control of their faculties. May wander off unpredictably.`});
@@ -1168,9 +1175,9 @@ G={
 						<div class="picBox"><img src="${me.pic}" class="pic" title="${me.name}"/>${me.has('dead')?'<div class="picSkull"></div>':''}</div>
 						<div style="text-align:center;">
 							<e style="float:left;margin-right:8px;">${me.name}</e>
-							<div style="min-width:32%;display:inline-block;"><cap>Perks :</cap> ${me.perks.map(perk=>(perk.type=='trait' && perk.name!='no perk')?('<div class="bit" title="'+perk.desc+'">'+perk.name+'</div>'):'').join(' ')}</div>
-							<div style="min-width:32%;display:inline-block;"><cap>Items :</cap> ${me.perks.map(perk=>(perk.type=='item' && perk.name!='no item')?('<div class="bit" title="'+perk.desc+'">'+perk.name+'</div>'):'').join(' ')}</div>
-							<div style="min-width:32%;display:inline-block;"><cap>Other :</cap> ${me.perks.map(perk=>(perk.type!='item' && perk.type!='trait')?('<div class="bit" title="'+perk.desc+'">'+perk.name+'</div>'):'').join(' ')}</div>
+							<div style="min-width:32%;display:inline-block;"><cap>Perks :</cap> ${me.perks.map(perk=>(perk.perk.type=='trait' && perk.perk.name!='no perk')?('<div class="bit" title="'+perk.desc+'">'+perk.perk.name+'</div>'):'').join(' ')}</div>
+							<div style="min-width:32%;display:inline-block;"><cap>Items :</cap> ${me.perks.map(perk=>(perk.perk.type=='item' && perk.perk.name!='no item')?('<div class="bit" title="'+perk.desc+'">'+perk.perk.name+'</div>'):'').join(' ')}</div>
+							<div style="min-width:32%;display:inline-block;"><cap>Other :</cap> ${me.perks.map(perk=>(perk.perk.type!='item' && perk.perk.type!='trait')?('<div class="bit" title="'+perk.desc+'">'+perk.perk.name+'</div>'):'').join(' ')}</div>
 						</div>
 						${me.kills.length>0?('<div style="color:#e2461f;">Killed '+me.kills.length+' (<e>'+me.kills.map(char=>char.name).join(', ')+'</e>)</div>'):''}
 						${(me.killer.length>0 && me.has('dead'))?('<div style="color:#e2461f;">Dead, killed by <e>'+me.killer.map(char=>char.name).join(', ')+'</e> ('+me.deathReason+')</div>'):''}
@@ -1243,7 +1250,7 @@ G={
 					}
 					for (var i in this.perks)
 					{
-						if (this.perks[i].name==perk.name) return true;
+						if (this.perks[i].perk.name==perk.name) return this.perks[i];
 					}
 					return false;
 				}
@@ -1254,7 +1261,7 @@ G={
 						if (!G.perksBN[perk]) {console.log('No perk named','"'+perk+'"');return false;}
 						perk=G.perksBN[perk];
 					}
-					if (perk.type=='item' || !this.has(perk)) this.perks.push(perk);
+					if (perk.type=='item' || !this.has(perk)) this.perks.push(new G.perkToken(perk, this));
 				}
 				G.char.prototype.lose=function(perk)
 				{
@@ -1263,7 +1270,8 @@ G={
 						if (!G.perksBN[perk]) {console.log('No perk named','"'+perk+'"');return false;}
 						perk=G.perksBN[perk];
 					}
-					if (this.has(perk)) this.perks.splice(this.perks.indexOf(perk),1);
+					let perkOwned = this.has(perk);
+					if (perkOwned) this.perks.splice(this.perks.indexOf(perkOwned),1);
 				}
 				G.char.prototype.give=function(other,perk)
 				{
@@ -1398,7 +1406,7 @@ G={
 					{
 						var el=l(member.l.id+'-perk-'+perkN);
 						var perk=G.perks[el.options[el.selectedIndex].value];
-						if (perk.name!='no perk' && perk.name!='no item' && (perk.type!='trait' || perks.indexOf(perk)==-1)) perks.push(perk);
+						if (perk.name!='no perk' && perk.name!='no item' && (perk.type!='trait' || perks.indexOf(perk)==-1)) perks.push(new G.perkToken(perk, member));
 						perkN++;
 					}
 					var me=new G.char({name:member.name,pic:member.pic,perks:perks,gender:member.gender,tier:member.tier});
@@ -3461,7 +3469,7 @@ G={
 				}
 			});
 			new G.move({
-				chance: 6,
+				chance: 7,
 				text: 'Seeing [2]\'s weakness, [1] stomps on [2:them][S]!',
 				failText: 'Seeing [2]\'s weakness, [1] stomps on [2:them], but somehow [2:they] manages to roll out of the way!',
 				fail: function() { return this.adjust(0.2); },
@@ -3485,7 +3493,7 @@ G={
 						return text.replace('[S]', ', causing [2:their] death!');
 					}
 				},
-				req: ['any%0.5|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5'],
+				req: ['any%0.6|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5'],
 				cReq: ['', '- fallen inCombat !out']
 			});
 			new G.move({
@@ -3588,6 +3596,9 @@ G={
 				if (!this.combat) { return false; }
 				if (!silent) { this.combat.overseer.injectBack('<br>[1] has fleed from the fight!'); }
 				this.lose('fleed');
+				for (let i in this.perks) {
+					if (this.perks[i].perk.combat) { this.lose(this.perks[i]); }
+				}
 				this.combat.overseer.removeParticipant(this);
 				this.combat = null;
 			}
