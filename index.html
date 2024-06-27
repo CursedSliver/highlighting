@@ -3583,7 +3583,7 @@ G={
 			});
 
 			//savage kill methods (devious/sociopath path) - CS
-			let deviousKiller = 'sociopath|devious%0.6|inventor%0.3|able%0.02 !peaceful|meek%0.5|clumsy%0.5'];
+			let deviousKiller = ['sociopath|devious%0.6|inventor%0.3|able%0.02 !peaceful|meek%0.5|clumsy%0.5'];
 			G.adjustFuncs.tryGrab = function(chance) {
 				let pow = 1;
 				if (this.has('bruised')) { pow += 0.1; }
