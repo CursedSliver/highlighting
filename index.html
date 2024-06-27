@@ -1262,6 +1262,7 @@ G={
 						perk=G.perksBN[perk];
 					}
 					if (perk.type=='item' || !this.has(perk)) this.perks.push(new G.perkToken(perk, this));
+					if (this.perks[this.perks.length - 1].onGain) { this.perks[this.perks.length - 1].onGain.call(this.perks[this.perks.length - 1]); }
 				}
 				G.char.prototype.lose=function(perk)
 				{
@@ -1271,7 +1272,10 @@ G={
 						perk=G.perksBN[perk];
 					}
 					let perkOwned = this.has(perk);
-					if (perkOwned) this.perks.splice(this.perks.indexOf(perkOwned),1);
+					if (perkOwned) { 
+						if (perkOwned.onLose) { perkOwned.onLose.call(this.perks[this.perks.indexOf(perkOwned)]); }
+						this.perks.splice(this.perks.indexOf(perkOwned), 1); 
+					}
 				}
 				G.char.prototype.give=function(other,perk)
 				{
@@ -1475,6 +1479,7 @@ G={
 				//refactored TW's code to be much more sensible - CS
 				let conditionTester = function(str, prevTeam, negate) {
 					//individual expressions, without AND or OR
+					if (str == '') { return true; }
 					if (!str) { return false; } 
 					let chance = str.split('%')[1]; 
 					let item = str.split('%')[0];
@@ -2597,6 +2602,7 @@ G={
 				if (obj.id) { this.id = obj.id; } else { this.id = G.moveDefault.id; }
 				
 				G.moves.push(this);
+				G.last = this;
 			}
 			G.moveDefault = {
 				chance: 1,
@@ -2937,6 +2943,7 @@ G={
 				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult;
 			} //vertical is here too, but each vertical distance above adds and each vertical distance below removes
 			G.lastCharList = null; //debug
+			G.last = null; //convenience; last refers to the last move created
 			G.char.prototype.makeMove = function() {
 				//iterate through every move available and collects any that fit both reqs, then select one to perform
 				//when performing, it first checks for available intercepting moves, then if not successfully intercepted it sees if it succeeds, then if succeeds it calls the func
@@ -2956,7 +2963,6 @@ G={
 					const m = G.moves[i];
 					if (m.element.interactMin > boxCharList.length) { continue; }
 					if (overseer.moveCount == 0 && m.element.interact == 0) { continue; }
-					if (!G.checkReq(this, m.req)) { continue; }
 					let list = deepArrCopy(boxCharList);
 
 					for (let ii = 0; ii < list.length; ii++) {
@@ -2969,6 +2975,9 @@ G={
 					} //ik with this you can have some funny stuff going on but cant be bothered to fix such a relatively rare event
 
 					if (list.length == 0) { continue; }
+					list = G.act.prototype.fit(this, m.req);
+					if (!list) { continue; }
+	
 					let targets = G.checkCReq(this, deepArrCopy(m.cReq), overseer.lastMove, list);
 					if (!targets) { continue; }
 					if (m.element.interactMin + 1 > targets.length) { continue; }
