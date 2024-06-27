@@ -2794,7 +2794,7 @@ G={
 			} 
 			G.interceptDefault = {
 				chance: 1,
-				req: [],
+				req: ['any'],
 				cReq: [],
 				pReq: [],
 				text: '',
@@ -3435,7 +3435,7 @@ G={
 					return text.replace('[S]', '');
 				},
 				pReq: ['h:2 v:0'],
-				req: ['any%0.5|bulky|the_gift', '- able']
+				req: ['able%0.5|bulky|the_gift', '- able']
 			});
 			new G.move({
 				chance: 1.5,
@@ -3513,7 +3513,7 @@ G={
 						return text.replace('[S]', ', causing [2:their] death!');
 					}
 				},
-				req: ['any%0.6|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5', '- fallen inCombat !out'],
+				req: ['able%0.6|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5', '- fallen inCombat !out'],
 			});
 			new G.move({
 				chance: 1,
@@ -3539,7 +3539,7 @@ G={
 						return text.replace('[S]', ', suffocating [2:them] to death!');
 					}
 				},
-				req: ['any%0.2|frenzied%0.5|sociopath|bulky%0.2|medic%0.2 !peaceful|meek%0.5|clumsy%0.5', '- !able inCombat !out'],
+				req: ['able%0.2|frenzied%0.5|sociopath|bulky%0.2|medic%0.2 !peaceful|meek%0.5|clumsy%0.5', '- !able inCombat !out'],
 			});
 			new G.move({
 				chance: 1,
