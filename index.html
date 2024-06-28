@@ -650,8 +650,8 @@ G={
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
 		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false});
-		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true}); // Removed Disabled
-		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true});
+		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true,injury:false}); // Removed Disabled
+		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true,injury:false});
 		new G.perk({name:`missing leg`,desc:`Missing a whole leg!`});
 		new G.perk({name:`missing arm`,desc:`Missing a whole arm!`,disable:false}); // Temporarily Removed until better handled.
 		new G.perk({name:`trapped`,desc:`Stuck in a trap, and waiting to be freed, if something doesn't kill them first.`});
@@ -4121,6 +4121,10 @@ G={
 				successFunc: G.moveAssets.sliceBig(),
 				req: ['sword'],
 				pReq: ['e:15']
+			});
+			//gonna do axe combat later
+			new G.move({
+				
 			});
 			
 			G.char.prototype.initiateCombat = function() {
