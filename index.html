@@ -3074,7 +3074,7 @@ G={
 			new G.move({
 				text: '[1] does something ????????',
 				chance: 0.001,
-				element: G.moveAssets.elements.alone
+				element: G.moveAssets.elements.alone,
 			});
 			new G.move({
 				text: '[1] baahs softly.',
@@ -3090,7 +3090,8 @@ G={
 					if (cl[1].combat.dist(this) < Math.random() * 6 + 8) { return this.adjust(0.5); }
 					return this.adjust(0.1);
 				},
-				successFunc: function() { this.gain('fleed'); }
+				successFunc: function() { this.gain('fleed'); },
+				req: ['', 'any']
 			});
 			new G.move({
 				chance: 2,
@@ -3113,14 +3114,16 @@ G={
 				func: function(charList) {
 					this.combat.moveToward(charList[1], 2);
 				},
-				pReq: 'h:1/100 v:1'
+				pReq: 'h:1/100 v:1',
+				req: ['', 'any']
 			});
 			new G.move({
 				text: '[1] runs toward [2].',
 				func: function(cl) {
 					this.combat.moveToward(cl[1], Math.random() * 3 + 4);
 				},
-				pReq: 'h:5/100 v:1'
+				pReq: 'h:5/100 v:1',
+				req: ['', 'any']
 			});
 			new G.move({
 				text: 'In a fit of [unrelenting|] rage, [1] runs at [2] full force, [screaming on the top of [1:their] lungs|hysterically flailing [1:their] arms|staring down [2]\'s soul].',
@@ -3189,7 +3192,7 @@ G={
 			new G.move({
 				text: '[1] [taunts|sneers at|insults|teases] [2][, menacingly|, aggressively|, confidently||].',
 				id: 'taunt',
-				req: ['sociopath%0.6|devious%0.6|annoying%0.6|able%0.15 !peaceful|meek%0.5|clumsy%0.5']
+				req: ['sociopath%0.6|devious%0.6|annoying%0.6|able%0.15 !peaceful|meek%0.5|clumsy%0.5', '- any']
 			});
 			new G.move({
 				chance: 2,
@@ -3356,7 +3359,8 @@ G={
 				fail: 0.4,
 				func: G.moveAssets.readyForPunch,
 				pReq: ['h:3 v:0.25'],
-				successFunc: G.moveAssets.mediumHeadHit()
+				successFunc: G.moveAssets.mediumHeadHit(),
+				req: ['', 'any']
 			});
 			new G.move({
 				chance: 0.75,
@@ -3377,7 +3381,7 @@ G={
 				func: G.moveAssets.readyForPunch,
 				successFunc: G.moveAssets.hardHeadHit(),
 				pReq: ['h:2 v:0.25'],
-				req: ['!peaceful|medic']
+				req: ['!peaceful|medic', 'any'],
 			});
 			new G.move({
 				chance: 0.75,
@@ -3392,7 +3396,7 @@ G={
 				func: G.moveAssets.readyForPunch,
 				successFunc: G.moveAssets.hardHeadHit(),
 				pReq: ['h:2 v:0'],
-				req: ['!peaceful|medic']
+				req: ['!peaceful|medic', 'any']
 			});
 			new G.move({
 				text: '[1] makes a powerful punch at [2]\'s [chest|neck][S].',
@@ -3401,6 +3405,7 @@ G={
 				func: G.moveAssets.readyForPunch,
 				successFunc: G.moveAssets.mediumBodyHit(),
 				pReq: ['h:3 v:0.5'],
+				req: ['', 'any']
 			});
 			new G.move({
 				chance: 2,
@@ -3439,7 +3444,7 @@ G={
 					if (Math.random() < this.has('frenzied')?0.1:0.3) { this.gain('fallen'); return text.replace('[S]', ', bringing [1:themself] onto the ground in the process'); }
 					return text.replace('[S]', '');
 				},
-				req: ['any%0.5|bulky|cursed_knife|frenzied']
+				req: ['any%0.5|bulky|cursed_knife|frenzied', 'any']
 			});
 			new G.move({
 				chance: 1.5,
@@ -3475,7 +3480,7 @@ G={
 					}
 					return text.replace('[S]', '');
 				},
-				pReq: ['h:6 v:1'],
+				pReq: ['h:6 v:1']
 			});
 			new G.move({
 				chance: 7,
@@ -3557,7 +3562,7 @@ G={
 					if (landings > thresholds[4]) { this.kill(cl[1], 'cranial spillage'); return text.replace('[S]', ', causing [2]\'s death.'); }
 				},
 				pReq: ['h:6 v:1'],
-				req: ['any%0.5|ninja%0.6|frenzied|suicidal%0.5']
+				req: ['any%0.5|ninja%0.6|frenzied|suicidal%0.5', 'any']
 			});
 
 			//savage kill methods (devious/sociopath path) - CS
