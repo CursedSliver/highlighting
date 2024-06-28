@@ -3713,7 +3713,7 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			};
 			new G.move({
-				chance: 0.75,
+				chance: 1.5,
 				text: '[1] slams [1:their] big stick right down [2]\'s [skull|head][S].',
 				failText: '[1] slams down [1:their] big stick at [2], but only managed to [kick off dirt in all directions|hit the ground].',
 				element: new G.element({
@@ -3741,7 +3741,7 @@ G={
 				pReq: ['e:10']
 			});
 			new G.move({
-				chance: 0.5,
+				chance: 1,
 				text: '[1] [swings|flails] [1:their] big stick at [2][S].',
 				failText: '[1] [swings|flails] [1:their] big stick at [2], but it missed and hit nothing.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'swing'), 'dodge'); },
@@ -3761,6 +3761,7 @@ G={
 				pReq: ['e:15']
 			});
 			new G.move({
+				chance: 2,
 				text: '[1] pokes [1:their] pitchfork at [2][S].',
 				failText: '[1] pokes [1:their] pitchfork at [2], but it missed.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'useSpearhead'), 'dodge'); },
@@ -3785,7 +3786,7 @@ G={
 				pReq: ['d:5']
 			});
 			new G.move({
-				chance: 1.5,
+				chance: 3,
 				text: '[1] uses [1:their] pitchfork to keep [2] away from [1:them].',
 				successFunc: function(cl) { 
 					cl[1].combat.moveToward(this, -4); 
