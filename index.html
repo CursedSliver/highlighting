@@ -390,7 +390,7 @@
 		<div id="popups"></div>
 		<div id="backToDashnet"><cap><a class="button" href="https://dashnet.org/" target="_blank">&lt; back to DashNet</a> <a class="button" href="https://discordapp.com/invite/cookie" target="_blank">official Discord</a></cap></div>
 		<div id="main"></div>
-		<div id="credits">by <a href="http://orteil.dashnet.org/" target="_blank">Orteil</a>, 2018</div>
+		<div id="credits">by <a href="http://orteil.dashnet.org/" target="_blank">Orteil</a>, 2018 | Modded by the Dashnet Forums community</div>
 		</div>
 	</body>
 </html>
@@ -3314,7 +3314,7 @@ G={
 					if (cl[1].has('bulky') || cl[1].has('survivalist')) { chance -= 0.15; } 
 					if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
 					if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
-					if (this.has('combat gear')) { chance += 0.2; }
+					if (cl[1].has('defensive')) { chance -= 0.2; }
 					if (chance > Math.random()) { cl[1].gain('dazed'); cl[1].gain('bruised'); return text.replace('[S]', ', stunning and greatly bruising [2]'); }
 					else if (chance / 4 > Math.random()) { this.kill(cl[1], 'fractured skull'); }
 					return text.replace('[S]', '');
@@ -3328,7 +3328,7 @@ G={
 					if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.2; }
 					if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
 					if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
-					if (this.has('combat gear')) { chance += 0.2; }
+					if (cl[1].has('defensive')) { chance -= 0.1; }
 					if (chance > Math.random()) { cl[1].gain('dazed'); return text.replace('[S]', ', stunning [2]'); }
 					return text.replace('[S]', '');
 				}
@@ -3658,6 +3658,7 @@ G={
 				if (this.has('ninja')) { pow += 0.2; }
 				if (this.has('survivalist')) { pow += 0.3; }
 				if (this.has('vigilant')) { pow += 0.4; }
+				if (this.has('defensive')) { pow += 0.2; }
 
 				return 1 - Math.pow(1 - chance, pow);
 			};
@@ -3739,6 +3740,7 @@ G={
 				if (this.has('clumsy')) { pow += 0.3; }
 				if (this.has('cowardly')) { pow += 0.1; }
 				if (this.has('plot armor')) { pow += 0.5; }
+				if (this.has('knight armor')) { pow += 0.1; }
 				if (this.has('dazed')) { pow += 0.3; }
 				if (this.has('dizzy')) { pow += 0.2; }
 				if (this.isDisabled()) { pow += 0.2; }
@@ -3761,6 +3763,7 @@ G={
 				if (this.has('clumsy')) { pow += 0.3; }
 				if (this.has('cowardly')) { pow += 0.1; }
 				if (this.has('plot armor')) { pow += 0.5; }
+				if (this.has('knight armor')) { pow += 0.1; }
 				if (this.has('dazed')) { pow += 0.3; }
 				if (this.has('dizzy')) { pow += 0.2; }
 				if (this.isDisabled()) { pow += 0.2; }
@@ -3893,6 +3896,39 @@ G={
 				},
 				pReq: ['e:20/100']
 			});
+
+			//pet rock (2 moves)
+			new G.move({
+				chance: 1.5,
+				text: 'Seeing [1:their] pet rock\'s [cute stare|round body|lifeless body], [1] fills with determination!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.gain('determined');
+				},
+				req: ['pet_rock !determined']
+			});
+			new G.move({
+				chance: 4,
+				text: '[1] [lobs|throws|launches] [1:their] pet rock at [2][S]![T]',
+				failText: '[1] [lobs|throws|launches] [1:their] pet rock at [2], but it missed!',
+				fail: function(cl) { return cl[1].adjust(0.2, 'dodge'); },
+				successFunc: function(cl, text) {
+					let chance = 0.7;
+					if (this.has('analytical')) { chance += 0.15; }
+					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
+
+					let toFind = (Math.random() < 0.5);
+					if (cl[1].has('knight armor') && Math.random() < chance) { this.lose('pet rock'); cl[1].lose('knight armor'); return text + ' The rock impacts [2]\'s knight armor and shatters, bringing [2:their] armor down with it!'; }
+					if (!toFind) { this.lose('pet rock'); }
+					if (Math.random() < chance) { cl[1].gain('bruised'); return text.replace('[S]', ', bruising [2:them]').replace('[T]', toFind?' [1] loses track of [1:their] pet rock, and it is never found again.':''); }
+					if (Math.random() < chance) { cl[1].gain('fallen'); if (Math.random() < chance) { cl[1].gain('dizzy'); } return text.replace('[S]', ', knocking [2:them] onto the ground').replace('[T]', toFind?' [1] loses track of [1:their] pet rock, and it is never found again.':''); }
+					if (Math.random() < chance) { this.lose('pet rock'); this.kill(cl[1], 'fractured skull'); return text.replace('[S]', 'hitting [2:them] and shattering right on the head'); }
+					return text.replace('[T]', '');
+				},
+				req: ['pet_rock !determined any%0.75|sociopath'],
+				pReq: ['e:10/50 d:5/80']
+			})
+			
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
