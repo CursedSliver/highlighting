@@ -3133,12 +3133,18 @@ G={
 				req: ['able !out']
 			});
 			new G.move({
-				text: '[1] carefully approaches [2]...',
+				text: '[1] [carefully |slowly ||]approaches [2]...',
 				func: function(charList) {
 					this.combat.moveToward(charList[1], 2);
 				},
 				pReq: 'h:1/100 v:1',
 				req: ['', 'any']
+			});
+			new G.move({
+				chance: 3.5,
+				text: '[1] could no longer maintain a standing posture from the pain [1:g|he is|she is|they are] experiencing.',
+				element: G.moveAssets.elements.alone,
+				req: ['!able !fallen !survivalist']
 			});
 			new G.move({
 				text: '[1] runs toward [2].',
