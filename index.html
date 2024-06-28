@@ -4091,6 +4091,16 @@ G={
 					if (Math.random() < chance && Math.random() < chance) { cl[1].gain('embedded'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
 					if (Math.random() < chance && Math.random() < chance) { this.kill(cl[1], 'punctural organ failure'); }
 				}
+			});
+			G.moveAssets.sliceBig = function() {
+				return function(cl, text) {
+					let chance = 0.25;
+					chance = cl[1].adjust(cl[1].adjust(this.adjust(this.adjust(chance, 'stabDamage'), 'overall'), 'stabDefense'), 'stabDefense');
+
+					cl[1].gain('cut up');
+					if (Math.random() < chance) { cl[1].gain('cut up'); }
+					if (Math.random() < chance) { cl[1].gain('bleeding out'); return text.replace('[S]', ', with blood streaming down the wound'); }
+				}
 			};
 			new G.move({
 				chance: 1.5,
@@ -4099,6 +4109,16 @@ G={
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 3 + 2); },
 				successFunc: G.moveAssets.stabHeavy('sword'),
+				req: ['sword'],
+				pReq: ['e:15']
+			});
+			new G.move({
+				chance: 2,
+				text: '[1] slashes [2] with [1:their] sword[S]!',
+				failText: '[1] slashes [2] with [1:their sword], but the sword only slashed the air.',
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.2, 'overall'), 'dodge'); },
+				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 2 + 1); },
+				successFunc: G.moveAssets.sliceBig(),
 				req: ['sword'],
 				pReq: ['e:15']
 			});
