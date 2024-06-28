@@ -11,7 +11,7 @@
 		
 		//TODO :
 			-more trait events
-			-allow action func to override the text; this way, we can have special conditional events (ie. scrappy finding different kinds of items in one action)
+			-allow action func to override the text; this way, we can have special conditional eventsx (ie. scrappy finding different kinds of items in one action)
 			-localstorage save
 			-load from pastebin
 			-better parsing : [1:They] (uppercase), [1:they|does|do] (>he does, she does, they do), [1:they] find[-s|] (>he finds, she finds, they find)
@@ -3797,7 +3797,7 @@ G={
 			//slingshot (2 moves)
 			//bad move, meant to be a slingshot nerfer
 			new G.move({
-				chance: 1.5,
+				chance: 2,
 				text: '[1] gathers ammo for [1:their] slingshot.',
 				element: G.moveAssets.elements.alone,
 				req: ['slingshot !scrappy|vigilant%0.4|frenzied%0.5']
@@ -3817,7 +3817,7 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			};
 			new G.move({
-				chance: 1,
+				chance: 4,
 				text: '[1] [pelts|attacks] [2] with pebbles from [1:their] slingshot. [S]',
 				failText: '[1] tries to shoot [2] with [1:their] slingshot, but the shots all missed.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.5, 'simpleProjectile'), 'dodge'); },
