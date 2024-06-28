@@ -4113,7 +4113,7 @@ G={
 				}
 			};
 			new G.move({
-				chance: 2,
+				chance: 1.5,
 				text: '[1] stabs [2] with [1:their] sword[S]!',
 				failText: '[1] tries to stab [2] with [1:their] sword, but the sword just went past [2:them] without touching.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
@@ -4123,7 +4123,7 @@ G={
 				pReq: ['e:15']
 			});
 			new G.move({
-				chance: 3.5,
+				chance: 2,
 				text: '[1] slashes [2] with [1:their] sword[S]!',
 				failText: '[1] slashes [2] with [1:their] sword, but the sword only slashed the air.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.2, 'overall'), 'dodge'); },
@@ -4134,7 +4134,7 @@ G={
 			});
 			//axe (1 move simpler alternative to sword without nearly as many possible modifiers)
 			new G.move({
-				chance: 5.5,
+				chance: 3.5,
 				text: '[1] hacks at [2] with [1:their] axe[S]!',
 				failText: '[1] hacks at [2] with [1:their] axe, but [2:they] avoided all the swings [1] made at [2:them].',
 				fail: function(cl) { return this.adjust(0.4, 'overall'); },
