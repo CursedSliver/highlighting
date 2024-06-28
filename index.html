@@ -569,6 +569,7 @@ G={
 		G.perkToken = function(perk, owner, obj) {
 			this.perk = perk;
 			this.owner = owner; 
+			this.roundN = 0;
 			if (obj) { for (let i in obj) { this[i] = obj[i]; } }
 			if (this.perk.init) { for (let i in this.perk.init) { this[i] = this.perk.init[i]; } }
 		}
@@ -3008,7 +3009,6 @@ G={
 					if (list.length == 0) { continue; }
 					let targets = G.act.prototype.fit(this, m.req, null, m.element.interactMin, list);
 					if (!targets) { continue; }
-					console.log(targets);
 	
 					if (!targets) { continue; }
 					if (m.element.interactMin + 1 > targets.length) { continue; }
@@ -3026,7 +3026,6 @@ G={
 					}
 				}
 				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', [this]); return this.has('fleed'); }
-				console.log(availableMoves);
 				
 				let m = choose(availableMoves);
 				boxCharList = m[1];
@@ -4252,6 +4251,7 @@ G={
 
 					if (me.type == 'char') { for (let i in me.perks) {
 						if (me.perks[i].perk.update) { me.perks[i].perk.update.call(me.perks[i]); }
+						me.perks[i].t++;
 					} }
 					
 					if (!me.combat && (me.tier==0 || (Math.random()<1/5))) {
