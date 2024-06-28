@@ -4294,7 +4294,8 @@ G={
 
 					if (me.type == 'char') { for (let i in me.perks) {
 						if (me.perks[i].perk.update) { me.perks[i].perk.update.call(me.perks[i]); }
-						me.perks[i].t++;
+					} for (let i in me.perks) {
+						if (me.perks[i]) { me.perks[i].t++; }
 					} }
 					
 					if (!me.combat && (me.tier==0 || (Math.random()<1/5))) {
