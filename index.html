@@ -2376,7 +2376,8 @@ G={
 			// Ancient Scepter Combat
 			new G.act(perkAttackMult*attackMajor*0.4,[coldBloodKiller+' ancient_scepter wizard_robe%0.5|goth%0.5|magic_wand%0.2|any%0.5','- any !wizard_robe%0.5|goth%0.2|stubborn%0.2|analytical%0.2 '+victimMajor,'+ any '+victimModerate,'+ any '+victimModerate],`[RED][1] uses a [ancient|horrid|dark|arcane|eldrich] ritual on a group of enemies!<br>[2]'s blood rips out from [2:their] body, burning [3] like acid and cutting up [4] like blades of iron!`,p=>{p[2].gain('bleeding out');p[3].gain('singed');p[4].gain('cut up');});
 				new G.act(perkAttackMult*attackKill*0.4,[coldBloodKiller+' ancient_scepter wizard_robe%0.5|goth%0.5|magic_wand%0.2|any%0.5','- any'],`[RED][1] calls arcane fury down on [2], [1:their] ancient scepter beaming with an inner rage.<br>[[2] combusts into thousands of firey butterflies...|[2] vaporizes into a minty purple mist...|[2] grimaces, then starts bubbling violently, before melting into the ground.|For a second, nothing happens. [2] opens [2:their] mouth to say something, then starts peeling away, layer by layer.|At first, it seems nothing happened, until a light breeze blows [2] away like a pile of old dust.|[2] quivers strangely, then starts getting taller and taller, and thinner and thinner, until [2:g|he becomes just a line and disappears|she becomes just a line and disappears|they become just a line and disappear].]`,p=>{p[1].kill(p[2],`ancient scepter`);});
-				new G.act(perkAttackMult*attackKill*0.2,[coldBloodKiller+' ancient_scepter wizard_robe%0.5|goth%0.5|magic_wand%0.2|any%0.5','- any !wizard_robe%0.5|goth%0.2|stubborn%0.2|analytical%0.2 '+victimKill,'+ any '+victimModerate,'+ any '+victimModerate],`[RED][1] calls on [dark|ancient|arcane] arts to turn [2] into a bomb!<br>[2] is [unaware|unprepared|feeling a little sick] when they next see [3] and [4], only to explode violently and sending both [3] and [4] [flying|tumbling|a barrage of body parts] and breaking a few bones.`,p=>{p[1].kill(p[2],`ancient scepter`);p[2].gain('confirmed');p[3].gain('broken');p[4].gain('broken');});
+				new G.act(perkAttackMult*attackKill*0.1,[coldBloodKiller+' ancient_scepter wizard_robe%0.5|goth%0.5|magic_wand%0.2|any%0.5','- any !wizard_robe%0.5|goth%0.2|stubborn%0.2|analytical%0.2 '+victimKill,'+ any '+victimModerate,'+ any '+victimModerate],`[RED][1] calls on [dark|ancient|arcane] arts to turn [2] into a bomb!<br>[2] is [unaware|unprepared|feeling a little sick] when they next see [3] and [4], only to explode violently and sending both [3] and [4] [flying|tumbling|a barrage of body parts] and breaking a few bones.`,p=>{p[1].kill(p[2],`ancient scepter`);p[2].gain('confirmed');p[3].gain('broken');p[4].gain('broken');});
+			new G.act(perkAttackMult*attackKill*0.15,[coldBloodKiller+' ancient_scepter wizard_robe%0.5|goth%0.5|magic_wand%0.2|any%0.5','- any !wizard_robe%0.5|goth%0.2|stubborn%0.2|analytical%0.2 '+victimKill,'+ any '+victimModerate],`[RED][1] calls on [dark|ancient|arcane] arts to turn [2] into a bomb!<br>[2] is [unaware|unprepared|feeling a little sick] when they next see [3], only to explode violently and sending [3] [flying|tumbling|a barrage of body parts] and breaking a few bones.`,p=>{p[1].kill(p[2],`ancient scepter`);p[2].gain('confirmed');p[3].gain('broken');});
 			// Gun Dueling
 				new G.act(perkAttackMult*attackKill*0.2,[coldBloodKiller+' handgun%0.8|lasergun%0.5|shotgun%0.2 marksmen|any%0.8 !cowardly%0.8|naive%0.2','- handgun%0.8|lasergun%0.2|shotgun%0.2 !peaceful|cowardly%0.8|kevlar_vest%0.5|combat_gear%0.2|lucky_coin%0.5 '+victimKill],`[RED][1] and [2] duel it out, guns drawn.<br>[Two shots are fired.|One shot is fired.] [2] falls over, dead.`,p=>{p[1].kill(p[2],`gun duel`);});
 				new G.act(perkAttackMult*attackKill*0.1,[hesitentKiller+' handgun%0.8|lasergun%0.2|shotgun%0.2 !kevlar_vest%0.5|combat_gear%0.2|lucky_coin%0.5|marksmen%0.5 '+victimKill,'- handgun%0.8|lasergun%0.5|shotgun%0.2 marksmen|any%0.8 !peaceful|cowardly%0.8'],`[RED][1] and [2] duel it out, guns drawn.<br>[Two shots are fired.|One shot is fired.] [1] falls over, dead.`,p=>{p[2].kill(p[1],`gun duel`);});
@@ -2393,7 +2394,7 @@ G={
 			new G.act(perkAttackMult*0.3,['magic_wand|ancient_scepter|the_gift%0.2|wizard_robe%0.2 magic_wand%0.5|ancient_scepter%0.5|wizard_robe%0.5|animal_ken%0.5|any%0.5','- !sheep|wizard_robe%0.5|stubborn%0.2'],`[BLUE]With a flick of [1:their] wrist, [1] turns [2] into a sheep!`,p=>{p[2].gain('sheep');});
 				new G.act(perkAttackMult*0.2,['magic_wand|ancient_scepter|the_gift%0.5|wizard_robe%0.2 wizard_robe%0.5|cute%0.5|seductive%0.5|devious%0.5|any%0.5 !peaceful%0.8|kind%0.5|naive%0.2','- any !dazed|wizard_robe%0.5|naive%0.2|stubborn%0.2|analytical%0.2'],`[RED][1] [casts a charm on|waves [1:their] magic at] [2] leaving [2:them] completely senseless.`,p=>{p[2].gain('dazed');p[2].gain('dizzy');});
 				new G.act(0.01,['ancient_scepter%0.5|magic_wand%0.2|wizard_robe%0.2|the_gift%0.2 ancient_scepter%0.5|magic_wand%0.2|wizard_robe%0.2|the_gift%0.2 leader%0.5|kind%0.5|medic%0.5|shell-shocked%0.5|any%0.2 !sociopath|devious%0.8|survivalist%0.8','+ dead'],`[BLUE][1] invokes [dark|desperate|arcane|last resort] magic with everything [1:they] have!<br>...it's a miracle! [1] brought [2] back to the edge of life!`,p=>{p[1].lose('shell-shocked');p[2].lose('dead');p[2].gain('revived');});
-				new G.act(0.01,['ancient_scepter%0.5|magic_wand%0.2|wizard_robe%0.2|the_gift%0.5 ancient_scepter%0.5|magic_wand%0.2|wizard_robe%0.2|the_gift%0.5 leader%0.5|kind%0.5|medic%0.5|suicidal%0.8|any%0.2 !sociopath|devious%0.8|survivalist%0.8','+ dead peaceful%0.5|kind%0.5|cute%0.5|medic%0.5|any%0.5'],`[BLUE][1] invokes [dark|desperate|arcane|last resort] magic with everything [1:they] have left!<br>One life for one life. With [1]'s life spent, [2] slowly begins to wake up once more...<br>When [2] realizes what has happened, it is already too late... Was it really worth it?`,p=>{p[1].kill(p[1],`self sacrafice`);p[2].gain('shell-shocked');p[2].lose('dead');p[2].gain('revived');});
+				new G.act(0.01,['ancient_scepter%0.5|magic_wand%0.2|wizard_robe%0.2|the_gift%0.5 ancient_scepter%0.5|magic_wand%0.2|wizard_robe%0.2|the_gift%0.5 leader%0.5|kind%0.5|medic%0.5|suicidal%0.8|any%0.2 !sociopath|devious%0.8|survivalist%0.8','+ dead peaceful%0.5|kind%0.5|cute%0.5|medic%0.5|any%0.5'],`[BLUE][1] invokes [dark|desperate|arcane|last resort] magic with everything [1:they] have left!<br>One life for one life. With [1]'s life spent, [2] slowly begins to wake up once more...<br>When [2] realizes what has happened, it is already too late... Was it really worth it?`,p=>{p[1].kill(p[1],`self sacrifice`);p[2].gain('shell-shocked');p[2].lose('dead');p[2].gain('revived');});
 			// Wish Ring
 			new G.act(perkAttackMult*attackKill*0.2,[hesitentKiller+' wish_ring the_gift%0.2|naive%0.5|goth%0.5|any%0.5','- any annoying|any%0.8 !lucky_coin%0.2|plot_armor%0.5'],`[RED][1] wishes [2] would disappear... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...nobody seems to remember [2] ever existed at all.`,p=>{p[1].kill(p[2],`ceased to exist`);p[2].gain('nihil');});
 				new G.act(perkAttackMult*attackKill*0.1,['wish_ring naive%0.5|peaceful%0.5|meek%0.5|the_gift%0.5|any%0.5 !survivalist%0.8|devious%0.5|stubborn%0.5|analytical%0.5|plot_armor%0.5'],`[RED][1] wishes [1:g|he wasn't|she wasn't|they weren't] here... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...nobody seems to remember [1] ever existed at all.`,p=>{p[1].kill(p[1],`ceased to exist`);p[1].gain('nihil');});
@@ -3937,7 +3938,7 @@ G={
 					if (Math.random() < chance) { this.lose('pet rock'); this.kill(cl[1], 'fractured skull'); return text.replace('[S]', 'hitting [2:them] and shattering right on the head'); }
 					return text.replace('[T]', '');
 				},
-				req: ['pet_rock !determined any%0.75|sociopath'],
+				req: ['pet_rock !determined any%0.75|sociopath', 'any'],
 				pReq: ['e:10/50 d:5/80']
 			});
 
@@ -4027,7 +4028,7 @@ G={
 				failFunc: function(cl, text) {
 					if (Math.random() < 0.25 && !this.has('survivalist')) { this.gain('fallen'); return text.replace('[S]', ' [1] meanwhile, lost [1:their] balance and fell [onto the ground|face-first].'); }
 				},
-				req: ['shuriken'],
+				req: ['shuriken', 'any'],
 				pReq: ['e:10']
 			});
 			//scrap metal (copy paste go go go)
@@ -4041,7 +4042,7 @@ G={
 				failFunc: function(cl, text) {
 					if (Math.random() < 0.25 && !this.has('survivalist')) { this.gain('fallen'); return text.replace('[S]', ' [1] meanwhile, lost [1:their] balance and fell [onto the ground|face-first].'); }
 				},
-				req: ['scrap_metal'],
+				req: ['scrap_metal', 'any'],
 				pReq: ['e:10']
 			});
 			//cursed knife (4 moves) 
@@ -4056,7 +4057,7 @@ G={
 				text: '[Motivated|Driven|Compelled] by [1:their] [cursed|ominous|unforgettable|creepy] knife, [1] [lurches|throws [1:themself]] at [2] with [incredible speed|surprising agility] and [slices|chops] [2]\'s [[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] eyelid [right |]off!|]',
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.sliceLight(),
-				req: ['cursed_knife able%0.75|frenzied'],
+				req: ['cursed_knife able%0.75|frenzied', 'any'],
 				pReq: ['d:15']
 			});
 			new G.move({
@@ -4067,7 +4068,7 @@ G={
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.stabLight('cursed knife', 0.25),
 				failFunc: function() { this.gain('fallen'); },
-				req: ['cursed_knife able%0.5|frenzied'],
+				req: ['cursed_knife able%0.5|frenzied', 'any'],
 				pReq: ['d:5']
 			});
 			new G.move({
@@ -4077,7 +4078,7 @@ G={
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.stabLight('cursed knife'),
-				req: ['cursed_knife able !frenzied'],
+				req: ['cursed_knife able !frenzied', 'any'],
 				pReq: ['e:10']
 			});
 			G.moveAssets.stabHeavy = function(item, chanceNew) {
@@ -4109,22 +4110,40 @@ G={
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 3 + 2); },
 				successFunc: G.moveAssets.stabHeavy('sword'),
-				req: ['sword'],
+				req: ['sword', 'any'],
 				pReq: ['e:15']
 			});
 			new G.move({
 				chance: 2,
 				text: '[1] slashes [2] with [1:their] sword[S]!',
-				failText: '[1] slashes [2] with [1:their sword], but the sword only slashed the air.',
+				failText: '[1] slashes [2] with [1:their] sword, but the sword only slashed the air.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.2, 'overall'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 2 + 1); },
 				successFunc: G.moveAssets.sliceBig(),
-				req: ['sword'],
+				req: ['sword', 'any'],
 				pReq: ['e:15']
 			});
-			//gonna do axe combat later
+			//axe (1 move simpler alternative to sword without nearly as many possible modifiers)
 			new G.move({
-				
+				chance: 3.5,
+				text: '[1] hacks at [2] with [1:their] axe[S]!',
+				failText: '[1] hacks at [2] with [1:their] axe, but [2:they] avoided all the swings [1] made at [2:them].',
+				fail: function(cl) { return this.adjust(0.4, 'overall'); },
+				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 3 + 2); },
+				successFunc: function(cl, text) {
+					let chance = 0.3;
+					if (this.has('analytical') || this.has('ninja') || this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
+					if (this.has('frenzied')) { chance += 0.1; }
+					if (this.has('clumsy') || this.has('meek') || this.isInjured() || this.isAiled()) { chance -= 0.1; }
+					if (cl[1].has('knight armor') || cl[1].has('combat gear') || cl[1].has('kevlar vest') || cl[1].has('defensive') || cl[1].has('ironskin')) { chance -= 0.15; }
+					if (cl[1].isDisabled() || cl[1].isInjured()) { chance += 0.2; }
+
+					cl[1].gain('cut up');
+					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', ', and also knocking [2:them] onto the ground'); }
+					if (Math.random() < chance / 3) { this.kill(cl[1], 'beheaded'); return text.replace('[S]', ', and also severing [2:their] jugular veins'); }
+				},
+				req: ['axe', 'any'],
+				pReq: ['e:12']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
