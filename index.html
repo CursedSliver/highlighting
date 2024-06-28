@@ -3713,6 +3713,7 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			};
 			new G.move({
+				chance: 0.75,
 				text: '[1] slams [1:their] big stick right down [2]\'s [skull|head][S].',
 				failText: '[1] slams down [1:their] big stick at [2], but only managed to [kick off dirt in all directions|hit the ground].',
 				element: new G.element({
@@ -3740,6 +3741,7 @@ G={
 				pReq: ['e:10']
 			});
 			new G.move({
+				chance: 0.5,
 				text: '[1] [swings|flails] [1:their] big stick at [2][S].',
 				failText: '[1] [swings|flails] [1:their] big stick at [2], but it missed and hit nothing.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'swing'), 'dodge'); },
@@ -3758,7 +3760,77 @@ G={
 				},
 				pReq: ['e:15']
 			});
-			
+			new G.move({
+				text: '[1] pokes [1:their] pitchfork at [2][S].',
+				failText: '[1] pokes [1:their] pitchfork at [2], but it missed.',
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'useSpearhead'), 'dodge'); },
+				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.floor(Math.random() * 3 + 5)); },
+				successFunc: function(cl, text) {
+					let chance = 0.3;
+					if (cl[1].has('combat gear') || cl[1].has('knight armor')) { return text.replace('[S]', ', but it did nothing'); }
+					if (this.has('knight armor')) { chance -= 0.1; }
+					if (this.has('bulky')) { chance += 0.15; }
+					if (this.has('analytical')) { chance += 0.1; }
+
+					if (Math.random() < chance) {
+						cl[1].gain('cut up');
+						return text.replace('[S]', ', which sees blood');
+					}
+					if (Math.random() < chance / 2 && !cl[1].has('fallen')) {
+						cl[1].gain('fallen');
+						return text.replace('[S], pushing [2:them] onto the ground.');
+					}
+				},
+				req: ['pitchfork', '- any'],
+				pReq: ['d:5']
+			});
+			new G.move({
+				chance: 1.5,
+				text: '[1] uses [1:their] pitchfork to keep [2] away from [1:them].',
+				successFunc: function(cl) { 
+					cl[1].combat.moveToward(this, -4); 
+				},
+				req: ['pitchfork', '- any'],
+				pReq: ['d:2/6']
+			});
+
+			//slingshot (2 moves)
+			//bad move, meant to be a slingshot nerfer
+			new G.move({
+				chance: 1.5,
+				text: '[1] gathers ammo for [1:their] slingshot.',
+				element: G.moveAssets.elements.alone,
+				req: ['slingshot !scrappy|vigilant%0.4|frenzied%0.5']
+			});
+			G.adjustFuncs.simpleProjectile = function(chance) {
+				let pow = 1;
+				if (this.has('marksmen')) { pow -= 0.5; }
+				if (this.has('the gift')) { pow -= 0.15; }
+				if (this.has('vigilant')) { pow -= 0.05; }
+
+				if (this.has('clumsy')) { pow += 0.5; }
+				if (this.has('plot armor')) { pow += 0.5; }
+				if (this.has('dizzy')) { pow += 0.5; }
+				if (this.isDisabled()) { pow += 0.5; }
+				if (this.has('blind')) { pow += 5; }
+
+				return 1 - Math.pow(1 - chance, pow);
+			};
+			new G.move({
+				chance: 1,
+				text: '[1] [pelts|attacks] [2] with pebbles from [1:their] slingshot. [S]',
+				failText: '[1] tries to shoot [2] with [1:their] slingshot, but the shots all missed.',
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.5, 'simpleProjectile'), 'dodge'); },
+				successFunc: function(cl, text) {
+					let chance = 0.4;
+					if (this.has('marksmen')) { chance += 0.1; }
+					
+					if (Math.random() < chance) { cl[1].gain('bruised'); return text.replace('[S]', 'The pebbles managed to bruise [2:them]!'); }
+					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', 'The pebbles managed to knock over [2:them]!'); }
+					if (Math.random() < chance / (this.has('marksmen')?1:2)) { cl[1].gain('dazed'); return text.replace('[S]', 'The pebbles managed to hit [2:them] right on the head, stunning [2:them]!'); }
+				},
+				pReq: ['e:20/100']
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
