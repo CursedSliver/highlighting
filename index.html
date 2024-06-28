@@ -647,6 +647,7 @@ G={
 		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false});
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
+		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false});
 		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true}); // Removed Disabled
 		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true});
 		new G.perk({name:`missing leg`,desc:`Missing a whole leg!`});
@@ -3168,13 +3169,23 @@ G={
 			new G.move({
 				chance: 1,
 				text: 'Something inside [1] [snaps|breaks|changes with turbulance], and [a smile of [death|pain]|a barrage of muscle twitches|a fiery stare] signifies [1:their] [descent into madness|enraged mind]...',
-				successFunc: function(cl) {
+				successFunc: function() {
 					this.gain('frenzied');
 					this.combat.overseer.injectColor('red');
 				},
 				element: G.moveAssets.elements.alone,
-				req: ['any%0.2|cursed_knife%0.5|unstable%0.2|leader%0.2|sociopath%0.2|devious%0.2|no_item%0.2|devious%0.2|pyromania%0.1'],
+				req: ['any%0.2|cursed_knife%0.5|unstable%0.5|leader%0.2|sociopath%0.2|devious%0.2|no_item%0.2|devious%0.2|pyromania%0.1'],
 				cReq: ['m:taunt|m:taunt2']
+			});
+			new G.move({
+				chance: 0.2, 
+				text: G.last.text,
+				successFunc: function() {
+					this.gain('frenzied');
+					this.combat.overseer.injectColor('red');
+				},
+				element: G.moveAssets.elements.alone,
+				req: ['unstable'] //why unstable is a good trait lmao
 			});
 			new G.move({
 				chance: 2.5,
@@ -3928,8 +3939,88 @@ G={
 				},
 				req: ['pet_rock !determined any%0.75|sociopath'],
 				pReq: ['e:10/50 d:5/80']
-			})
-			
+			});
+
+			//fun stabbing weapons (shuriken melee, cursed knife, scrap metal, sword jousting)
+			G.adjustFuncs.stabAccuracy = function(chance) {
+				let pow = 1;
+				if (this.has('haste')) { pow *= 0.8; }
+				if (this.has('marksmen')) { pow *= 0.8; }
+				if (this.has('frenzied')) { pow *= 0.6; }
+				if (this.has('determined')) { pow *= 0.7; }
+
+				if (this.has('clumsy')) { pow += 0.4; }
+				if (this.has('peaceful')) { pow += 0.3; }
+				if (this.has('meek')) { pow += 0.2; }
+				if (this.has('blind')) { pow += 2; }
+				if (this.has('dizzy')) { pow += 0.5; }
+				if (this.has('dazed')) { pow += 0.5; }
+				if (this.has('bruised')) { pow += this.has('bruised').count * 0.05; }
+
+				return 1 - Math.pow(1 - chance, pow);
+			};
+			G.adjustFuncs.stabDamage = function(chance) {
+				//mainly about accuracy of stabbing vital organs; more pow = better
+				let pow = 1;
+				if (this.has('bulky')) { pow += 0.2; }
+				if (this.has('the gift')) { pow += 0.2; } //FIRE
+				if (this.has('haste')) { pow += 0.3; }
+				if (this.has('marksmen')) { pow += 0.4; }
+				if (this.has('analytical')) { pow += 0.4; }
+				if (this.has('ninja')) { pow += 0.4; }
+				if (this.has('frenzied')) { pow += 0.5; }
+				if (this.has('determined')) { pow += 0.1; }
+
+				if (this.has('clumsy')) { pow *= 0.75; }
+				if (this.has('peaceful')) { pow *= 0.9; }
+				if (this.has('meek')) { pow *= 0.9; }
+				if (this.has('blind')) { pow *= 0.2; }
+				if (this.has('dizzy')) { pow *= 0.85; }
+				if (this.has('dazed')) { pow *= 0.85; }
+
+				return 1 - Math.pow(1 - chance, pow);
+			};
+			G.adjustFuncs.stabDefense = function(chance) {
+				//very significant; more pow = more chances to die
+				//intended for body (how do you stab a head, anyways)
+				let pow = 1;
+				if (this.has('knight armor')) { pow *= 0.3; }
+				if (this.has('combat gear') || this.has('kevlar vest')) { pow *= 0.6; }
+				if (this.has('ironskin')) { pow *= 0.6; }
+				if (this.has('bulky')) { pow *= 0.9; }
+				if (this.has('parka') || this.has('dapper suit')) { pow *= 0.85; }
+				if (this.has('survivalist')) { pow *= 0.8; }
+				if (this.has('defensive')) { pow *= 0.8; }
+
+				if (this.has('frenzied')) { pow *= 1.25; }
+				if (this.has('meek') || this.has('clumsy')) { pow *= 1.2; }
+
+				return 1 - Math.pow(1 - chance, pow);
+			};
+			G.moveAssets.stabLight = function(item) {
+				return function(cl, text) {
+					let chance = 0.1; //chance to embed; pow 2 is chance to bleed out instantly
+					chance = cl[1].adjust(this.adjust(chance, 'stabDamage'), 'stabDefense');
+
+					if (Math.random() < 0.9) { this.gain('cut up'); }
+					if (Math.random() < chance) { this.lose(item); cl[1].gain('embedded'); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:their] [kicked|threw] [1] off [2:themself].'; }
+					if (Math.random() < chance && Math.random() < chance) { cl[1].gain('embedded'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
+				}
+			}
+			//shuriken melee
+			new G.move({
+				chance: 2,
+				text: '[1] uses a sharp edge on [1:their] shuriken and [digs|sinks it] [right |]into [2]\'s [chest|thigh|left shoulder|right shoulder][S]!',
+				failText: '[1] lurches at [2] with shuriken in hand, but[ luckily||], [2] [got out of the way in time|managed to avoid it]![S]',
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'stabAccuracy'), 'dodge'); },
+				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random()); },
+				successFunc: G.moveAssets.stabLight('shuriken'),
+				failFunc: function(cl, text) {
+					if (Math.random() < 0.25 && !this.has('survivalist')) { this.gain('fallen'); return text.replace('[S]', ' [1] meanwhile, lost [1:their] balance and fell [onto the ground|face-first].'); }
+				},
+				req: ['shuriken'],
+				pReq: ['e:10']
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
