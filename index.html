@@ -3740,7 +3740,7 @@ G={
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'swing'), 'dodge'); },
 				req: ['big_stick'],
 				func: function(cl) {
-					this.combat.moveInFrontOf(charList[1], Math.floor(Math.random() * 5 + 2));
+					this.combat.moveInFrontOf(cl[1], Math.floor(Math.random() * 5 + 2));
 				},
 				successFunc: function(cl, text) {
 					let chance = 0.5; 
