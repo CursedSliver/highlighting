@@ -641,10 +641,11 @@ G={
 		G.glob.ailment = false;
 		G.glob.combat = false;
 		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false}); // Removed Disabled
-		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`});
-		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
+		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`,injury:false});
+		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
 		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`});
-		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false});
+		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.6) { this.owner.gain('lacerated'); } }});
+		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,disable:false});
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
 		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false});
@@ -4079,6 +4080,28 @@ G={
 				successFunc: G.moveAssets.stabLight('cursed knife'),
 				req: ['cursed_knife able !frenzied'],
 				pReq: ['e:10']
+			});
+			G.moveAssets.stabHeavy = function(item, chanceNew) {
+				if (!chanceNew) { chanceNew = 0.25; }
+				return function(cl, text) {
+					let chance = chanceNew; //chance to embed; pow 2 is chance to bleed out instantly, another pow 2 is chance to die
+					chance = cl[1].adjust(this.adjust(chance, 'stabDamage'), 'stabDefense');
+
+					this.gain('cut up'); 
+					if (Math.random() < chance) { this.lose(item); cl[1].gain('embedded'); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:their] [kicked|threw] [1] off [2:themself].'; }
+					if (Math.random() < chance && Math.random() < chance) { cl[1].gain('embedded'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
+					if (Math.random() < chance && Math.random() < chance) { this.kill(cl[1], 'punctural organ failure'); }
+				}
+			};
+			new G.move({
+				chance: 1.5,
+				text: '[1] stabs [2] with [1:their] sword[S]!',
+				failText: '[1] tries to stab [2] with [1:their] sword, but the sword just went past [2:them] without touching.',
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
+				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 3 + 2); },
+				successFunc: G.moveAssets.stabHeavy('sword'),
+				req: ['sword'],
+				pReq: ['e:15']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
