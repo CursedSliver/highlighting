@@ -3828,7 +3828,7 @@ G={
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 					if (Math.random() < chance) {
 						if (cl[1].has('knight armor') && Math.random() < chance) { cl[1].lose('knight armor'); return text.replace('[S]', ', breaking [2:their] knight armor in the process!'); }
-						cl[1].gain('fallen'); return text.replace('[S]', ', [[knocking|catapulting] [2:them] onto the [ground|floor]!]');
+						cl[1].gain('fallen'); return text.replace('[S]', ', [knocking|catapulting] [2:them] onto the [ground|floor]');
 					}
 				},
 				pReq: ['e:15']
