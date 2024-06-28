@@ -4054,7 +4054,7 @@ G={
 			});
 			new G.move({
 				chance: 2.5,
-				text: '[Motivated|Driven|Compelled] by [1:their] [cursed|ominous|unforgettable|creepy] knife, [1] [lurches|throws [1:themself]] at [2] with [incredible speed|surprising agility] and [slices|chops] [2]\'s [[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] eyelid [right |]off!|]',
+				text: '[Motivated|Driven|Compelled] by [1:their] [cursed|ominous|unforgettable|creepy] knife, [1] [lurches|throws [1:themself]] at [2] with [incredible speed|surprising agility] and [slices|chops] [2]\'s [[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] eyelid [right |]off!]',
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.sliceLight(),
 				req: ['cursed_knife able%0.75|frenzied', 'any'],
