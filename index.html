@@ -641,7 +641,7 @@ G={
 		G.glob.ailment = false;
 		new G.perk({name:`defensive`,desc:`In a defensive stance.`});
 		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true});
-		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},canLose:false,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { count--; if (count == 0) { this.lose('skipped', true); } }});
+		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},cannotLose:true,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { count--; if (count == 0) { this.lose('skipped', true); } }});
 		new G.perk({name:`in stasis`,desc:`Can no longer make turns!`});
 
 		G.glob.disable = true;
@@ -1302,7 +1302,7 @@ G={
 					let perkOwned = this.has(perk);
 					if (perkOwned) { 
 						if (perkOwned.perk.onLose) { perkOwned.perk.onLose.call(this.perks[this.perks.indexOf(perkOwned)]); }
-						if (perkOwned.perk.canLose && !force) { return this.perks.splice(this.perks.indexOf(perkOwned), 1); }
+						if (!perkOwned.perk.cannotLose && !force) { return this.perks.splice(this.perks.indexOf(perkOwned), 1); }
 					}
 				}
 				G.char.prototype.give=function(other,perk)
@@ -2272,8 +2272,8 @@ G={
 			var victimKill=injuredMajor+' '+victimMinor;
 			// Injury/murder chances
 			// Greatly reduced, replaced by the descriptive combat system
-			var anyAttackMult=0.75;  // Actual chance about halved due to trait checks.
-			var perkAttackMult=0.25; // Actual chance about halved due to trait checks.
+			var anyAttackMult=0.5;  // Actual chance about halved due to trait checks.
+			var perkAttackMult=0.15; // Actual chance about halved due to trait checks.
 			var anyDefenseMult=0.5;
 			
 			var attackFail=1;     // Placeholder
@@ -4631,9 +4631,9 @@ G={
 				this.combat.horizontal = (Math.pow(Math.random() - 0.5, 0.33) * 150);
 			}
 			G.char.prototype.fleeCombat = function(silent) {
+				this.lose('fleed');
 				if (!this.combat) { return false; }
 				if (!silent) { this.combat.overseer.injectBack('<br>[1] has fleed from the fight!'); }
-				this.lose('fleed');
 				for (let i in this.perks) {
 					if (this.perks[i].perk.combat) { this.lose(this.perks[i]); }
 				}
