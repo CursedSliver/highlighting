@@ -4509,8 +4509,8 @@ G={
 					return 'stuns [N]';
 				}
 				if (Math.random() < chance) {
-					target.gain('unconscious'); target.gain('fallen'); if (Math.random() < chance) { target.gain('cut up'); if (Math.random() < chance) { target.gain('bleeding out'); return 'knocking [N] out in a bloodied mess'; } }
-					return 'knocks out [N]';
+					target.gain('shell-shocked'); target.gain('fallen'); if (Math.random() < chance) { target.gain('cut up'); if (Math.random() < chance) { target.gain('bleeding out'); return 'knocking [N] out in a bloodied mess'; } }
+					return 'critically traumatizes [N]';
 				}
 				if (Math.random() < chance / 2) {
 					target.gain('comatose'); target.gain('fallen'); target.gain('lacerated'); target.gain('cut up');
