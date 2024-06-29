@@ -4548,9 +4548,9 @@ G={
 				}
 			};
 			new G.move(grenadeObj);
-			grenadeObj.element.interact = 2; grenadeObj.element.interactMin = 2; grenadeObj.chance += 1.5;
+			grenadeObj.element = new G.element({interact: 2, interactMin: 2}); grenadeObj.chance += 1.5;
 			new G.move(grenadeObj);
-			grenadeObj.element.interact = 3; grenadeObj.element.interactMin = 3; grenadeObj.chance += 1.5;
+			grenadeObj.element = new G.element({interact: 3, interactMin: 3}); grenadeObj.chance += 1.5;
 			new G.move(grenadeObj);
 			new G.move({
 				chance: 1,
