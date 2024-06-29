@@ -645,8 +645,8 @@ G={
 		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`,injury:false});
 		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
 		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`});
-		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.6) { this.owner.gain('lacerated'); } }});
-		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,disable:false});
+		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.4) { this.owner.gain('lacerated'); } }});
+		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } }});
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
 		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false});
@@ -3101,6 +3101,7 @@ G={
 					return this.adjust(0.1);
 				},
 				successFunc: function() { this.gain('fleed'); },
+				failFunc: function(cl) { let mover = (Math.random()<0.5?1:-1) * (Math.random() * 5 + 6); this.combat += mover; cl[1].combat += mover; },
 				req: ['!determined', 'able']
 			});
 			new G.move({
@@ -3113,6 +3114,7 @@ G={
 					return this.adjust(0.1);
 				},
 				successFunc: function() { this.gain('fleed'); },
+				failFunc: function(cl) { let mover = (Math.random()<0.5?1:-1) * (Math.random() * 5 + 6); this.combat += mover; cl[1].combat += mover; },
 				req: ['cowardly', 'able']
 			});
 			new G.move({
@@ -3149,6 +3151,22 @@ G={
 				},
 				req: ['!able !fallen !survivalist']
 			});
+			new G.move({
+				chance: 5,
+				text: '[1] can feel the blood loss from [1:their] numerous injuries getting to [1:their] head...',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.gain('bleeding out');
+					this.gain('fallen');
+					this.combat.overseer.injectColor('red');
+				},
+				req: ['lacerated !survivalist !frenzied'],
+				reqFunc: function() {
+					let count = this.has('lacerated').count - 2 * Math.floor(Math.random() * 2);
+					if (Math.random() * 4 > count) { return true; }
+					return false;
+				}
+			})
 			new G.move({
 				text: '[1] runs toward [2].',
 				func: function(cl) {
@@ -3198,7 +3216,7 @@ G={
 				req: ['unstable'] //why unstable is a good trait lmao
 			});
 			new G.move({
-				chance: 2.5,
+				chance: 3.5,
 				text: '[1] calls for [help from [S]|reinforcements], and [S] answers[.|!]',
 				failText: '[1] tries to call for help[ from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...|, but no one hears [1:them]...|, but no one hears [1:them]...|, but nothing happens...|, but nothing happens...]',
 				req: ['inTeam any%0.06|peaceful%0.04|leader|vigilant%0.04|the_gift%0.06|snake_charmer\'s_flute%0.1|*able !frenzied|laughed|dizzy%0.25|dazed%0.25|able%0.5'],
@@ -3229,7 +3247,18 @@ G={
 					if (pool.length > 0) { return text.replaceAll('[S]', '<e>'+choose(pool).name+'</e>'); } else {
 						return '[1] tries to call for help, only to realize that there is no one left to help [1:them]...';
 					}
-				}
+				},
+				reqFunc: function() {
+					let ownTeamN = 0;
+					let othersN = 0;
+					for (let i in this.combat.overseer.participants) {
+						if (this.combat.overseer.participants[i].team == this.team) { ownTeamN++; } else { othersN++; }
+					}
+					if (Math.random() < (1 - Math.pow(ownTeamN / (othersN + ownTeamN), 2))) {
+						return true;
+					}
+					return false;
+				},
 			});
 			new G.move({
 				text: '[1] [taunts|sneers at|insults|teases] [2][, menacingly|, aggressively|, confidently||].',
@@ -3318,6 +3347,7 @@ G={
 					if (this.has('ninja')) { chance -= 0.2; }
 					if (this.has('haste')) { chance -= 0.1; }
 					if (this.has('bulky')) { chance += 0.1; }
+					if (this.has('frenzied')) { chance -= 0.2; }
 					return chance;
 				},
 				successFunc: function() {
@@ -3572,6 +3602,7 @@ G={
 					if (this.has('bulky')) { chance += 0.1; }
 					if (cl[1].has('knight armor')) { chance -= 0.1; }
 					if (cl[1].has('bulky')) { chance -= 0.1; }
+					cl[1].gain('bruised');
 					if (Math.random() < chance) {
 						cl[1].gain('bruised');
 						return text.replace('[S]', ', greatly bruising [2]');
@@ -4109,6 +4140,7 @@ G={
 
 					cl[1].gain('cut up');
 					if (Math.random() < chance) { cl[1].gain('cut up'); }
+					if (Math.random() < chance / 4) { cl[1].gain('cut up'); }
 					if (Math.random() < chance) { cl[1].gain('bleeding out'); return text.replace('[S]', ', with blood streaming down the wound'); }
 				}
 			};
@@ -4132,15 +4164,22 @@ G={
 				req: ['sword', 'any'],
 				pReq: ['e:15']
 			});
+			new G.move({
+				chance: 2,
+				text: '[1] keeps [2] away with [1:their] sword.',
+				successFunc: function(cl) { cl[1].combat.moveToward(this, -8); },
+				req: ['sword', 'able'],
+				pReq: ['d:5']
+			})
 			//axe (1 move simpler alternative to sword without nearly as many possible modifiers)
 			new G.move({
-				chance: 3.5,
+				chance: 4,
 				text: '[1] hacks at [2] with [1:their] axe[S]!',
 				failText: '[1] hacks at [2] with [1:their] axe, but [2:they] avoided all the swings [1] made at [2:them].',
 				fail: function(cl) { return this.adjust(0.4, 'overall'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 3 + 2); },
 				successFunc: function(cl, text) {
-					let chance = 0.3;
+					let chance = 0.35;
 					if (this.has('analytical') || this.has('ninja') || this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
 					if (this.has('frenzied')) { chance += 0.1; }
 					if (this.has('clumsy') || this.has('meek') || this.isInjured() || this.isAiled()) { chance -= 0.1; }
