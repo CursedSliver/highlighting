@@ -4543,7 +4543,7 @@ G={
 					for (let i = 0; i < cl.length; i++) {
 						afflictions.push(G.moveAssets.grenadeBlastEffects(cl[i]));
 					}
-					for (let i in afflictions) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + 1)+']'); }
+					for (let i = 1; i <= afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+i+']'); }
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				}
 			};
