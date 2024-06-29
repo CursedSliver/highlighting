@@ -4387,12 +4387,12 @@ G={
 				var overseer = new G.combatOverseer();
 				this.combat = new G.combatTracker(overseer, this);
 				opponent.combat = new G.combatTracker(overseer, opponent);
-				opponent.combat.horizontal = (Math.random() - 0.5) * 40;
+				opponent.combat.horizontal = (Math.random() - 0.5) * 100;
 			}
 			G.char.prototype.joinCombat = function(overseer) {
 				if (this.combat) { return false; }
 				this.combat = new G.combatTracker(overseer, this);
-				this.combat.horizontal = ((Math.random() - 0.5) * 40);
+				this.combat.horizontal = (Math.pow(Math.random() - 0.5, 0.33) * 150);
 			}
 			G.char.prototype.fleeCombat = function(silent) {
 				if (!this.combat) { return false; }
