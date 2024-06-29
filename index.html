@@ -4368,7 +4368,8 @@ G={
 				req: ['handgun any%0.6|marksmen'],
 				reqFunc: function() {
 					return this.has('handgun').loaded;
-				}
+				},
+				pReq: ['e:7/1000']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
