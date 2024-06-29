@@ -3012,6 +3012,7 @@ G={
 				if (!this.combat) { return; }
 				if (!this.has('frenzied') && !this.has('haste') && ((Math.random() < 0.05) || (this.isDisabled() && Math.random() < 0.15) || (this.isInjured() && Math.random() < 0.1) || (this.isAiled() && Math.random() < 0.05))) { return this.has('fleed'); } //everyone can just be slow sometimes
 				let overseer = this.combat.overseer;
+				console.log(overseer);
 				let otherChars = overseer.participants;
 				let boxCharList = [];
 				for (let i in overseer.participants) {
