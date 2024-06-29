@@ -625,7 +625,7 @@ G={
 			G.glob.ailment = true; 
 			G.glob.injury = false;
 			G.glob.combat = false; //whether this applies to combat only; any perks marked with this will be removed after fleeing from combat
-		new G.perk({name:`frenzied`,desc:`Experiencing a fit of violent rage and, when met with trouble, an incredible surge of adrenaline.`});
+		new G.perk({name:`frenzied`,desc:`Experiencing a fit of violent rage and, when met with trouble, an incredible surge of adrenaline.`,disable:false});
 		new G.perk({name:`shell-shocked`,desc:`Has seen too much. May not be of much use for a while.`});
 		new G.perk({name:`dazed`,desc:`Not quite in full control of their faculties. May wander off unpredictably.`});
 		new G.perk({name:`heroic`,desc:`Having a moment of heroism. Resolved and unstoppable.`,ailment:false,onGain:function(){ if (this.owner.has('cowardly') || this.owner.has('terrified')) { this.owner.lose(this.perk.name); } }});
