@@ -4630,7 +4630,8 @@ G={
 						else if (tag.indexOf('ALL')==0) {
 							let list = [];
 							let exemptList = tag.split('-').splice(0, 1);
-							for (let i in actors) {
+							console.log(exemptList);
+							for (let i = 0; i < exemptList.length; i++) {
 								if (exemptList.includes((i + 1).toString())) { continue; }
 								list.push('<e>'+actors[i].name+'</e>');
 							}
