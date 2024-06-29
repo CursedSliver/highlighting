@@ -4036,7 +4036,7 @@ G={
 
 			//pets general
 			G.moveDefault.element = G.moveAssets.elements.alone;
-			G.moveDefault.successFunc: function() { this.gain('determined'); }
+			G.moveDefault.successFunc = function() { this.gain('determined'); }
 			new G.move({
 				chance: 4,
 				text: 'Seeing [1:their] pet rock\'s [cute stare|round body|lifeless body], [1] fills with determination!',
