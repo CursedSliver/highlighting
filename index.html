@@ -1696,8 +1696,9 @@ G={
 									neg = true;
 								}
 								for (let iiii in req[iii]) {
-									if (it.testCond(req[iii][iiii], prevTeam, neg)) { fitOR = true; break; }
+									if (it.testCond(req[iii][iiii], prevTeam, false)) { fitOR = true; break; }
 								}
+								if (fitOR && neg) { fitOR = false; } else if (!fitOR && neg) { fitOR = true; }
 								if (!fitOR) { fitAND = false; break; }
 							}
 							
