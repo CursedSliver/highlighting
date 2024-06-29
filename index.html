@@ -631,8 +631,8 @@ G={
 		new G.perk({name:`heroic`,desc:`Having a moment of heroism. Resolved and unstoppable.`,ailment:false,onGain:function(){ if (this.owner.has('cowardly') || this.owner.has('terrified')) { this.owner.lose(this.perk.name); } }});
 		new G.perk({name:`determined`,desc:`Set to give their all, whatever the cost.`,ailment:false,onGain:function(){ if (this.owner.has('cowardly') || this.owner.has('terrified')) { this.owner.lose(this.perk.name); } }});
 		new G.perk({name:`terrified`,desc:`Running away from something horrifying.`});
-		new G.perk({name:`has killed`,desc:`Caused someone's death.`,disable:false,ailment:false});
-		new G.perk({name:`revived`,desc:`Has been revived before.`,ailment:false});
+		new G.perk({name:`has killed`,desc:`Caused someone's death.`,init:{count:1},disable:false,ailment:false,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } }});
+		new G.perk({name:`revived`,desc:`Will be revived soon.`,ailment:false});
 		new G.perk({name:`set trap`,desc:`Laid down some traps that others may get caught in...`,disable:false,ailment:false});
 
 		//combat stuff
@@ -2269,8 +2269,8 @@ G={
 			var victimKill=injuredMajor+' '+victimMinor;
 			// Injury/murder chances
 			// Greatly reduced, replaced by the descriptive combat system
-			var anyAttackMult=2;  // Actual chance about halved due to trait checks.
-			var perkAttackMult=0.5; // Actual chance about halved due to trait checks.
+			var anyAttackMult=1;  // Actual chance about halved due to trait checks.
+			var perkAttackMult=0.25; // Actual chance about halved due to trait checks.
 			var anyDefenseMult=0.75;
 			
 			var attackFail=1;     // Placeholder
@@ -3071,7 +3071,9 @@ G={
 					}
 					
 					if (m.reqFunc && !m.reqFunc.call(this, targets)) { continue; }
-					for (let ii = 0; ii < randomFloor(m.chance); ii++) {
+					let chance = m.chance;
+					if (typeof m.chance == 'function') { chance = m.chance.call(this, targets); }
+					for (let ii = 0; ii < randomFloor(chance); ii++) {
 						availableMoves.push([m, targets]);
 					}
 				}
@@ -4510,11 +4512,13 @@ G={
 			}
 			G.moveAssets.grenadeBlastEffects = function(target, hDiff, vDiff) {
 				let chance = target.adjust(target.adjust(0.75, 'shockwaveDefense'), 'bulletDefense', hDiff, vDiff);
-				if (Math.random() < chance) {
+				target.combat.horizontal += (Math.random() - 0.5) * 30;
+				target.combat.vertical += Math.random();
+				if (Math.random() < chance && !target.has('dazed') && !target.has('lacerated') && !target.has('crippled')) {
 					target.gain('dazed'); if (Math.random() < chance) { target.gain('fallen'); return 'stuns and knocks over [N]'; }
 					return 'stuns [N]';
 				}
-				if (Math.random() < chance) {
+				if (Math.random() < chance && !target.has('shell-shocked') && !target.has('lacerated') && !target.has('crippled')) {
 					target.gain('shell-shocked'); target.gain('fallen'); if (Math.random() < chance) { target.gain('cut up'); if (Math.random() < chance) { target.gain('bleeding out'); return 'knocking [N] out in a bloodied mess'; } }
 					return 'critically traumatizes [N]';
 				}
@@ -4526,15 +4530,16 @@ G={
 					this.kill(target, 'grenade blast');
 					return '[brutally |]kills [N]';
 				}
-				return 'makes [N] squirm';
+				if (target.isDisabled()) { return 'gives [N] a big scare'; } else { return 'makes [N] squirm'; }
 			}
 			let grenadeObj = {
 				chance: 0.5,
 				text: '[1] [lights|rips out the pins on|arms] [1:their] grenade and throws it! It hits [ALL-1], which [S]!',
 				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it hits [ALL-1], but also [1:themself], which [S]!',
-				fail: function(cl) { let chance = this.adjust(this.adjust(0.2, 'throw'), 'runFail'); },
+				fail: function(cl) { let chance = this.adjust(this.adjust(0.25, 'throw'), 'runFail'); },
 				element: new G.element(),
 				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2|*able', '- any', '- any', 'any'],
+				pReq: ['h:2/20 v:2'],
 				successFunc: function(cl, text) {
 					this.lose('grenade');
 					let afflictions = [];
@@ -4567,9 +4572,10 @@ G={
 				chance: 1.5,
 				text: '[1] [lights|rips out the pins on|arms] [1:their] grenade and throws it! However, it did not manage to hit anyone.',
 				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it did not manage to hit anyone, and even hit [1:themself], which [S]!',
-				fail: function(cl) { let chance = this.adjust(this.adjust(0.2, 'throw'), 'runFail'); },
+				fail: function(cl) { let chance = this.adjust(this.adjust(0.25, 'throw'), 'runFail'); },
 				element: G.moveAssets.elements.alone,
 				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2'],
+				pReq: ['h:2/20 v:2'],
 				successFunc: function() { this.lose('grenade'); },
 				failFunc: function() { 
 					this.lose('grenade'); 
