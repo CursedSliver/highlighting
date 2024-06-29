@@ -4534,16 +4534,16 @@ G={
 					for (let i = 1; i < cl.length; i++) {
 						afflictions.push(G.moveAssets.grenadeBlastEffects.call(this, cl[i]));
 					}
-					for (let i in afflictions) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + 2)+']'); }
+					for (let i = 0; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + 2)+']'); }
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
 				failFunc: function(cl, text) {
 					this.lose('grenade');
-					let afflictions = [];
+					let afflictions = [''];
 					for (let i = 0; i < cl.length; i++) {
 						afflictions.push(G.moveAssets.grenadeBlastEffects(cl[i]));
 					}
-					for (let i = 0; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + 1)+']'); }
+					for (let i = 1; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+i+']'); }
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				}
 			};
