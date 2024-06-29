@@ -4553,14 +4553,18 @@ G={
 			grenadeObj.element = new G.element({interact: 3, interactMin: 3}); grenadeObj.chance += 2.5;
 			new G.move(grenadeObj);
 			new G.move({
-				chance: 1,
+				chance: 1.5,
 				text: '[1] [lights|rips out the pins on|arms] [1:their] grenade and throws it! However, it did not manage to hit anyone.',
 				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it did not manage to hit anyone, and even hit [1:themself], which [S]!',
 				fail: function(cl) { let chance = this.adjust(this.adjust(0.2, 'throw'), 'runFail'); },
 				element: G.moveAssets.elements.alone,
 				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2'],
 				successFunc: function() { this.lose('grenade'); },
-				failFunc: function() { this.lose('grenade'); return text.replace('[S]', G.moveAssets.grenadeBlastEffect.call(this, this).replace('[N]', '[1:themself]')); }
+				failFunc: function() { this.lose('grenade'); return text.replace('[S]', G.moveAssets.grenadeBlastEffect.call(this, this).replace('[N]', '[1:themself]')); },
+				reqFunc: function() {
+					if (Math.random() < 1 - (1 / (this.combat.overseer.participants.length - 1))) { return true; }
+					return false;
+				}
 			});
 			
 			G.char.prototype.initiateCombat = function() {
