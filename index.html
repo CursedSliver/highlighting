@@ -4610,7 +4610,7 @@ G={
 				this.combat = null;
 			}
 			
-			G.parse=function(text,actors)
+			G.parse = function(text,actors)
 			{
 				/*
 					syntax :
@@ -4627,10 +4627,10 @@ G={
 		 			'[ALL-1-2]'
 	  					> every people and team except for chars or teams marked by 1 and 2
 				*/
-				var input=text.split(''); //seemingly just for editing purposes -CS
-				var out='';
-				var tag='';
-				var intag=0;
+				var input = text.split(''); //seemingly just for editing purposes -CS
+				var out = '';
+				var tag = '';
+				var intag = 0;
 				
 				for (var i in input)
 				{
@@ -4645,7 +4645,7 @@ G={
 							let list = [];
 							let exemptList = tag.split('-');
 							exemptList.splice(0, 1);
-							for (let i = 0; i < list.length; i++) {
+							for (let i = 0; i < actors.length; i++) {
 								if (exemptList.includes((i + 1).toString())) { continue; }
 								list.push('<e>'+actors[i].name+'</e>');
 							}
