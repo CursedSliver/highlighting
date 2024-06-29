@@ -4024,7 +4024,9 @@ G={
 				pReq: ['e:10/100']
 			});
 
-			//pet rock (2 moves)
+			//pets general
+			G.moveDefault.element = G.moveAssets.elements.alone;
+			G.moveDefault.successFunc: function() { this.gain('determined'); }
 			new G.move({
 				chance: 1.5,
 				text: 'Seeing [1:their] pet rock\'s [cute stare|round body|lifeless body], [1] fills with determination!',
@@ -4032,8 +4034,39 @@ G={
 				successFunc: function() {
 					this.gain('determined');
 				},
-				req: ['pet_rock !determined']
+				req: ['pet_rock !determined any']
 			});
+			new G.move({
+				chance: 5,
+				text: 'Seeing [1:their] pet turtle\'s [trusting stare|snubby shell|curious head|small body], [1] fills with determination!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.gain('determined');
+				},
+				req: ['pet_turtle !determined any']
+			});
+			new G.move({
+				chance: 1,
+				text: 'Inspired by [1:their] pet hawk\'s [watchful eye|unstoppable conviction], [1] fills with determination!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.gain('determined');
+				},
+				req: ['pet_hawk !determined any']
+			});
+			new G.move({
+				chance: 1,
+				text: 'Captivated by [1:their] pet wolf\'s [royalty|fierceness|anger], [1] fills with determination!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.gain('determined');
+				},
+				req: ['pet_wolf !determined any']
+			});
+
+			G.moveDefault.element = new G.element();
+			G.moveDefault.successFunc: function() { }
+			//pet rock (1 move)
 			new G.move({
 				chance: 4,
 				text: '[1] [lobs|throws|launches] [1:their] pet rock at [2][S]![T]',
