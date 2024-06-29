@@ -3140,7 +3140,7 @@ G={
 					return this.adjust(0.1);
 				},
 				successFunc: function() { this.gain('fleed'); },
-				failFunc: function(cl) { let mover = (Math.random()<0.5?1:-1) * (Math.random() * 5 + 6); this.combat += mover; cl[1].combat += mover; },
+				failFunc: function(cl) { let mover = (Math.random()<0.5?1:-1) * (Math.random() * 5 + 6); this.combat.horizontal += mover; cl[1].combat.horizontal += mover; },
 				req: ['!determined', 'able']
 			});
 			new G.move({
@@ -3153,7 +3153,7 @@ G={
 					return this.adjust(0.1);
 				},
 				successFunc: function() { this.gain('fleed'); },
-				failFunc: function(cl) { let mover = (Math.random()<0.5?1:-1) * (Math.random() * 5 + 6); this.combat += mover; cl[1].combat += mover; },
+				failFunc: function(cl) { let mover = (Math.random()<0.5?1:-1) * (Math.random() * 5 + 6); this.combat.horizontal += mover; cl[1].combat.horizontal += mover; },
 				req: ['cowardly', 'able']
 			});
 			new G.move({
