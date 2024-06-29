@@ -4038,40 +4038,40 @@ G={
 			G.moveDefault.element = G.moveAssets.elements.alone;
 			G.moveDefault.successFunc: function() { this.gain('determined'); }
 			new G.move({
-				chance: 1.5,
+				chance: 4,
 				text: 'Seeing [1:their] pet rock\'s [cute stare|round body|lifeless body], [1] fills with determination!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.gain('determined');
 				},
-				req: ['pet_rock !determined any']
+				req: ['pet_rock !determined any%0.4|animal_ken']
 			});
 			new G.move({
-				chance: 5,
+				chance: 15,
 				text: 'Seeing [1:their] pet turtle\'s [trusting stare|snubby shell|curious head|small body], [1] fills with determination!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.gain('determined');
 				},
-				req: ['pet_turtle !determined any']
+				req: ['pet_turtle !determined any%0.4|animal_ken']
 			});
 			new G.move({
-				chance: 1,
+				chance: 2.5,
 				text: 'Inspired by [1:their] pet hawk\'s [watchful eye|unstoppable conviction], [1] fills with determination!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.gain('determined');
 				},
-				req: ['pet_hawk !determined any']
+				req: ['pet_hawk !determined any%0.4|animal_ken']
 			});
 			new G.move({
-				chance: 1,
+				chance: 2,
 				text: 'Captivated by [1:their] pet wolf\'s [royalty|fierceness|anger], [1] fills with determination!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.gain('determined');
 				},
-				req: ['pet_wolf !determined any']
+				req: ['pet_wolf !determined any%0.4|animal_ken']
 			});
 
 			G.moveDefault.element = new G.element();
@@ -4443,6 +4443,125 @@ G={
 				},
 				pReq: ['e:4/1000']
 			});
+
+			//grenades (4 moves for 0 1 2 and 3 people respectively, plus one idling)
+			new G.move({
+				chance: 1.5,
+				text: '[1] [wonders|ponders] [what to do with|how to handle|how to use] [1:their] grenade.',
+				element: G.moveAssets.elements.alone,
+				req: ['grenade']
+			});
+			G.adjustFuncs.throw = function(chance) {
+				let pow = 1;
+
+				if (this.has('marksmen')) { pow *= 0.8; }
+				if (this.has('analytical')) { pow *= 0.8; }
+				if (this.has('vigilant')) { pow *= 0.9; }
+				if (this.has('determined')) { pow *= 0.9; }
+				if (this.has('frenzied')) { pow *= 0.75; }
+
+				if (this.has('blind')) { pow *= 2; }
+				if (this.has('clumsy')) { pow *= 1.4; }
+				if (this.has('meek')) { pow *= 1.2; }
+				if (this.isInjured()) { pow *= 1.25; }
+				if (this.isAiled()) { pow *= 1.25; }
+				if (this.isDisabled()) { pow *= 1.25; }
+
+				return 1 - Math.pow(1 - chance, pow);
+			};
+			G.adjustFuncs.runFail = function(chance) {
+				//decreases the chance
+				let pow = 1; 
+
+				if (this.has('haste')) { pow *= 0.9; }
+				if (this.has('ninja')) { pow *= 0.8; }
+				if (this.has('frenzied')) { pow *= 0.75; }
+				
+				if (this.has('clumsy')) { pow *= 1.2; }
+				if (this.has('meek')) { pow *= 1.25; }
+				if (this.has('fortified')) { pow *= 2; }
+				if (this.isDisabled()) { pow *= 2; }
+				if (this.isInjured()) { pow *= 1.5; }
+				if (this.isAiled()) { pow *= 1.25; }
+
+				return 1 - Math.pow(1 - chance, pow);
+			};
+			G.adjustFuncs.shockwaveDefense = function(chance) {
+				//hey ik grenades mainly damage via the shrapnels but I realy dont want to rewrite code for the magic spells pls forgive me tysm
+				//more pow = more chances to die
+				let pow = 1;
+
+				if (this.has('bulky')) { pow *= 0.8; }
+				if (this.has('combat gear')) { pow *= 0.8; }
+				if (this.has('knight armor')) { pow *= 1.4; }
+				if (this.has('survivalist')) { pow *= 0.85; }
+				if (this.has('defensive')) { pow *= 0.9; }
+				if (this.has('bleeding out')) { pow *= 1.5; }
+				//alright guys im done
+
+				return 1 - Math.pow(1 - chance, pow);
+			}
+			G.moveAssets.grenadeBlastEffects = function(target) {
+				let chance = target.adjust(target.adjust(0.35, 'shockwaveDefense'), 'bulletDefense');
+				if (Math.random() < chance) {
+					target.gain('dazed'); if (Math.random() < chance) { target.gain('fallen'); return 'stuns and knocks over [N]'; }
+					return 'stuns [N]';
+				}
+				if (Math.random() < chance) {
+					target.gain('unconscious'); target.gain('fallen'); if (Math.random() < chance) { target.gain('cut up'); if (Math.random() < chance) { target.gain('bleeding out'); return 'knocking [N] out in a bloodied mess'; } }
+					return 'knocks out [N]';
+				}
+				if (Math.random() < chance / 2) {
+					target.gain('comatose'); target.gain('fallen'); target.gain('lacerated'); target.gain('cut up');
+					return 'sends [N] into a coma';
+				}
+				if (Math.random() < chance / 2) {
+					this.kill(target, 'grenade blast');
+					return '[brutally |]kills [N]';
+				}
+				return 'makes [N] squirm';
+			}
+			let grenadeObj = {
+				chance: 2,
+				text: '[1] [lights|rips out the pins on|arms] [1:their] grenade and throws it! It hits [ALL-1], which [S]!',
+				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it hits [ALL-1], but also [1:themself], which [S]!',
+				fail: function(cl) { let chance = this.adjust(this.adjust(0.2, 'throw'), 'runFail'); },
+				element: new G.element(),
+				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2', 'any', 'any', 'any'],
+				successFunc: function(cl, text) {
+					this.lose('grenade');
+					let afflictions = [];
+					for (let i = 1; i < cl.length; i++) {
+						afflictions.push(G.moveAssets.grenadeBlastEffects.call(this, cl[i]));
+					}
+					for (let i in afflictions) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + 2)+']'); }
+					return text.replace('[S]', oxfordsConcat(afflictions));
+				},
+				failFunc: function(cl, text) {
+					this.lose('grenade');
+					let afflictions = [];
+					for (let i = 0; i < cl.length; i++) {
+						afflictions.push(G.moveAssets.grenadeBlastEffects(cl[i]));
+					}
+					for (let i in afflictions) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + 1)+']'); }
+					return text.replace('[S]', oxfordsConcat(afflictions));
+				}
+			};
+			new G.move(grenadeObj);
+			grenadeObj.element.interact = 2; grenadeObj.element.interactMin = 2; grenadeObj.chance += 1.5;
+			new G.move(grenadeObj);
+			grenadeObj.element.interact = 3; grenadeObj.element.interactMin = 3; grenadeObj.chance += 1.5;
+			new G.move(grenadeObj);
+			new G.move({
+				chance: 1,
+				text: '[1] [lights|rips out the pins on|arms] [1:their] grenade and throws it! However, it did not manage to hit anyone.',
+				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it did not manage to hit anyone, and even hit [1:themself], which [S]!',
+				fail: function(cl) { let chance = this.adjust(this.adjust(0.2, 'throw'), 'runFail'); },
+				element: G.moveAssets.elements.alone,
+				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2', 'any', 'any', 'any'],
+				successFunc: function() { this.lose('grenade'); },
+				failFunc: function() { this.lose('grenade'); return text.replace('[S]', G.moveAssets.grenadeBlastEffect.call(this, this).replace('[N]', '[1:themself]')); }
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
@@ -4491,6 +4610,8 @@ G={
 						> note that this can be nested, ie. '[1] [eats [cake|ice cream]|looks at [2]]'
 	  				'[ALL]'
 	   					> every people and team using oxford\'s commas
+		 			'[ALL-1-2]'
+	  					> every people and team except for chars or teams marked by 1 and 2
 				*/
 				var input=text.split(''); //seemingly just for editing purposes -CS
 				var out='';
@@ -4506,9 +4627,11 @@ G={
 					{
 						if (tag=='RED'){out+='[RED]'}
 						else if (tag=='BLUE'){out+='[BLUE]'}
-						else if (tag=='ALL') {
+						else if (tag.indexOf('ALL')==0) {
 							let list = [];
+							let exemptList = tag.split('-').splice(0, 1);
 							for (let i in actors) {
+								if (exemptList.includes((i + 1).toString())) { continue; }
 								list.push('<e>'+actors[i].name+'</e>');
 							}
 							out += oxfordsConcat(list);
@@ -4574,7 +4697,7 @@ G={
 				for (let i in G.chars){G.chars[i].acted=false;}
 				for (let i in G.ongoingCombats) { if (G.ongoingCombats[i].processed) { G.ongoingCombats[i].processed = false; G.ongoingCombats[i].roundCount++; G.ongoingCombats[i].clearOut(); G.ongoingCombats[i].addBox('Continuing the fight from last round, with [ALL]...', deepArrCopy(G.ongoingCombats[i].participants), true); } }
 				for (let i = 0; i < randomFloor(Math.log2(G.chars.length + 1)); i++) {
-					if (Math.random() < 0.2) {
+					if (Math.random() < 0.35 / (G.ongoingCombats.length + 1)) {
 						//chooses someone able to initiate combat with someone else
 						var pool = [];
 						for (let i in G.chars) {
