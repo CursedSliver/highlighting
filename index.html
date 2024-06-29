@@ -4528,7 +4528,7 @@ G={
 				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it hits [ALL-1], but also [1:themself], which [S]!',
 				fail: function(cl) { let chance = this.adjust(this.adjust(0.2, 'throw'), 'runFail'); },
 				element: new G.element(),
-				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2|*able', 'any', 'any', 'any'],
+				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2|*able', '- any', '- any', 'any'],
 				successFunc: function(cl, text) {
 					this.lose('grenade');
 					let afflictions = [];
