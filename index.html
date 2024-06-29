@@ -4522,12 +4522,12 @@ G={
 				return 'makes [N] squirm';
 			}
 			let grenadeObj = {
-				chance: 2,
+				chance: 0.5,
 				text: '[1] [lights|rips out the pins on|arms] [1:their] grenade and throws it! It hits [ALL-1], which [S]!',
 				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it hits [ALL-1], but also [1:themself], which [S]!',
 				fail: function(cl) { let chance = this.adjust(this.adjust(0.2, 'throw'), 'runFail'); },
 				element: new G.element(),
-				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2', 'any', 'any', 'any'],
+				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2|*able', 'any', 'any', 'any'],
 				successFunc: function(cl, text) {
 					this.lose('grenade');
 					let afflictions = [];
@@ -4548,9 +4548,9 @@ G={
 				}
 			};
 			new G.move(grenadeObj);
-			grenadeObj.element = new G.element({interact: 2, interactMin: 2}); grenadeObj.chance += 1.5;
+			grenadeObj.element = new G.element({interact: 2, interactMin: 2}); grenadeObj.chance += 2.5; grenadeObj.req[0] = 'grenade any%0.6|suicidal|devious%0.2|sociopath%0.2';
 			new G.move(grenadeObj);
-			grenadeObj.element = new G.element({interact: 3, interactMin: 3}); grenadeObj.chance += 1.5;
+			grenadeObj.element = new G.element({interact: 3, interactMin: 3}); grenadeObj.chance += 2.5;
 			new G.move(grenadeObj);
 			new G.move({
 				chance: 1,
@@ -4558,7 +4558,7 @@ G={
 				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it did not manage to hit anyone, and even hit [1:themself], which [S]!',
 				fail: function(cl) { let chance = this.adjust(this.adjust(0.2, 'throw'), 'runFail'); },
 				element: G.moveAssets.elements.alone,
-				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2', 'any', 'any', 'any'],
+				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2'],
 				successFunc: function() { this.lose('grenade'); },
 				failFunc: function() { this.lose('grenade'); return text.replace('[S]', G.moveAssets.grenadeBlastEffect.call(this, this).replace('[N]', '[1:themself]')); }
 			});
