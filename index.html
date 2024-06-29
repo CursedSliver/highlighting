@@ -3663,16 +3663,17 @@ G={
 					if (this.has('bulky')) { chance += 0.1; }
 					if (cl[1].has('knight armor')) { chance -= 0.1; }
 					if (cl[1].has('bulky')) { chance -= 0.1; }
+					if (cl[1].has('crippled')) { chance += 0.25; }
 					cl[1].gain('bruised');
-					if (Math.random() < chance) {
+					if (Math.random() < chance && !cl[1].has('crippled')) {
 						cl[1].gain('bruised');
 						return text.replace('[S]', ', greatly bruising [2:them]');
 					}
-					if (Math.random() < chance / 2) {
+					if (Math.random() < chance / 2 || (cl[1].has('crippled') && Math.random() < chance / 2)) {
 						cl[1].gain('broken');
 						return text.replace('[S]', ', breaking [2:their] [ribs|neck]');
 					}
-					if (Math.random() < chance / 3) {
+					if (Math.random() < chance / 3 || (cl[1].has('crippled') && Math.random() < chance / 3)) {
 						this.kill(cl[1], 'Counterproductive CPR');
 						return text.replace('[S]', ', causing [2:their] death!');
 					}
