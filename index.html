@@ -2952,6 +2952,12 @@ G={
 				boxIndex = boxIndex||(this.out.length - 1);
 				this.out[boxIndex].color = color;
 			}
+			G.combatOverseer.prototype.addChar = function(char, index, subIndex, widgets) {
+				if (!index) { index = this.out.length - 1; }
+				if (!subIndex) { subIndex = this.out[index].charList.length - 1; }
+				this.out[index].charList.splice(subIndex, 0, new G.charIcon(char));
+				if (widgets) { this.out[index].charList[subIndex + 1].widgets = widgets; }
+			}
 			G.combatOverseer.prototype.getPrompt = function(boxIndex) {
 				if (!this.out.length) { return ''; }
 				boxIndex = boxIndex||(this.out.length - 1);
@@ -3259,7 +3265,7 @@ G={
 						if (!this.team.chars[i].combat && !this.team.chars[i].isOut()) { pool.push(this.team.chars[i]); }
 					}
 					let char = choose(pool);
-					if (char) { char.joinCombat(this.combat.overseer); return text.replaceAll('[S]', '<e>'+char.name+'</e>'); }
+					if (char) { char.joinCombat(this.combat.overseer); this.combat.overseer.addChar(char); return text.replaceAll('[S]', '<e>'+char.name+'</e>'); }
 				},
 				failFunc: function(cl, text) {
 					let pool = [];
