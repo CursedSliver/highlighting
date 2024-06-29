@@ -4643,8 +4643,8 @@ G={
 						else if (tag=='BLUE'){out+='[BLUE]'}
 						else if (tag.indexOf('ALL')==0) {
 							let list = [];
-							let exemptList = tag.split('-').splice(0, 1);
-							console.log(exemptList);
+							let exemptList = tag.split('-');
+							exemptList.splice(0, 1);
 							for (let i = 0; i < exemptList.length; i++) {
 								if (exemptList.includes((i + 1).toString())) { continue; }
 								list.push('<e>'+actors[i].name+'</e>');
