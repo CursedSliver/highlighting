@@ -4645,7 +4645,7 @@ G={
 							let list = [];
 							let exemptList = tag.split('-');
 							exemptList.splice(0, 1);
-							for (let i = 0; i < exemptList.length; i++) {
+							for (let i = 0; i < list.length; i++) {
 								if (exemptList.includes((i + 1).toString())) { continue; }
 								list.push('<e>'+actors[i].name+'</e>');
 							}
