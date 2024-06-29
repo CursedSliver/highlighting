@@ -570,6 +570,7 @@ G={
 			this.perk = perk;
 			this.owner = owner; 
 			this.roundN = 0;
+			this.t = 0;
 			if (obj) { for (let i in obj) { this[i] = obj[i]; } }
 			if (this.perk.init) { for (let i in this.perk.init) { this[i] = this.perk.init[i]; } }
 		}
@@ -3170,31 +3171,6 @@ G={
 				req: ['', 'any']
 			});
 			new G.move({
-				chance: 2,
-				text: '[1] could no longer maintain a standing posture from the pain [1:g|he is|she is|they are] experiencing.',
-				element: G.moveAssets.elements.alone,
-				successFunc: function() {
-					this.gain('fallen');	
-				},
-				req: ['!able !fallen !survivalist']
-			});
-			new G.move({
-				chance: 5,
-				text: '[1] can feel the blood loss from [1:their] numerous injuries getting to [1:their] head...',
-				element: G.moveAssets.elements.alone,
-				successFunc: function() {
-					this.gain('bleeding out');
-					this.gain('fallen');
-					this.combat.overseer.injectColor('red');
-				},
-				req: ['lacerated !survivalist !frenzied'],
-				reqFunc: function() {
-					let count = this.has('lacerated').count - 2 * Math.floor(Math.random() * 2);
-					if (Math.random() * 4 > count) { return true; }
-					return false;
-				}
-			})
-			new G.move({
 				text: '[1] runs toward [2].',
 				func: function(cl) {
 					this.combat.moveToward(cl[1], Math.random() * 3 + 4);
@@ -3321,10 +3297,12 @@ G={
 				cReq: ['interact:0'],
 				req: ['any%0.5|suicidal|naive|kind|unstable|sociopath|vigilant']
 			});
+
+			//status
+			G.moveDefaults.element = G.moveAssets.elements.alone;
 			new G.move({
 				chance: 0.5,
 				text: '[1] struggles [helplessly|uselessly|painfully] against [1:their] injuries.',
-				element: G.moveAssets.elements.alone,
 				req: ['!able']
 			});
 			new G.move({
@@ -3334,7 +3312,6 @@ G={
 					this.cureAilments();
 					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('batch of cookies'); this.injectBack('<br>[1] has eaten all of [1:their] cookies.'); }
 				},
-				element: G.moveAssets.elements.alone,
 				req: ['batch_of_cookies any%0.05|ailed']
 			});
 			new G.move({
@@ -3344,7 +3321,6 @@ G={
 					this.healInjuries();
 					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('hot chocolate'); this.injectBack('<br>[1] has drank all of [1:their] hot chocolate.'); }
 				},
-				element: G.moveAssets.elements.alone,
 				req: ['batch_of_cookies any%0.05|ailed']
 			});
 			new G.move({
@@ -3361,7 +3337,6 @@ G={
 				successFunc: function() {
 					this.lose('dazed');
 				},
-				element: G.moveAssets.elements.alone,
 				req: ['dazed']
 			});
 			new G.move({
@@ -3380,10 +3355,39 @@ G={
 				successFunc: function() {
 					this.lose('fallen');
 				},
-				element: G.moveAssets.elements.alone,
 				req: ['fallen']
 			});
+			new G.move({
+				chance: 2,
+				text: '[1] could no longer maintain a standing posture from the pain [1:g|he is|she is|they are] experiencing.',
+				successFunc: function() {
+					this.gain('fallen');	
+				},
+				req: ['!able !fallen !survivalist']
+			});
+			new G.move({
+				chance: 5,
+				text: '[1] can feel the blood loss from [1:their] numerous injuries getting to [1:their] head...',
+				successFunc: function() {
+					this.gain('bleeding out');
+					this.gain('fallen');
+					this.combat.overseer.injectColor('red');
+				},
+				req: ['lacerated !survivalist !frenzied'],
+				reqFunc: function() {
+					let count = this.has('lacerated').count - 2 * Math.floor(Math.random() * 2);
+					if (Math.random() * 4 > count) { return true; }
+					return false;
+				}
+			});
+			new G.move({
+				chance: 0.3,
+				text: '[1] [finally |at last]succumbs to [1:their] [extensive |]blood loss.',
+				successFunc: function() { this.die('blood loss'); },
+				req: ['bleeding_out !survivalist']
+			});
 
+			G.moveDefaults.element = new G.element();
 			//hand to hand combat
 			G.moveAssets.hardHeadHit = function() {
 				return function(cl, text) {
