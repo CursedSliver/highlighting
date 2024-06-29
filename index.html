@@ -3012,8 +3012,6 @@ G={
 				if (!this.combat) { return; }
 				if (!this.has('frenzied') && !this.has('haste') && ((Math.random() < 0.05) || (this.isDisabled() && Math.random() < 0.15) || (this.isInjured() && Math.random() < 0.1) || (this.isAiled() && Math.random() < 0.05))) { return this.has('fleed'); } //everyone can just be slow sometimes
 				let overseer = this.combat.overseer;
-				console.log(overseer);
-				console.log(this.combat);
 				let otherChars = overseer.participants;
 				let boxCharList = [];
 				for (let i in overseer.participants) {
@@ -4319,7 +4317,7 @@ G={
 			};
 			//handgun (one reload one shoot)
 			new G.move({
-				chance: 3,
+				chance: 5,
 				text: '[1] reloads [1:their] handgun.',
 				failText: '[1] tried to reload [1:their] handgun, but [1:they] fumbled it and the cartridge fell to the ground.',
 				fail: function() { return this.adjust(0.15, 'chargeWeapon'); },
@@ -4333,7 +4331,7 @@ G={
 				}
 			});
 			new G.move({
-				chance: 4,
+				chance: 5,
 				text: '[1] [fires a few shots|shoots at] [2] with [1:their] handgun, some hitting [2:their] body[S]!',
 				failText: '[1] [fires a few shots|shoots at] [2] with [1:their] handgun, but all the shots missed.',
 				fail: function(cl) { let hDiff = cl[1].combat.horizontal - this.combat.horizontal; let vDiff = cl[1].combat.horizontal - this.combat.horizontal; return cl[1].adjust(this.adjust(0.5, 'bulletAccuracy', hDiff, vDiff), 'bulletDodge', hDiff, vDiff); },
