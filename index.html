@@ -761,6 +761,7 @@ G={
 		new G.perk({name:`freezing sapphire`,desc:``,tier:1});
 		new G.perk({name:`high pressure garden hose`,desc:``,tier:1});
 		new G.perk({name:`topaz with a hole`,desc:``,tier:2});
+		new G.perk({name:`topaz on a stick`,desc:``,tier:3});
 		new G.perk({name:`angel in a bottle`,desc:``,tier:3});
 		
 		//creator
@@ -2411,9 +2412,9 @@ G={
 			// Wish Ring
 			new G.act(perkAttackMult*attackKill*0.2,[hesitentKiller+' wish_ring the_gift%0.2|naive%0.5|goth%0.5|any%0.5','- any annoying|any%0.8 !lucky_coin%0.2|plot_armor%0.5'],`[RED][1] wishes [2] would disappear... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...nobody seems to remember [2] ever existed at all.`,p=>{p[1].kill(p[2],`ceased to exist`);p[2].gain('nihil');});
 				new G.act(perkAttackMult*attackKill*0.1,['wish_ring naive%0.5|peaceful%0.5|meek%0.5|the_gift%0.5|any%0.5 !survivalist%0.8|devious%0.5|stubborn%0.5|analytical%0.5|plot_armor%0.5'],`[RED][1] wishes [1:g|he wasn't|she wasn't|they weren't] here... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...nobody seems to remember [1] ever existed at all.`,p=>{p[1].kill(p[1],`ceased to exist`);p[1].gain('nihil');});
-			new G.act(0.05,['wish_ring meek%0.5|devious%0.5|survivalist%0.5|analytical%0.5|any%0.5 !plot_armor%0.8|naive%0.5|peaceful%0.2|bulky%0.2'],`[RED][1] wishes [1:they] [were immortal|were invincibile|could survive anything].<br>[1]'s wish ring shimmers ominonusly, and [1] realizes what they've done.<br>It couldn't have been that easy, could it?`,p=>{p[1].gain('plot armor');});
+			new G.act(0.1,['wish_ring sheep|plot_armor meek%0.5|devious%0.5|survivalist%0.5|analytical%0.5|any%0.5 !naive%0.5|peaceful%0.2|bulky%0.2'],`[RED][1] wishes [1:they] [were immortal|were invincibile|could survive anything].<br>[1]'s wish ring shimmers ominonusly, and [1] realizes what they've done.<br>It couldn't have been that easy, could it?`,p=>{p[1].gain('plot armor');});
 			new G.act(0.05,['wish_ring peaceful%0.5|kind%0.5|the_gift%0.2|medic%0.2|any%0.5 !sociopath|devious%0.8|survivalist%0.8','+ dead !nihil'],`[BLUE][1] wishes [1:they] could see [2] one last time... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...it's a miracle! [2] came back to life!`,p=>{p[2].lose('dead');p[2].gain('revived');});
-			new G.act(0.1,['wish_ring peaceful%0.5|kind%0.5|the_gift%0.2|cowardly%0.5|any%0.5 !sociopath|survivalist%0.8|devious%0.5 alive:1 dead:>0'],`[BLUE][1] wishes [1:g|he wasn't|she wasn't|they weren't] alone anymore... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...it's a miracle! Everybody's been brought back to life!`,p=>{
+			new G.act(0.2,['wish_ring peaceful%0.5|kind%0.5|the_gift%0.2|cowardly%0.5|any%0.5 !sociopath|survivalist%0.8|devious%0.5 alive:1 dead:>0'],`[BLUE][1] wishes [1:g|he wasn't|she wasn't|they weren't] alone anymore... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...it's a miracle! Everybody's been brought back to life!`,p=>{
 				for (var i in G.chars){G.chars[i].lose('dead');G.chars[i].gain('revived');}
 			});
 			new G.act(0.01,['wish_ring peaceful%0.5|kind%0.5|naive%0.5|meek%0.2|any%0.2 !sociopath%0.8|devious%0.5|survivalist%0.5|analytical%0.2|stubborn%0.2 alive:>1'],`[BLUE][1] wishes [everyone|people] would get along! [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...it seems the world has been made a softer place.`,p=>{
@@ -3155,7 +3156,7 @@ G={
 				req: ['cowardly', 'able']
 			});
 			new G.move({
-				chance: 2,
+				chance: FORCE,
 				text: 'Seeing that [1:their] enemies have either fleed or is dead, [1] stops fighting.',
 				successFunc: function() { this.fleeCombat(true); },
 				element: G.moveAssets.elements.alone,
@@ -3395,7 +3396,7 @@ G={
 				}
 			});
 			new G.move({
-				chance: 0.3,
+				chance: 0.6,
 				text: '[1] [finally |at last]succumbs to [1:their] [extensive |]blood loss.',
 				successFunc: function() { this.die('blood loss'); },
 				req: ['bleeding_out !survivalist']
@@ -3977,6 +3978,34 @@ G={
 
 				return 1 - Math.pow(1 - chance, pow);
 			};
+			//at last, a real need for moves that move you away from someone
+			new G.move({
+				chance: 20,
+				text: '[1] [walks away|tries to keep distance] from [2].',
+				successFunc: function(cl) {
+					this.combat.moveToward(cl[1], -10);
+				},
+				req: ['able able%0.025|cowardly%0.25|slingshot%0.125|handgun%0.05|flamethrower%0.075|grenade%0.15|magic_wand%0.025|topaz_on_a_stick%0.125|rocket_launcher%0.15|lasergun%0.1|ancient_scepter%0.025'],
+				pReq: ['h:10 v:1']
+			});
+			new G.move({
+				chance: 5,
+				text: '[1] [runs away|is getting as far away as possible|is trying to get away] from [2].',
+				successFunc: function(cl) {
+					this.combat.moveToward(cl[1], -30 * (-30 * Math.random()));
+				},
+				req: ['able able%0.025|cowardly%0.25|slingshot%0.125|handgun%0.05|flamethrower%0.075|grenade%0.15|magic_wand%0.025|topaz_on_a_stick%0.125|rocket_launcher%0.15|lasergun%0.1|ancient_scepter%0.025'],
+				pReq: ['h:5 v:1']
+			});
+			new G.move({
+				chance: 15,
+				text: '[1] [crawls away|tries to crawl away|huddles along the floor to get away] from [2].',
+				successFunc: function(cl) {
+					this.combat.moveToward(cl[1], -5 - Math.random() * 5);
+				},
+				req: ['!able any%0.1|cowardly%0.1|slingshot%0.125|handgun%0.05|flamethrower%0.075|grenade%0.15|magic_wand%0.025|topaz_on_a_stick%0.125|rocket_launcher%0.15|lasergun%0.1|ancient_scepter%0.025'],
+				pReq: ['h:5 v:1']
+			});
 			new G.move({
 				chance: 4,
 				text: '[1] [pelts|attacks] [2] with pebbles from [1:their] slingshot. [S]',
@@ -3992,7 +4021,7 @@ G={
 					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', 'The pebbles managed to knock over [2:them]!'); }
 					if (Math.random() < chance / (this.has('marksmen')?1:2)) { cl[1].gain('dazed'); return text.replace('[S]', 'The pebbles managed to hit [2:them] right on the head, stunning [2:them]!'); }
 				},
-				pReq: ['e:20/100']
+				pReq: ['e:10/100']
 			});
 
 			//pet rock (2 moves)
@@ -4331,7 +4360,7 @@ G={
 				}
 			});
 			new G.move({
-				chance: 5,
+				chance: 7.5,
 				text: '[1] [fires a few shots|shoots at] [2] with [1:their] handgun, some hitting [2:their] body[S]!',
 				failText: '[1] [fires a few shots|shoots at] [2] with [1:their] handgun, but all the shots missed.',
 				fail: function(cl) { let hDiff = cl[1].combat.horizontal - this.combat.horizontal; let vDiff = cl[1].combat.horizontal - this.combat.horizontal; return cl[1].adjust(this.adjust(0.5, 'bulletAccuracy', hDiff, vDiff), 'bulletDodge', hDiff, vDiff); },
@@ -4369,7 +4398,7 @@ G={
 				reqFunc: function() {
 					return this.has('handgun').loaded;
 				},
-				pReq: ['e:7/1000']
+				pReq: ['e:4/1000']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
