@@ -1554,7 +1554,7 @@ G={
 					
 					if (!G.perksBN[item].disable && this.isDisabled()) { return actualFalse; }
 					if (!G.perksBN[item].out && this.isOut()) { return actualFalse; }
-					return this.has(item);
+					if (this.has(item)) { return actualTrue; } else { return actualFalse; }
 				}
 				G.char.prototype.testCond = conditionTester;
 				G.team.prototype.testCond = conditionTester;
