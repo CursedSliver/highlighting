@@ -4090,7 +4090,7 @@ G={
 					chance = cl[1].adjust(this.adjust(chance, 'stabDamage'), 'stabDefense');
 
 					if (Math.random() < 0.9) { this.gain('cut up'); }
-					if (Math.random() < chance) { this.lose(item); cl[1].gain('embedded'); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:their] [kicked|threw] [1] off [2:themself].'; }
+					if (Math.random() < chance) { this.lose(item); cl[1].gain('embedded'); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:they] [kicked|threw] [1] off [2:themself].'; }
 					if (Math.random() < chance && Math.random() < chance) { cl[1].gain('embedded'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
 				}
 			}
