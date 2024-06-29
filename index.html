@@ -4356,7 +4356,10 @@ G={
 							return text.replace('[S]', ', some hitting [2:their] [heart|head]');
 						}
 					} else {
-						return text + ' However, [2]\'s clothes absorbed any shots that did land on [2:them].');
+						if (cl[1].has('kevlar vest') && Math.random() < 0.3) { cl[1].lose('kevlar vest'); }
+						if (cl[1].has('combat gear') && Math.random() < 0.3) { cl[1].lose('combat gear'); }
+						if (cl[1].has('knight armor') && Math.random() < 0.4) { cl[1].lose('knight armor'); }
+						return text + ' However, [2]\'s clothes absorbed any shots that did land on [2:them].';
 					}
 				},
 				failFunc: function() {
