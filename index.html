@@ -3326,7 +3326,7 @@ G={
 			//status
 			G.moveDefault.element = G.moveAssets.elements.alone;
 			new G.move({
-				chance: 0.5,
+				chance: 1,
 				text: '[1] struggles [helplessly|uselessly|painfully] against [1:their] injuries.',
 				req: ['!able']
 			});
@@ -3346,7 +3346,7 @@ G={
 					this.healInjuries();
 					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('hot chocolate'); this.injectBack('<br>[1] has drank all of [1:their] hot chocolate.'); }
 				},
-				req: ['batch_of_cookies any%0.05|ailed']
+				req: ['batch_of_cookies any%0.05|injured']
 			});
 			new G.move({
 				chance: 1,
