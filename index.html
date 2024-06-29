@@ -1289,7 +1289,7 @@ G={
 					if (perk instanceof G.perkToken) { token = perk; } else { token = new G.perkToken(perk, this); }
 					if (perk.type=='item' || !this.has(perk)) { this.perks.push(token); } else if (this.has(perk)) { alreadyHasPerk = true; }
 					if (perk.type=='trait' || !this.has(perk)) { this.perks.push(token); }
-					if (this.perks[this.perks.length - 1].perk.onGain) { token.perk.onGain.call(token, alreadyHasPerk); }
+					if (token.perk.onGain) { token.perk.onGain.call(token, alreadyHasPerk); }
 					return token;
 				}
 				G.char.prototype.lose=function(perk, force)
