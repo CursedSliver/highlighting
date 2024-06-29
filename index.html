@@ -641,7 +641,7 @@ G={
 		G.glob.ailment = false;
 		new G.perk({name:`defensive`,desc:`In a defensive stance.`});
 		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true});
-		new G.perk({name:`skipped`,desc:`Turn skipped! One time use only.`});
+		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},canLose:false,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { count--; if (count == 0) { this.lose('skipped', true); } }});
 		new G.perk({name:`in stasis`,desc:`Can no longer make turns!`});
 
 		G.glob.disable = true;
@@ -656,7 +656,7 @@ G={
 		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } }});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`});
-		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false});
+		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false,init:{embeddedItem:null},setItem:function(itemPerk) { this.embeddedItem = itemPerk; }});
 		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true,injury:false}); // Removed Disabled
 		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true,injury:false});
 		new G.perk({name:`missing leg`,desc:`Missing a whole leg!`});
@@ -1285,11 +1285,14 @@ G={
 						perk=G.perksBN[perk];
 					}
 					let alreadyHasPerk = false;
-					if (perk.type=='item' || !this.has(perk)) { this.perks.push(new G.perkToken(perk, this)); } else if (this.has(perk)) { alreadyHasPerk = true; }
-					if (perk.type=='trait' || !this.has(perk)) { this.perks.push(new G.perkToken(perk, this)); }
-					if (this.perks[this.perks.length - 1].onGain) { this.perks[this.perks.length - 1].onGain.call(this.perks[this.perks.length - 1], alreadyHasPerk); }
+					let token = null;
+					if (perk instanceof G.perkToken) { token = perk; } else { token = new G.perkToken(perk, this); }
+					if (perk.type=='item' || !this.has(perk)) { this.perks.push(token); } else if (this.has(perk)) { alreadyHasPerk = true; }
+					if (perk.type=='trait' || !this.has(perk)) { this.perks.push(token); }
+					if (this.perks[this.perks.length - 1].perk.onGain) { token.perk.onGain.call(token, alreadyHasPerk); }
+					return token;
 				}
-				G.char.prototype.lose=function(perk)
+				G.char.prototype.lose=function(perk, force)
 				{
 					if (typeof perk==='string')
 					{
@@ -1298,8 +1301,8 @@ G={
 					}
 					let perkOwned = this.has(perk);
 					if (perkOwned) { 
-						if (perkOwned.onLose) { perkOwned.onLose.call(this.perks[this.perks.indexOf(perkOwned)]); }
-						this.perks.splice(this.perks.indexOf(perkOwned), 1); 
+						if (perkOwned.perk.onLose) { perkOwned.perk.onLose.call(this.perks[this.perks.indexOf(perkOwned)]); }
+						if (perkOwned.perk.canLose && !force) { return this.perks.splice(this.perks.indexOf(perkOwned), 1); }
 					}
 				}
 				G.char.prototype.give=function(other,perk)
@@ -3004,6 +3007,7 @@ G={
 				if (this.isDisabled()) { count += 2; }
 				if (this.isInjured()) { count += 1.5; }
 				if (this.isAiled()) { count += 0.75; }
+				if (this.has('embedded')) { count += 1; }
 				for (let i in this.perks) {
 					if (this.perks[i].perk.type != 'item') { continue; } 
 					if (this.perks[i].perk.tier == 3) { count += 0.45; }
@@ -3132,6 +3136,7 @@ G={
 			G.moveAssets = {};
 			G.moveAssets.elements = {};
 			G.moveAssets.elements.alone = new G.element({ interact: 0, interactMin: 0 });
+			let hardDisables = '!unconscious|trapped|shell_shocked';
 			new G.move({
 				text: '[1] does something ????????',
 				chance: 0.001,
@@ -3251,7 +3256,7 @@ G={
 				chance: 3.5,
 				text: '[1] calls for [help from [S]|reinforcements], and [S] answers[.|!]',
 				failText: '[1] tries to call for help[ from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...|, but no one hears [1:them]...|, but no one hears [1:them]...|, but nothing happens...|, but nothing happens...]',
-				req: ['inTeam any%0.06|peaceful%0.04|leader|vigilant%0.04|the_gift%0.06|snake_charmer\'s_flute%0.1|*able !frenzied|laughed|dizzy%0.25|dazed%0.25|able%0.5 !comatose|dead|shell-shocked|unconscious'],
+				req: ['inTeam any%0.06|peaceful%0.04|leader|vigilant%0.04|the_gift%0.06|snake_charmer\'s_flute%0.1|*able !frenzied|laughed|dizzy%0.25|dazed%0.25|able%0.5 '+hardDisables],
 				element: G.moveAssets.elements.alone,
 				fail: function() {
 					let count = 0;
@@ -4170,8 +4175,8 @@ G={
 					chance = cl[1].adjust(this.adjust(chance, 'stabDamage'), 'stabDefense');
 
 					if (Math.random() < 0.9) { this.gain('cut up'); }
-					if (Math.random() < chance) { this.lose(item); cl[1].gain('embedded'); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:they] [kicked|threw] [1] off [2:themself].'; }
-					if (Math.random() < chance && Math.random() < chance) { cl[1].gain('embedded'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
+					if (Math.random() < chance) { cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), this.has(item)); this.lose(item); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:they] [kicked|threw] [1] off [2:themself].'; }
+					if (Math.random() < chance && Math.random() < chance) { cl[1].gain('bleeding out'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
 				}
 			}
 			G.moveAssets.sliceLight = function() {
@@ -4253,8 +4258,8 @@ G={
 					chance = cl[1].adjust(this.adjust(chance, 'stabDamage'), 'stabDefense');
 
 					this.gain('cut up'); 
-					if (Math.random() < chance) { this.lose(item); cl[1].gain('embedded'); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:their] [kicked|threw] [1] off [2:themself].'; }
-					if (Math.random() < chance && Math.random() < chance) { cl[1].gain('embedded'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
+					if (Math.random() < chance) { cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), this.has(item)); this.lose(item); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:their] [kicked|threw] [1] off [2:themself].'; }
+					if (Math.random() < chance && Math.random() < chance) { cl[1].gain('bleeding out'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
 					if (Math.random() < chance && Math.random() < chance) { this.kill(cl[1], 'punctural organ failure'); }
 				}
 			};
@@ -4317,6 +4322,20 @@ G={
 				},
 				req: ['axe', 'any'],
 				pReq: ['e:12']
+			});
+			//embedded removal (causes potential death)
+			new G.move({
+				chance: 10,
+				text: '[1] [forcefully removes|pulls out|forcefully pulls|grabs|takes] the [S] embedded within [2]\'s body, with blood erupting from the crater that it leaves behind...<br>by this rate, [2] wouldn\'t last very long.',
+				successFunc: function(cl, text) {
+					let item = cl[1].has('embedded').embeddedItem;
+					this.gain(item);
+					cl[1].gain('bleeding out');
+					cl[1].lose('embedded');
+					return text.replace('[S]', embeddedItem.perk.name);
+				},
+				req: ['any%0.25|sociopath%0.1|frenzied%0.25|devious%0.05|roll_of_fabric%0.1|leather_scraps%0.1|cursed_knife%0.2|fallen%0.2 !clumsy%0.25|meek|naive '+hardDisables, 'embedded'],
+				pReq: ['e:2']
 			});
 
 			//GUN (WTF IS A KILOMETER)
@@ -4538,7 +4557,7 @@ G={
 				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it hits [ALL-1], but also [1:themself], which [S]!',
 				fail: function(cl) { let chance = this.adjust(this.adjust(0.25, 'throw'), 'runFail'); },
 				element: new G.element(),
-				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2|*able', '- any', '- any', 'any'],
+				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2|*able'+hardDisables, '- any', '- any', 'any'],
 				pReq: ['h:2/20 v:2'],
 				successFunc: function(cl, text) {
 					this.lose('grenade');
