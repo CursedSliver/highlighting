@@ -2269,9 +2269,9 @@ G={
 			var victimKill=injuredMajor+' '+victimMinor;
 			// Injury/murder chances
 			// Greatly reduced, replaced by the descriptive combat system
-			var anyAttackMult=1;  // Actual chance about halved due to trait checks.
+			var anyAttackMult=0.75;  // Actual chance about halved due to trait checks.
 			var perkAttackMult=0.25; // Actual chance about halved due to trait checks.
-			var anyDefenseMult=0.75;
+			var anyDefenseMult=0.5;
 			
 			var attackFail=1;     // Placeholder
 			var attackMinor=1;    // 37% to 99%
@@ -2292,16 +2292,16 @@ G={
 				new G.act(anyAttackMult*attackMajor*0.05,[coldBloodKiller+' '+victimMajor,'- '+hesitentKiller],`[RED][1] attempts to [ambush|attack|duel] [2] but makes a life-threatening mistake in the fight before escaping.<br>[2] is left confused and covered in [1]'s blood. A lot of blood...`,p=>{p[1].gain('bleeding out');});
 				new G.act(anyAttackMult*attackMajor*0.05,[coldBloodKiller+' '+victimMajor,'- '+hesitentKiller+' '+victimMajor],`[RED]In a particularly violent [affair|duel|battle|fight] between [1] and [2], both are left with life-threatening wounds.`,p=>{p[1].gain('bleeding out');p[2].gain('bleeding out');});
 			
-			new G.act(anyAttackMult*attackKill*0.1,[coldBloodKiller,'- any '+victimKill],`[RED][1] [ambushes [2]|attacks [2] from behind] and [murders|kills|slaughters|strangles|eviscerates|gets rid of] [2:them]!`,p=>{p[1].kill(p[2],`ambush`);});
+			new G.act(anyAttackMult*attackKill*0.1,[coldBloodKiller,'- any !vigilant '+victimKill],`[RED][1] [ambushes [2]|attacks [2] from behind] and [murders|kills|slaughters|strangles|eviscerates|gets rid of] [2:them]!`,p=>{p[1].kill(p[2],`ambush`);});
 				new G.act(anyAttackMult*attackKill*0.02,[coldBloodKiller,'- '+victimKill+' '+hesitentKiller],`[RED][[1] duels it out with [2]|[1] challenges [2] to a duel|[2] challenges [1] to a duel|[1] wants to end things once and for all with [2]|[2] wants to end things once and for all with [1]].<br>[2] bites the dust!`,p=>{p[1].kill(p[2],`duel`);});
 				new G.act(anyAttackMult*attackKill*0.02,[hesitentKiller+' !sociopath|survivalist%0.5|devious%0.5 deaths:>0','- any '+victimKill],`[RED][1] really doesn't want to, but [1:g|he finds himself|she finds herself|they find themself] having to get rid of [2].`,p=>{p[1].kill(p[2],`murder`);});
 			new G.act(anyAttackMult*attackKill**0.02,[hesitentKiller+' '+victimKill,'- '+hesitentKiller],`[RED][1] tries to kill [2], but [2] retaliates and kills [1:them] instead.`,p=>{p[2].kill(p[1],`retaliation`);});
 				new G.act(anyAttackMult*attackKill*0.01,[coldBloodKiller+' '+victimKill,'- '+hesitentKiller],`[RED][[1] duels it out with [2]|[1] challenges [2] to a duel|[2] challenges [1] to a duel|[1] wants to end things once and for all with [2]|[2] wants to end things once and for all with [1]].<br>[1] bites the dust!`,p=>{p[2].kill(p[1],`duel`);});
 				new G.act(anyAttackMult*attackKill*0.01,[hesitentKiller+' '+victimKill,'- cute|any%0.2 cute%0.5|seductive%0.5|bikini%0.5|artist%0.5|glasses%0.2|any%0.5 sociopath%0.5|devious%0.5|any%0.5 '+coldBloodKiller],`[RED][1] [ambushes [2]|attacks [2] from behind] and tries to [kill|murder|attack] [2:them] but [2] is too cute to kill.<br>That doesn't stop [2] from [stabbing|murdering|slaughtering|removing] [1] when [1:their] back is turned.`,p=>{p[2].kill(p[1],`reverse ambush`);});
 			new G.act(anyAttackMult*attackKill*0.01,[coldBloodKiller,'- any '+victimKill,'+ any '+victimKill],`[RED][1] [ambushes [2] and [3]|attacks [2] and [3] from behind|manages to sneak-attack [2] and [3]], [murdering|killing|slaughtering] them both!`,p=>{p[1].kill(p[2],`ambush`);p[1].kill(p[3],`ambush`);});
-			new G.act(anyAttackMult*attackKill*0.02,[coldBloodKiller+ ' leader%0.5|devious%0.5|any%0.5','+ leader%0.5|devious%0.5|any%0.5 '+coldBloodKiller,'- any'],`[RED][1] and [2] [team up and ambush [3]|come at [3] from both sides|ambush [3]|attack [3] from behind|manage to sneak-attack [3]], [murdering|killing|slaughtering] [3:them]!`,p=>{p[1].kill(p[3],`ambush`,p[2]);});
+			new G.act(anyAttackMult*attackKill*0.02,[coldBloodKiller+ ' leader%0.5|devious%0.5|any%0.5','+ leader%0.5|devious%0.5|any%0.5 !vigilant '+coldBloodKiller,'- any !vigilant'],`[RED][1] and [2] [team up and ambush [3]|come at [3] from both sides|ambush [3]|attack [3] from behind|manage to sneak-attack [3]], [murdering|killing|slaughtering] [3:them]!`,p=>{p[1].kill(p[3],`ambush`,p[2]);});
 			new G.act(anyAttackMult*attackKill*0.02,[coldBloodKiller,'- any '+victimKill,'+ leader%0.5|kind%0.5|bulky%0.5|knight_armor%0.2|kite_shield%0.2|riot_shield%0.2|any%0.2 !sociopath%0.5|survivalist%0.5|cowardly%0.5|devious%0.2|meek%0.2'],`[RED][1] attempts to kill [2], but [3] intervenes just in time!<br>[3] had to kill [1] to protect [2]'s life...`,p=>{p[3].kill(p[1],`retaliation`);});
-				new G.act(anyAttackMult*attackKill*0.01,[coldBloodKiller,'- any '+victimKill,'+ !sociopath|stubborn%0.5|survivalist%0.5|analytical%0.2|medic%0.2|first_aid_kit%0.5|AED%0.5 any'],`[RED][1] [kills|murders|attacks and kills] [2] [in front of [3]|before [3] can react]!<br>[There is nothing [3] can do...|[3] rushes to help, but [[2] dies in [3:their] arms|it's already too late]...]`,p=>{p[1].kill(p[2],`ambush`);p[3].gain('shell-shocked');});
+				new G.act(anyAttackMult*attackKill*0.01,[coldBloodKiller,'- any !vigilant '+victimKill,'+ !sociopath|stubborn%0.5|survivalist%0.5|analytical%0.2|medic%0.2|first_aid_kit%0.5|AED%0.5 any !vigilant'],`[RED][1] [kills|murders|attacks and kills] [2] [in front of [3]|before [3] can react]!<br>[There is nothing [3] can do...|[3] rushes to help, but [[2] dies in [3:their] arms|it's already too late]...]`,p=>{p[1].kill(p[2],`ambush`);p[3].gain('shell-shocked');});
 				new G.act(anyAttackMult*attackKill*0.01,[coldBloodKiller,'- any '+victimKill,'+ leader%0.5|kind%0.5|peaceful%0.2|any%0.5 !sociopath%0.5|survivalist%0.5|cowardly%0.5|devious%0.2 '+victimKill],`[RED][1] attempts to kill [2], but [3] intervenes to protect [2:them]!<br>Unfortunately, [3] dies in the attempt...`,p=>{p[1].kill(p[3],`failed retaliation`);});
 			// Status Effect kills
 			new G.act(0.2,[hesitentKiller,'sheep annoying%0.5|suicidal%0.5|clumsy%0.2|meek%0.2|naive%0.2|any%0.5 !cute%0.2|stubborn%0.2|cowardly%0.2|plot_armor%0.8'],`[RED][1] decides to put [2] out of [2:their] sheep misery.`,p=>{p[1].kill(p[2],`sheep pity kill`);});
