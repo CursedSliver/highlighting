@@ -3252,6 +3252,7 @@ G={
 				fail: function() {
 					let count = 0;
 					for (let i in this.team.chars) {
+						if (this.team.chars[i] == this) { continue; }
 						if (!this.team.chars[i].combat && !this.team.chars[i].isOut()) { count++; }
 					} 
 					if (count == 0) { return 1; }
@@ -3262,6 +3263,7 @@ G={
 				successFunc: function(cl, text) {
 					let pool = [];
 					for (let i in this.team.chars) {
+						if (this.team.chars[i] == this) { continue; }
 						if (!this.team.chars[i].combat && !this.team.chars[i].isOut()) { pool.push(this.team.chars[i]); }
 					}
 					let char = choose(pool);
@@ -3270,6 +3272,7 @@ G={
 				failFunc: function(cl, text) {
 					let pool = [];
 					for (let i in this.team.chars) {
+						if (this.team.chars[i] == this) { continue; }
 						if (!this.combat.overseer.participants.includes(this.team.chars[i])) { pool.push(this.team.chars[i]); }
 					}
 					if (pool.length > 0) { return text.replaceAll('[S]', '<e>'+choose(pool).name+'</e>'); } else {
