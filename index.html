@@ -4502,7 +4502,7 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			}
 			G.moveAssets.grenadeBlastEffects = function(target) {
-				let chance = target.adjust(target.adjust(0.35, 'shockwaveDefense'), 'bulletDefense');
+				let chance = target.adjust(target.adjust(0.75, 'shockwaveDefense'), 'bulletDefense');
 				if (Math.random() < chance) {
 					target.gain('dazed'); if (Math.random() < chance) { target.gain('fallen'); return 'stuns and knocks over [N]'; }
 					return 'stuns [N]';
