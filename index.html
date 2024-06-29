@@ -640,7 +640,9 @@ G={
 		G.glob.disable = false;
 		G.glob.ailment = false;
 		new G.perk({name:`defensive`,desc:`In a defensive stance.`});
-		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true})
+		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true});
+		new G.perk({name:`skipped`,desc:`Turn skipped! One time use only.`});
+		new G.perk({name:`in stasis`,desc:`Can no longer make turns!`});
 
 		G.glob.disable = true;
 		G.glob.injury = true;
@@ -3012,6 +3014,8 @@ G={
 				let str = '';
 				if (!this.combat) { return; }
 				if (!this.has('frenzied') && !this.has('haste') && ((Math.random() < 0.05) || (this.isDisabled() && Math.random() < 0.15) || (this.isInjured() && Math.random() < 0.1) || (this.isAiled() && Math.random() < 0.05))) { return this.has('fleed'); } //everyone can just be slow sometimes
+				if (this.has('skipped')) { this.lose('skipped'); return this.has('fleed'); }
+				if (this.has('in stasis')) { return this.has('fleed'); }
 				let overseer = this.combat.overseer;
 				let otherChars = overseer.participants;
 				let boxCharList = [];
