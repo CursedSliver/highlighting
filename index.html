@@ -4360,13 +4360,14 @@ G={
 				if (this.has('parka')) { pow *= 0.95; hasOne = true; }
 				if (this.has('wizard robe')) { pow *= 0.9; hasOne = true; }
 				if (this.has('defensive')) { pow *= 0.85; hasOne = true; }
-				if (!hasOne) { return chance - chanceMinus; }
+				if (!hasOne) { return chance - (chanceMinus?chanceMinus:0); }
 
 				pow *= Math.min(25 / e, 1);
 
 				pow = 1 / pow;
 
-				return chance - (1 - Math.pow(1 - chanceMinus, pow));
+				if (chanceMinus) { return chance - (1 - Math.pow(1 - chanceMinus, pow)); }
+				else { return 1 - Math.pow(1 - chance, pow); }
 			};
 			G.adjustFuncs.chargeWeapon = function(chance) {
 				//more pow = less likely to successfully charge
@@ -4501,8 +4502,8 @@ G={
 
 				return 1 - Math.pow(1 - chance, pow);
 			}
-			G.moveAssets.grenadeBlastEffects = function(target) {
-				let chance = target.adjust(target.adjust(0.75, 'shockwaveDefense'), 'bulletDefense');
+			G.moveAssets.grenadeBlastEffects = function(target, hDiff, vDiff) {
+				let chance = target.adjust(target.adjust(0.75, 'shockwaveDefense'), 'bulletDefense', hDiff, vDiff);
 				if (Math.random() < chance) {
 					target.gain('dazed'); if (Math.random() < chance) { target.gain('fallen'); return 'stuns and knocks over [N]'; }
 					return 'stuns [N]';
@@ -4531,8 +4532,10 @@ G={
 				successFunc: function(cl, text) {
 					this.lose('grenade');
 					let afflictions = [];
+					let posX = this.combat.horizontal + (Math.random() - 0.5) * 10;
+					let posY = this.combat.vertical + Math.random() * 3; 
 					for (let i = 1; i < cl.length; i++) {
-						afflictions.push(G.moveAssets.grenadeBlastEffects.call(this, cl[i]));
+						afflictions.push(G.moveAssets.grenadeBlastEffects.call(this, cl[i], cl[i].combat.horizontal - posX, cl[i].combat.vertical - posY));
 					}
 					for (let i = 0; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + 2)+']'); }
 					return text.replace('[S]', oxfordsConcat(afflictions));
@@ -4540,8 +4543,10 @@ G={
 				failFunc: function(cl, text) {
 					this.lose('grenade');
 					let afflictions = [''];
+					let posX = this.combat.horizontal + (Math.random() - 0.5) * 10;
+					let posY = this.combat.vertical + Math.random() * 3; 
 					for (let i = 0; i < cl.length; i++) {
-						afflictions.push(G.moveAssets.grenadeBlastEffects(cl[i]));
+						afflictions.push(G.moveAssets.grenadeBlastEffects.call(this, cl[i], cl[i].combat.horizontal - posX, cl[i].combat.vertical - posY));
 					}
 					for (let i = 1; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+i+']'); }
 					return text.replace('[S]', oxfordsConcat(afflictions));
@@ -4560,7 +4565,12 @@ G={
 				element: G.moveAssets.elements.alone,
 				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2'],
 				successFunc: function() { this.lose('grenade'); },
-				failFunc: function() { this.lose('grenade'); return text.replace('[S]', G.moveAssets.grenadeBlastEffect.call(this, this).replace('[N]', '[1:themself]')); },
+				failFunc: function() { 
+					this.lose('grenade'); 
+					let posX = this.combat.horizontal + (Math.random() - 0.5) * 10;
+					let posY = this.combat.vertical + Math.random() * 3; 
+					return text.replace('[S]', G.moveAssets.grenadeBlastEffect.call(this, this, this.combat.horizontal - posX, this.combat.vertical - posY).replace('[N]', '[1:themself]')); 
+				},
 				reqFunc: function() {
 					if (Math.random() < 1 - (1 / (this.combat.overseer.participants.length - 1))) { return true; }
 					return false;
