@@ -4347,7 +4347,7 @@ G={
 			new G.move({
 				chance: 10,
 				text: '[1] approaches [2] with a grim smile on [1:their] face...',
-				successFunc: function(cl) { this.moveInFrontOf(cl[1], 1); },
+				successFunc: function(cl) { this.combat.moveInFrontOf(cl[1], 1); },
 				req: ['any%0.5|sociopath%0.3|frenzied%0.5|devious%0.2 '+hardDisables, 'embedded any'],
 				pReq: ['e:30']
 			});
