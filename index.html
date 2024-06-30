@@ -4849,7 +4849,7 @@ G={
 					if (Math.random() < chance / 2) {
 						cl[1].gain('comatose'); return text.replace('[S]', ', sending [2] into a coma');
 					}
-					return text.replace('[S]', 'but [2:they] didn\'t anything more than a few scratches!');
+					return text.replace('[S]', ', but [2:they] didn\'t anything more than a few scratches!');
 				},
 				failFunc: function() { this.has('shotgun').loaded = 0; },
 				req: ['shotgun any%0.75|marksmen', 'any'],
