@@ -4826,7 +4826,7 @@ G={
 				chance: 7.5,
 				text: '[1] presses down the trigger on [1:their] shotgun, aiming at [2][S]!',
 				failText: '[1] presses down the trigger on [1:their] shotgun at [2], but nothing happens.',
-				fail: function() { return this.adjust(0.1, 'spreadAccuracy', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical); },
+				fail: function(cl) { return this.adjust(0.1, 'spreadAccuracy', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical); },
 				successFunc: function(cl, text) {
 					let chance = 0.75;
 					chance = cl[1].adjust(chance, 'spreadDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical);
