@@ -3161,7 +3161,7 @@ G={
 				text: '[1] runs away from [2].',
 				failText: '[1] tries to run away, but is caught by [2] before [1:they] can make it!',
 				fail: function(cl) {
-					return G.moveAssets.fleeCheck(cl[1]);
+					return G.moveAssets.fleeCheck.call(this, cl[1]);
 				},
 				successFunc: function() { this.gain('fleed'); },
 				failFunc: function(cl) { let mover = (Math.random()<0.5?1:-1) * (Math.random() * 5 + 6); this.combat.horizontal += mover; cl[1].combat.horizontal += mover; },
@@ -3172,7 +3172,7 @@ G={
 				text: 'Out of fear, [1] runs away from [2].',
 				failText: '[1] tries to run away, but is caught by [2] before [1:they] can make it!',
 				fail: function(cl) {
-					return G.moveAssets.fleeCheck(cl[1]);
+					return G.moveAssets.fleeCheck.call(this, cl[1]);
 				},
 				successFunc: function() { this.gain('fleed'); },
 				failFunc: function(cl) { let mover = (Math.random()<0.5?1:-1) * (Math.random() * 5 + 6); this.combat.horizontal += mover; cl[1].combat.horizontal += mover; },
@@ -3322,7 +3322,7 @@ G={
 				text: '[1] fakes a charge at [2] before running away.',
 				failText: '[1] fakes a charge at [2] in an attempt to flee, but [2] saw right through and charged back, striking [1] on the [chest|head|heart|shoulder|kneecaps]!',
 				fail: function(cl) {
-					return G.moveAssets.fleeCheck(cl[1]);
+					return G.moveAssets.fleeCheck.call(this, cl[1]);
 				},
 				successFunc: function() {
 					this.gain('fleed');
