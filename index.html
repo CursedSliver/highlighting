@@ -639,7 +639,7 @@ G={
 		G.glob.combat = true;
 		G.glob.disable = false;
 		G.glob.ailment = false;
-		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`,injury:false}); //quite possibly the most used perk ever
+		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`,disable:true}); //quite possibly the most used perk ever
 		new G.perk({name:`defensive`,desc:`In a defensive stance.`});
 		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true});
 		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},cannotLose:true,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { count--; if (count == 0) { this.lose('skipped', true); } }});
