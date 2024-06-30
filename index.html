@@ -639,6 +639,7 @@ G={
 		G.glob.combat = true;
 		G.glob.disable = false;
 		G.glob.ailment = false;
+		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`,injury:false}); //quite possibly the most used perk ever
 		new G.perk({name:`defensive`,desc:`In a defensive stance.`});
 		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true});
 		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},cannotLose:true,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { count--; if (count == 0) { this.lose('skipped', true); } }});
@@ -649,7 +650,6 @@ G={
 		G.glob.ailment = false;
 		G.glob.combat = false;
 		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false}); // Removed Disabled
-		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`,injury:false});
 		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
 		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`});
 		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.4) { this.owner.gain('lacerated'); } }});
