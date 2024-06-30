@@ -4264,7 +4264,7 @@ G={
 					chance = cl[1].adjust(this.adjust(chance, 'stabDamage'), 'stabDefense');
 
 					this.gain('cut up'); 
-					if (Math.random() < chance) { cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), this.has(item)); this.lose(item); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:their] [kicked|threw] [1] off [2:themself].'; }
+					if (Math.random() < chance) { cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), this.has(item)); this.lose(item); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:they] [kicked|threw] [1] off [2:themself].'; }
 					if (Math.random() < chance && Math.random() < chance) { cl[1].gain('bleeding out'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
 					if (Math.random() < chance && Math.random() < chance) { this.kill(cl[1], 'punctural organ failure'); }
 				}
