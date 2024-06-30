@@ -4705,7 +4705,7 @@ G={
 					cl[1].gain('cut up');
 					if (Math.random() < chance) {
 						//embed
-						cl[1].gain('embedded').setItem.call(cl[1].has('embedded'), new G.perkToken(G.perksBN['scrap metal'], cl[1]));
+						cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), new G.perkToken(G.perksBN['scrap metal'], cl[1]));
 						if (Math.random() < chance) { cl[1].gain('bruised'); }
 						return text.replace('[S]', ', which [embed|sinks deep] into [2:their] body');
 					}
