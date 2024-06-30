@@ -4719,7 +4719,7 @@ G={
 						//embed
 						cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), new G.perkToken(G.perksBN['scrap metal'], cl[1]));
 						if (Math.random() < chance) { cl[1].gain('cut up'); }
-						return text.replace('[S]', ', which [embed|sinks deep] into [2:their] body');
+						return text.replace('[S]', ', which [embed into|sinks deep into|gets stuck in] [2:their] body');
 					}
 					if (Math.random() < chance / 1.5) {
 						cl[1].gain('bleeding out'); cl[1].gain('cut up');
@@ -4742,17 +4742,19 @@ G={
 			new G.move({
 				chance: 3,
 				text: '[1] [throws|hurls] [1:their] shuriken at [2], hitting [2:them] on the [arm|shoulder|chest|thigh][S]!',
-				failText: '[1] [throws|hurls] [1:their] shuriken at [2], but it flew right past [2:them].',
+				failText: '[1] [throws|hurls] [1:their] shuriken at [2], but it flew right past [2:them], never to be found again.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'simpleProjectile'), 'dodge'); },
 				successFunc: function(cl, text) {
 					let chance = 0.75;
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 
+					this.lose('shuriken');
 					if (cl[1].has('ironskin')) { return text.replace('[S]', 'but it did nothing'); }
 					if (Math.random() < chance) {
-						cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), new G.perkToken(G.perksBN['shuriken'], cl[1]));
+						this.has('shuriken').owner = cl[1];
+						cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), this.has('shuriken'));
 						if (Math.random() < chance) { cl[1].gain('cut up'); }
-						return text.replace('[S]', ', which [embed|sinks deep] into [2:their] body');
+						return text.replace('[S]', ', which [embed into|sinks deep into|gets stuck in] [2:their] body');
 					}
 					if (Math.random() < chance / 1.5) {
 						cl[1].gain('fallen');
