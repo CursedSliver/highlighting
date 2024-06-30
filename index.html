@@ -4831,7 +4831,7 @@ G={
 					let chance = 0.75;
 					chance = cl[1].adjust(chance, 'spreadDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical);
 
-					this.has('shotgun').loaded = 1;
+					this.has('shotgun').loaded = 0;
 					if (Math.random() < chance && !cl[1].has('shot')) {
 						cl[1].gain('shot');
 						if (Math.random() < chance) { cl[1].gain('shot'); }
