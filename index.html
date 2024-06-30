@@ -4687,14 +4687,14 @@ G={
 
 			//bows (1 move + 1 idling)
 			new G.move({
-				chance: 4,
+				chance: 2,
 				text: '[1] takes aim at [2], but doesn\'t shoot yet.',
 				req: ['bow able', 'any'],
 				pReq: ['e:15/1000']
 			});
 			new G.move({
-				chance: 4,
-				text: '[1] draws [1:their] bow and unleashes an arrow upon [2][S]!',
+				chance: 4.5,
+				text: '[1] draws [1:their] bow and unleashes a[n| deadly] arrow upon [2][S]!',
 				failText: '[1] attempted to shoot at arrow at [2], but it missed.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.4, 'simpleProjectile'), 'dodge'); },
 				successFunc: function(cl, text) {
@@ -4717,7 +4717,9 @@ G={
 						this.kill(cl[1], 'cupid\'s arrow');
 						return text.replace('[S]', ', which flies true to [2:their] heart!');
 					}
-				}
+				},
+				req: ['bow able', 'any'],
+				pReq: ['e:6/100']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
