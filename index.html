@@ -4825,7 +4825,7 @@ G={
 			new G.move({
 				chance: 7.5,
 				text: '[1] presses down the trigger on [1:their] shotgun, aiming at [2][S]!',
-				failText: '[1] presses down the trigger on [1:their] shotgun at [2], but nothing happens.',
+				failText: '[1] presses down the trigger on [1:their] shotgun at [2], but it appears that none of the [slugs|shells|shots] actually hit [2:them].',
 				fail: function(cl) { return this.adjust(0.1, 'spreadAccuracy', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical); },
 				successFunc: function(cl, text) {
 					let chance = 0.75;
@@ -4844,6 +4844,7 @@ G={
 					if (Math.random() < chance / 2) {
 						cl[1].gain('comatose'); return text.replace('[S]', ', sending [2] into a coma');
 					}
+					return text.replace('[S]', 'but [2:they] didn\'t anything more than a few scratches!');
 				},
 				failFunc: function() { this.has('shotgun').loaded = 0; },
 				req: ['shotgun any%0.75|marksmen', 'any'],
