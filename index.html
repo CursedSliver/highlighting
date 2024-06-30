@@ -4774,7 +4774,7 @@ G={
 			//shotgun (1 load, 1 fire)
 			new G.move({
 				chance: 5,
-				text: '[1] loads [some slugs into | ][1:their] shotgun.',
+				text: '[1] loads [some slugs into |some shells into |some shots into |||][1:their] shotgun.',
 				failText: '[1] tried to loads [some slugs into | ][1:their] shotgun, but [1:they] [messed up|fumbled it].',
 				fail: function() { return this.adjust(0.3, 'chargeWeapon'); },
 				successFunc: function() { this.has('shotgun').loaded = 1; },
