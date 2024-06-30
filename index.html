@@ -3423,6 +3423,11 @@ G={
 				successFunc: function() { this.die('blood loss'); },
 				req: ['bleeding_out !survivalist']
 			});
+			new G.move({
+				chance: 2,
+				text: '[1] sleeps peacefully...',
+				req: ['comatose']
+			});
 
 			G.moveDefault.element = new G.element();
 			//hand to hand combat
