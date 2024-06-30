@@ -4818,6 +4818,7 @@ G={
 				fail: function() { return this.adjust(0.3, 'chargeWeapon'); },
 				successFunc: function() { this.has('shotgun').loaded = 1; },
 				req: ['shotgun any%0.6|marksmen '+hardDisables],
+				element: G.moveAssets.elements.alone,
 				reqFunc: function() { return !this.has('shotgun').loaded; }
 			});
 			G.adjustFuncs.spreadAccuracy = function(chance, hDiff, vDiff) {
