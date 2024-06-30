@@ -4547,7 +4547,7 @@ G={
 				if (this.has('clumsy')) { pow *= 1.4; }
 				if (this.has('meek')) { pow *= 1.2; }
 				pow *= Math.pow(1.34, this.isInjured()); 
-				if (this.isAiled()) { pow *= Math.pow(1.36, this.isAiled()); 
+				pow *= Math.pow(1.36, this.isAiled()); 
 				pow *= Math.pow(1.2, this.isDisabled()); 
 
 				return 1 - Math.pow(1 - chance, pow);
