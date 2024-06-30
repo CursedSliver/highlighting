@@ -4332,7 +4332,7 @@ G={
 					this.gain(item);
 					cl[1].gain('bleeding out');
 					cl[1].lose('embedded');
-					return text.replace('[S]', embeddedItem.perk.name);
+					return text.replace('[S]', item.perk.name);
 				},
 				req: ['any%0.25|sociopath%0.1|frenzied%0.25|devious%0.05|roll_of_fabric%0.1|leather_scraps%0.1|cursed_knife%0.2|fallen%0.2 !clumsy%0.25|meek|naive '+hardDisables, 'embedded'],
 				pReq: ['e:2']
