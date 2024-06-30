@@ -1529,8 +1529,8 @@ G={
 						if (item == 'out') { return cNegate(actualTrue, !this.isOut()); }
 						if (item == 'inTeam') { return cNegate(actualTrue, !this.team); }
 						if (item == 'noTeam') { return cNegate(actualTrue, this.team); }
-						if (item == '-') { return cNegate(actualTrue, (this.team === prevTeam)); }
-						if (item == '+') { return cNegate(actualTrue, !(this.team === prevTeam)); }
+						if (item == '-') { return cNegate(actualTrue, (this.team === prevTeam || prevTeam == 0 || this.team == 0)); }
+						if (item == '+') { return cNegate(actualTrue, (!(this.team === prevTeam) || prevTeam == 0 || this.team == 0)); }
 						if (item == 'ailed') { return cNegate(actualTrue, !this.isAiled()); }
 						if (item == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
 						if (item == 'inCombat') { return cNegate(actualTrue, !this.combat); }
