@@ -656,7 +656,7 @@ G={
 		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } }});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`});
-		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false,init:{embeddedItem:null},setItem:function(itemPerk) { this.embeddedItem = itemPerk; }});
+		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false,init:{embeddedItem:null},setItem:function(itemPerk) { itemPerk.owner = this.owner; this.embeddedItem = itemPerk; }});
 		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true,injury:false}); // Removed Disabled
 		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true,injury:false});
 		new G.perk({name:`missing leg`,desc:`Missing a whole leg!`});
@@ -1286,7 +1286,7 @@ G={
 					}
 					let alreadyHasPerk = false;
 					let token = null;
-					if (perk instanceof G.perkToken) { token = perk; } else { token = new G.perkToken(perk, this); }
+					if (perk instanceof G.perkToken) { token = perk; token.owner = this; } else { token = new G.perkToken(perk, this); }
 					if (perk.type=='item' || !this.has(perk)) { this.perks.push(token); } else if (this.has(perk)) { alreadyHasPerk = true; }
 					if (perk.type=='trait' || !this.has(perk)) { this.perks.push(token); }
 					if (token.perk.onGain) { token.perk.onGain.call(token, alreadyHasPerk); }
@@ -1312,7 +1312,7 @@ G={
 						if (!G.perksBN[perk]) {console.log('No perk named','"'+perk+'"');return false;}
 						perk=G.perksBN[perk];
 					}
-					if (this.has(perk)) {this.lose(perk);other.gain(perk);}
+					if (this.has(perk)) {this.has(perk).owner = other; other.gain(this.has(perk)); this.lose(perk);}
 				}
 				G.char.prototype.die=function(reason)
 				{
@@ -4329,6 +4329,7 @@ G={
 				text: '[1] [forcefully removes|pulls out|forcefully pulls|grabs|takes] the [S] embedded within [2]\'s body, with blood erupting from the crater that it leaves behind...<br>by this rate, [2] wouldn\'t last very long.',
 				successFunc: function(cl, text) {
 					let item = cl[1].has('embedded').embeddedItem;
+					item.owner = this;
 					this.gain(item);
 					cl[1].gain('bleeding out');
 					cl[1].lose('embedded');
@@ -4682,6 +4683,41 @@ G={
 					return text.replace('[S]', result);
 				},
 				req: ['random_orb any%0.75|inventor|scrappy !frenzied%0.5 !able%0.5']
+			});
+
+			//bows (1 move + 1 idling)
+			new G.move({
+				chance: 4,
+				text: '[1] takes aim at [2], but doesn\'t shoot yet.',
+				req: ['bow able', 'any'],
+				pReq: ['e:15/1000']
+			});
+			new G.move({
+				chance: 4,
+				text: '[1] draws [1:their] bow and unleashes an arrow upon [2][S]!',
+				failText: '[1] attempted to shoot at arrow at [2], but it missed.',
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.4, 'simpleProjectile'), 'dodge'); },
+				successFunc: function(cl, text) {
+					let chance = 0.5;
+					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'overall'); //cant be bothered to create a new adjustfunc for this one specifically
+					//maybe if I implement more pitchfork but whatev
+
+					cl[1].gain('cut up');
+					if (Math.random() < chance) {
+						//embed
+						cl[1].gain('embedded').setItem.call(cl[1].has('embedded'), new G.perkToken(G.perksBN['scrap metal'], cl[1]));
+						if (Math.random() < chance) { cl[1].gain('bruised'); }
+						return text.replace('[S]', ', which [embed|sinks deep] into [2:their] body');
+					}
+					if (Math.random() < chance / 1.5) {
+						cl[1].gain('bleeding out'); 
+						return text.replace('[S]', ', which caused blood to spurt out of every orifice on [2:their] body');
+					}
+					if (Math.random() < chance / 2) {
+						this.kill(cl[1], 'cupid\'s arrow');
+						return text.replace('[S]', ', which flies true to [2:their] heart!');
+					}
+				}
 			});
 			
 			G.char.prototype.initiateCombat = function() {
