@@ -698,8 +698,8 @@ G={
 		new G.perk({name:`pitchfork`,desc:`Used to stack hay and stab your friends.`,tier:1});
 		new G.perk({name:`sword`,desc:`A classic bladed weapon popular since medieval times.`,tier:2});
 		new G.perk({name:`axe`,desc:`Makes quick, if messy work of anyone who'd stand in your way.`,tier:2});
-		new G.perk({name:`handgun`,desc:`Takes down a target quite reliably if you know how to aim.`,tier:1,init:{loaded:0}});
-		new G.perk({name:`shotgun`,desc:`Delivers a powerful, low-accuracy blow.`,tier:2});
+		new G.perk({name:`handgun`,desc:`Takes down a target quite reliably if you know how to aim.`,tier:1,init:{loaded:1}});
+		new G.perk({name:`shotgun`,desc:`Delivers a powerful, low-accuracy blow.`,tier:2,init:{loaded:1}});
 		new G.perk({name:`grenade`,desc:`A single-use explosive device to blow several enemies to bits.`,tier:1});
 		new G.perk({name:`slingshot`,desc:`Fires small projectiles. Not quite deadly as much as slightly annoying.`,tier:0});
 		new G.perk({name:`bow`,desc:`Its arrows can easily chop a head clean off from a distance if skillfully wielded.`,tier:1});
@@ -4441,7 +4441,7 @@ G={
 				successFunc: function() {
 					this.has('handgun').loaded = 1;
 				},
-				req: ['handgun any%0.4|marksmen'],
+				req: ['handgun any%0.4|marksmen '+hardDisables],
 				reqFunc: function() {
 					return !this.has('handgun').loaded;
 				}
@@ -4769,6 +4769,86 @@ G={
 				failFunc: function() { this.lose('shuriken'); },
 				req: ['shuriken', 'any'],
 				pReq: ['e:4/25']
+			});
+
+			//shotgun (1 load, 1 fire)
+			new G.move({
+				chance: 5,
+				text: '[1] loads [some slugs into | ][1:their] shotgun.',
+				failText: '[1] tried to loads [some slugs into | ][1:their] shotgun, but [1:they] [messed up|fumbled it].',
+				fail: function() { return this.adjust(0.3, 'chargeWeapon'); },
+				successFunc: function() { this.has('shotgun').loaded = 1; },
+				req: ['shotgun any%0.6|marksmen '+hardDisables],
+				reqFunc: function() { return !this.has('shotgun').loaded; }
+			});
+			G.adjustFuncs.spreadAccuracy = function(chance, hDiff, vDiff) {
+				let e = Math.abs(hDiff) + Math.pow(Math.abs(vDiff), 2) * 10 + 1;
+				let pow = 1;
+				//NOTE: more pow = more inaccuracy
+
+				if (this.has('marksmen')) { pow *= 0.7; }
+				if (this.has('analytical')) { pow *= 0.85; }
+				if (this.has('the gift')) { pow *= 0.9; }
+				if (this.has('determined')) { pow *= 0.95; }
+
+				if (this.has('blind')) { pow *= 2; } 
+				if (this.has('dizzy')) { pow *= 1.2; }
+				if (this.has('dazed')) { pow *= 1.2; }
+				if (this.has('clumsy')) { pow *= 1.1; }
+				if (this.has('shell-shocked')) { pow *= 2; }
+				if (this.isDisabled()) { pow *= 1.15; }
+				if (this.isAiled()) { pow *= 1.05; }
+
+				pow *= Math.max(Math.pow(e / 5, 2), e / 5);
+
+				return 1 - Math.pow(1 - chance, pow);
+			};
+			G.adjustFuncs.spreadDefense = function(chance, hDiff, vDiff) {
+				//more pow = more chances to die
+				let e = Math.abs(hDiff) + vDiff * 10 + 1;
+				let pow = 1;
+
+				if (this.has('kevlar vest')) { pow *= 0.4; }
+				if (this.has('combat gear')) { pow *= 0.65; }
+				if (this.has('knight armor')) { pow *= 0.65; }
+				if (this.has('ironskin')) { pow *= 0.6; }
+				if (this.has('bulky')) { pow *= 0.9; }
+				if (this.has('dapper suit')) { pow *= 0.9; }
+				if (this.has('parka')) { pow *= 0.9; }
+				if (this.has('wizard robe')) { pow *= 0.85; }
+				if (this.has('defensive')) { pow *= 0.8; }
+
+				pow *= Math.min(10 / Math.pow(e + 1, 1.5), 3);
+				
+				return 1 - Math.pow(1 - chance, pow); 
+			};
+			new G.move({
+				chance: 7.5,
+				text: '[1] presses down the trigger on [1:their] shotgun, aiming at [2][S]!',
+				failText: '[1] presses down the trigger on [1:their] shotgun at [2], but nothing happens.',
+				fail: function() { return this.adjust(0.1, 'spreadAccuracy'); },
+				successFunc: function(cl, text) {
+					let chance = 0.75;
+					chance = cl[1].adjust(chance, 'spreadDefense');
+
+					this.has('shotgun').loaded = 1;
+					if (Math.random() < chance && !cl[1].has('shot')) {
+						cl[1].gain('shot');
+						if (Math.random() < chance) { cl[1].gain('shot'); }
+						if (Math.random() < chance / 2) { cl[1].gain('bleeding out'); return text + '<br>[2] is now bleeding out!'; }
+						cl[1].gain('fallen'); return text + '<br>[2] yelps in surprise as [2:they] falls to the ground.';
+					}
+					if (Math.random() < chance / 2) {
+						this.kill(cl[1], 'shotgun'); return text + '<br>[2] yelps in surprise as [2:their] brain collapses on itself.';
+					}
+					if (Math.random() < chance / 2) {
+						cl[1].gain('comatose'); return text.replace('[S]', ', sending [2] into a coma');
+					}
+				},
+				failFunc: function() { this.has('shotgun').loaded = 0; },
+				req: ['shotgun any%0.75|marksmen', 'any'],
+				pReq: ['e:1/15'],
+				reqFunc: function() { return this.has('shotgun').loaded; }
 			});
 			
 			G.char.prototype.initiateCombat = function() {
