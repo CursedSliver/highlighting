@@ -4884,7 +4884,7 @@ G={
 				if (!this.combat) { return false; }
 				if (!silent) { this.combat.overseer.injectBack('<br>[1] has fleed from the fight!'); }
 				for (let i in this.perks) {
-					if (this.perks[i].perk.combat) { this.lose(this.perks[i]); }
+					if (this.perks[i].perk.combat) { this.lose(this.perks[i], true); }
 				}
 				this.combat.overseer.removeParticipant(this);
 				this.combat = null;
