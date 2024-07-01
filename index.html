@@ -5017,7 +5017,9 @@ G={
 			G.char.prototype.joinCombat = function(overseer) {
 				if (this.combat) { return false; }
 				this.combat = new G.combatTracker(overseer, this);
+				console.log(this.combat.horizontal);
 				this.combat.horizontal = (Math.pow(Math.random() - 0.5, 0.33) * 150);
+				console.log(this.combat.horizontal);
 			}
 			G.char.prototype.fleeCombat = function(silent) {
 				this.lose('fleed');
