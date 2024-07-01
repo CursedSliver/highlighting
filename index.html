@@ -1281,14 +1281,14 @@ G={
 				}
 				G.char.prototype.gain=function(perk)
 				{
+					let alreadyHasPerk = false;
+					let token = null;
+					if (perk instanceof G.perkToken) { token = perk; token.owner = this; } else if (perk instanceof G.perk) { token = new G.perkToken(perk, this); }
 					if (typeof perk==='string')
 					{
 						if (!G.perksBN[perk]) {console.log('No perk named','"'+perk+'"');return false;}
 						perk=G.perksBN[perk];
 					}
-					let alreadyHasPerk = false;
-					let token = null;
-					if (perk instanceof G.perkToken) { token = perk; token.owner = this; } else { token = new G.perkToken(perk, this); }
 					if (perk.type=='item' || !this.has(perk)) { this.perks.push(token); } else if (this.has(perk)) { alreadyHasPerk = true; }
 					if (perk.type=='trait' || !this.has(perk)) { this.perks.push(token); }
 					if (token.perk.onGain) { token.perk.onGain.call(token, alreadyHasPerk); }
@@ -1296,11 +1296,6 @@ G={
 				}
 				G.char.prototype.lose=function(perk, force)
 				{
-					if (typeof perk==='string')
-					{
-						if (!G.perksBN[perk]) {console.log('No perk named','"'+perk+'"');return false;}
-						perk=G.perksBN[perk];
-					}
 					let token = null;
 					if (perk instanceof G.perkToken) { token = perk; } else { token = this.has(perk); }
 					if (token) { 
