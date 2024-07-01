@@ -656,7 +656,7 @@ G={
 		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } }});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
 		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 3 && Math.random() < 0.5) { this.owner.gain('burnt'); } } });
-		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`.ailment:true});
+		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`,ailment:true});
 		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false,init:{embeddedItem:null},setItem:function(itemPerk) { itemPerk.owner = this.owner; this.embeddedItem = itemPerk; }});
 		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true,injury:false}); // Removed Disabled
 		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true,injury:false});
