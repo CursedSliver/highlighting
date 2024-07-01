@@ -652,10 +652,11 @@ G={
 		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false}); // Removed Disabled
 		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
 		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`});
-		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.4) { this.owner.gain('lacerated'); } }});
+		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.4) { this.owner.gain('lacerated'); } }, update:function() { if (Math.random() < 0.1) { this.count--; if (this.count == 0) { this.owner.lose('cut up'); }}}});
 		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } }});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
-		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`});
+		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true.injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 3 && Math.random() < 0.5) { this.owner.gain('burnt'); } }});
+		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`.ailment:true});
 		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false,init:{embeddedItem:null},setItem:function(itemPerk) { itemPerk.owner = this.owner; this.embeddedItem = itemPerk; }});
 		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true,injury:false}); // Removed Disabled
 		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true,injury:false});
@@ -677,7 +678,7 @@ G={
 		new G.perk({name:`dizzy`,desc:`Has suffered recent head trauma making it harder to think.`,disable:false});
 		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:true,ailment:false});
 		new G.perk({name:`broken`,desc:`Something's broken, but its not an arm or a leg.`,disable:false});
-		new G.perk({name:`shot`,desc:`Has been shot by an arrow or bullet.`,disable:false});
+		new G.perk({name:`shot`,desc:`Has been shot by an arrow or bullet.`,disable:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } }});
 		new G.perk({name:`bitten`,desc:`Becoming a zombie isn't infectious, right?`,disable:false});
 		new G.perk({name:`blind`,desc:`Has lost their glasses.`,ailment:false});
 		new G.perk({name:`gremlin`,desc:`Has gone into gremlin mode, causing chaos everywhere.`});
@@ -3007,11 +3008,13 @@ G={
 			G.char.prototype.targetCount = function(perpentrator) {
 				if (!this.combat) { return 1; }
 				let count = 1;
-				if (this.has('nerd') || this.has('glasses')) { count += 0.25; }
-				if (this.isDisabled()) { count += 2; }
-				if (this.isInjured()) { count += 1.5; }
-				if (this.isAiled()) { count += 0.75; }
-				if (this.has('embedded')) { count += 1; }
+				if (this.has('nerd')) { count += 0.6; }
+				if (this.has('glasses')) { count += 0.5; }
+				if (this.has('meek')) { count += 0.4; }
+				count += 2 * this.isDisabled(); 
+				count += 1.5 * this.isInjured(); 
+				count += 0.75 * this.isAiled(); 
+				if (this.has('embedded')) { count += 2; }
 				for (let i in this.perks) {
 					if (this.perks[i].perk.type != 'item') { continue; } 
 					if (this.perks[i].perk.tier == 3) { count += 0.45; }
@@ -3019,7 +3022,7 @@ G={
 					if (this.perks[i].perk.tier == 1) { count += 0.15; }
 				}
 				
-				if (this.has('frenzied')) { count -= 0.15; }
+				if (this.has('frenzied')) { count -= 0.25; }
 			}
 			G.last = null; //convenience; last refers to the last move created
 			G.char.prototype.makeMove = function() {
@@ -3438,6 +3441,18 @@ G={
 				text: '[1] sleeps peacefully...',
 				req: ['comatose']
 			});
+			new G.move({
+				chance: 2.5,
+				text: 'Something about [1]\'s bullet wounds changes, and [suddenly|abruptly], [1:they] feels an immeasurable wave of pain wash over them.',
+				successFunc: function() { this.gain('crippled'); },
+				req: ['shot any'],
+				reqFunc: function(cl) {
+					if (Math.random() < (1 - 1 / (this.has('shot').count + 1))) {
+						return true;
+					}
+					return false;
+				}
+			});
 
 			G.moveDefault.element = new G.element();
 			//hand to hand combat
@@ -3622,6 +3637,10 @@ G={
 					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', ', causing [2] to fall'); }
 					return text.replace('[S]', '');
 				},
+				failFunc: function(cl) {
+					this.gain('skipped');
+					cl[1].gain('skipped');
+				},
 				pReq: ['h:2 v:0'],
 				req: ['able%0.5|bulky|the_gift', '- able']
 			});
@@ -3639,7 +3658,8 @@ G={
 					if (Math.random() < this.has('frenzied')?0.1:0.3 && !this.has('fallen')) { this.gain('fallen'); return text.replace('[S]', ', bringing [1:themself] onto the ground in the process'); }
 					return text.replace('[S]', '');
 				},
-				req: ['any%0.5|bulky|cursed_knife|frenzied', 'any']
+				req: ['any%0.5|bulky|cursed_knife|frenzied', 'any'],
+				pReq: ['h:4 v:1']
 			});
 			new G.move({
 				chance: 1.5,
@@ -4273,7 +4293,7 @@ G={
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.sliceLight(),
 				req: ['cursed_knife able%0.75|frenzied', 'any'],
-				pReq: ['d:15']
+				pReq: ['e:15']
 			});
 			new G.move({
 				chance: 1.5,
@@ -4888,10 +4908,15 @@ G={
 				},
 				failFunc: function() { this.has('shotgun').loaded = 0; },
 				req: ['shotgun any%0.75|marksmen', 'any'],
-				pReq: ['h:1/8 v:1'],
+				pReq: ['h:8 v:1'],
 				reqFunc: function() { return this.has('shotgun').loaded; }
 			});
-			
+
+			//flamethrower (slow load but powerful 2 points weapon, 1 idle + 1 load + 3 fire)
+			new G.move({
+				chance: 5,
+				
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
