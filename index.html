@@ -4943,10 +4943,11 @@ G={
 				successFunc: function(cl, text) {
 					if (cl.length == 1 || Math.random() < this.adjust(0.25)) { return text.replace('[S]', ', but no one got hurt'); }
 
+					console.log(cl);
 					let afflictions = [];
 					for (let i = 1; i < cl.length; i++) {
 						cl[i].gain('singed');
-						let chance = 0.5;
+						let chance = 0.7;
 
 						if (Math.random() < chance / 3) { this.kill(cl[i], 'reduced to ashes'); afflictions.push('burns ['+i+'] to a crisp'); continue; }
 						if (Math.random() < chance / 2) { cl[i].gain('fallen'); cl[i].gain('seared'); afflictions.push('blows ['+i+'] to the ground and torches ['+i+':them]'); continue; }
