@@ -4954,7 +4954,7 @@ G={
 						if (Math.random() < chance / 1.5) { cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('singed'); afflictions.push('heavily burns ['+i+']'); continue; }
 						if (Math.random() < chance) { cl[i].gain('singed'); afflictions.push('burns ['+i+']'); continue; }
 
-						afflictions.push('hits ['+i+']');
+						afflictions.push('hits ['+(i + 1)+']');
 					}
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
