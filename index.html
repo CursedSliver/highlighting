@@ -4703,7 +4703,7 @@ G={
 				chance: 1.5,
 				text: '[1] [wonders|ponders] [what to do with|when to open|how to use] [1:their] random item orb.',
 				element: G.moveAssets.elements.alone,
-				req: ['random_orb any%0.6|naive|kind !inventor|scrappy|analytical|frenzied']
+				req: ['random_orb any%0.6|naive|kind !inventor|scrappy|analytical|frenzied|determined']
 			});
 			G.moveAssets.randomOrbPool = [
 				['big stick', 1],
@@ -4929,10 +4929,10 @@ G={
 
 			//flamethrower (powerful but friendly fire 2 points weapon, 1 idle + 1 funny fire that can hit anywhere between 0 and 5 people)
 			new G.move({
-				chance: 2,
+				chance: 1,
 				text: '[1] [wonders|thinks|ponders] about [the capabilities of [1:their] flamethrower|whether getting torched will hurt|whether flamethrowers are environmentally friendly|how [1:their] flamethrower works|when to use [1:their] flamethrower].',
 				element: G.moveAssets.elements.alone,
-				req: ['flamethrower']
+				req: ['flamethrower !frenzied|determined|analytical']
 			});
 			G.adjustFuncs.fireDefense = function(chance) {
 				let pow = 1;
