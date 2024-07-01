@@ -5233,7 +5233,7 @@ G={
 						for (let i in overseer.participants) {
 							for (let ii in overseer.participants) {
 								if (i == ii) { continue; }
-								overseer.participants[i].moveTowards(overseer.participants[ii], Math.pow(Math.abs(overseer.participants[i].combat.horizontal - overseer.participants[ii].combat.horizontal) + 1, 0.2));
+								overseer.participants[i].moveTowards(overseer.participants[ii], Math.pow(Math.abs(overseer.participants[i].combat.horizontal - overseer.participants[ii].combat.horizontal) + 1, 0.25) - 1);
 							}
 						}
 						while(true) {
