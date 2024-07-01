@@ -1493,7 +1493,7 @@ G={
 					else if (!op && val==cond) return true;
 					else return false;
 				}
-				G.actReqKeywords = ['any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', 'every', 'ailed', 'injured', 'inCombat'];
+				G.actReqKeywords = ['any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', '=', 'every', 'ailed', 'injured', 'inCombat'];
 				G.getAliveCharsN = function() {
 					let amount = 0;
 					for (let i in G.chars) {
@@ -1515,7 +1515,7 @@ G={
 					return this.chars.length - this.getAliveCharsN();
 				}
 				//refactored TW's code to be much more sensible - CS
-				let conditionTester = function(str, prevTeam, negate) {
+				let conditionTester = function(str, prevTeam, firstTeam, negate) {
 					//individual expressions, without AND or OR
 					if (str == '') { return true; }
 					if (!str) { return false; } 
@@ -1536,6 +1536,7 @@ G={
 						if (item == 'noTeam') { return cNegate(actualTrue, this.team); }
 						if (item == '-') { return cNegate(actualTrue, (this.team === prevTeam && !(prevTeam == 0 || this.team == 0))); }
 						if (item == '+') { return cNegate(actualTrue, (!(this.team === prevTeam) && !(prevTeam == 0 || this.team == 0))); }
+						if (item == '=') { return cNegate(actualTrue, !(this.team === firstTeam && !(prevTeam == 0 || this.team == 0))); }
 						if (item == 'ailed') { return cNegate(actualTrue, !this.isAiled()); }
 						if (item == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
 						if (item == 'inCombat') { return cNegate(actualTrue, !this.combat); }
@@ -1617,6 +1618,8 @@ G={
 								> this many in the team must be dead
 							'+'
 								> must be the same team as the previous team/person selected (separated to others via AND)
+							'='
+       								> must be the same team as the initial team/person ("char") selected
 							'-'
 								> must be a different team
 							'inTeam'
@@ -1635,18 +1638,21 @@ G={
 								> can be abled or disabled (still doesn't accept out)
 							'every'
        							> matches everyone
+	       					'delete' 
+	      						> removes the character from the output; must be put at the front as an independent term (use percent sign to make it probabilistic)
 			   				put '%N' after any perk to signify a chance for that to be true, where N is the chance
 					*/
-					var bigReq = null;
+					let bigReq = null;
 					if (toMatch) { bigReq = deepArrCopy(toMatch); } else { bigReq = deepArrCopy(this.people); }
 
 					if (!interactMin) { interactMin = bigReq.length - 1; }
 
 					if (!me instanceof G.char) { console.log(me); throw 'The above is not an instance of char!'; }
 					
-					var selected=[];
+					let selected = [];
 					
-					var prevTeam=0;
+					let prevTeam = 0;
+					let firstTeam = me.team;
 
 					if (lastSelected) { prevTeam = lastSelected.team; }
 					let req = bigReq[0].split(' ');
@@ -1685,9 +1691,17 @@ G={
 						}
 						
 						req = req.split(' '); //req now describes all statements separated by AND
+						let skip = false;
 						for (let ii in req) {
+							if (req[ii].indexOf('delete') == 0) {
+								if (req[ii] == 'delete') { skip = true; continue; }
+								let chance = parseFloat(req[ii].split('%')[1]);
+								if (Math.random() < chance) { skip = true; continue; }
+								req.splice(ii, 1);
+							}
 							req[ii] = req[ii].split('|'); //req is now a nested array, with layer one being AND and layer two being OR
 						}
+						if (skip) { continue; }
 
 						pool=shuffle(pool);
 						
@@ -1704,7 +1718,7 @@ G={
 									neg = true;
 								}
 								for (let iiii in req[iii]) {
-									if (it.testCond(req[iii][iiii], prevTeam, false)) { fitOR = true; break; }
+									if (it.testCond(req[iii][iiii], prevTeam, firstTeam)) { fitOR = true; break; }
 								}
 								if (fitOR && neg) { fitOR = false; } else if (!fitOR && neg) { fitOR = true; }
 								if (!fitOR) { fitAND = false; break; }
@@ -4929,7 +4943,7 @@ G={
 				successFunc: function(cl, text) {
 					console.log(cl);
 				},
-				req: ['flamethrower any%0.25|pyromania%0.5|able%0.25', '!+%0.5 any%0.6', '!+%0.5 any%0.6', '!+%0.5 any%0.6', '!+%0.5 any%0.6', '!+%0.5 any%0.6'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
+				req: ['flamethrower any%0.25|pyromania%0.5|able%0.25', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
 				pReq: ['e:12', 'e:12', 'e:12', 'e:12', 'e:22']
 			});
 			
