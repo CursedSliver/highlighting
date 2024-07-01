@@ -642,7 +642,7 @@ G={
 		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`,disable:true}); //quite possibly the most used perk ever
 		new G.perk({name:`defensive`,desc:`In a defensive stance.`});
 		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true});
-		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},cannotLose:true,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { this.count--; if (this.count == 0) { this.owner.lose('skipped', true); } }});
+		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},cannotLose:true,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { this.count--; if (this.count <= 0) { this.owner.lose('skipped', true); } }});
 		new G.perk({name:`in stasis`,desc:`Can no longer make turns!`});
 
 		G.glob.disable = true;
@@ -1304,7 +1304,7 @@ G={
 					let perkOwned = this.has(perk);
 					if (perkOwned) { 
 						if (perkOwned.perk.onLose) { perkOwned.perk.onLose.call(this.perks[this.perks.indexOf(perkOwned)]); }
-						if (!perkOwned.perk.cannotLose && !force) { return this.perks.splice(this.perks.indexOf(perkOwned), 1); }
+						if (!perkOwned.perk.cannotLose || force) { return this.perks.splice(this.perks.indexOf(perkOwned), 1); }
 					}
 				}
 				G.char.prototype.give=function(other,perk)
