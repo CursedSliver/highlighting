@@ -5142,6 +5142,7 @@ G={
 						if (pool.length > 0) { choose(pool).initiateCombat(); }
 					}
 				}
+				G.ongoingCombats = shuffle(G.ongoingCombats);
 				
 				var everybody=shuffle(G.teams).concat(shuffle(G.chars));
 				for (var iAct=0;iAct<everybody.length;iAct++)
@@ -5228,6 +5229,13 @@ G={
 						if (overseer.processed) { continue; }
 						overseer.processed = true;
 						var count = 0;
+						overseer.participants = shuffle(overseer.participants);
+						for (let i in overseer.participants) {
+							for (let ii in overseer.participants) {
+								if (i == ii) { continue; }
+								overseer.participants[i].moveTowards(overseer.participants[ii], Math.pow(Math.abs(overseer.participants[i].combat.horizontal - overseer.participants[ii].combat.horizontal) + 1, 0.2));
+							}
+						}
 						while(true) {
 							for (let i in overseer.participants) {
 								if (overseer.participants[i].makeMove()) { overseer.participants[i].fleeCombat(); }
