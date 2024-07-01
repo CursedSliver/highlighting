@@ -3985,8 +3985,8 @@ G={
 				}),
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.65, 'useSpearhead'), 'dodge'); },
 				req: ['big_stick'],
-				func: function(charList) {
-					this.combat.moveInFrontOf(charList[1], Math.floor(Math.random() * 3 + 1));
+				func: function(cl) {
+					this.combat.moveInFrontOf(cl[1], Math.floor(Math.random() * 3 + 1));
 				},
 				successFunc: function(cl, text) {
 					let chance = 0.9; //chance to do stuff idk
@@ -5240,6 +5240,7 @@ G={
 							for (let i in overseer.participants) {
 								if (overseer.participants[i].makeMove()) { overseer.participants[i].fleeCombat(); }
 							}
+							for (let i in overseer.participants) { if (isNaN(overseer.participants[i].combat.horizontal)) { throw 'NaN has appeared!'; } }
 							if (overseer.participants.length <= 1 || Math.random() > 1 / (count + 1)) { break; }
 							count++;
 						}
