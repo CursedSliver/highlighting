@@ -1301,10 +1301,11 @@ G={
 						if (!G.perksBN[perk]) {console.log('No perk named','"'+perk+'"');return false;}
 						perk=G.perksBN[perk];
 					}
-					let perkOwned = this.has(perk);
-					if (perkOwned) { 
-						if (perkOwned.perk.onLose) { perkOwned.perk.onLose.call(this.perks[this.perks.indexOf(perkOwned)]); }
-						if (!perkOwned.perk.cannotLose || force) { return this.perks.splice(this.perks.indexOf(perkOwned), 1); }
+					let token = null;
+					if (perk instanceof G.perkToken) { token = perk; } else { token = this.has(perk); }
+					if (token) { 
+						if (token.perk.onLose) { token.perk.onLose.call(this.perks[this.perks.indexOf(token)]); }
+						if (!token.perk.cannotLose || force) { return this.perks.splice(this.perks.indexOf(token), 1); }
 					}
 				}
 				G.char.prototype.give=function(other,perk)
@@ -3369,7 +3370,7 @@ G={
 				text: '[1] takes out [1:their] batch of [freshly baked |]cookies and [gorges on|devours|eats] them, recovering from [1:their] ailments!',
 				successFunc: function() {
 					this.cureAilments();
-					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('batch of cookies'); this.injectBack('<br>[1] has eaten all of [1:their] cookies.'); }
+					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('batch of cookies'); this.combat.overseer.injectBack('<br>[1] has eaten all of [1:their] cookies.'); }
 				},
 				req: ['batch_of_cookies any%0.05|ailed']
 			});
@@ -3378,7 +3379,7 @@ G={
 				text: '[1] takes out [1:their] [hot |steaming |fragrant |magical |]hot chocolate and [consumes|drinks|drains] it, recovering from [1:their] injuries!',
 				successFunc: function() {
 					this.healInjuries();
-					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('hot chocolate'); this.injectBack('<br>[1] has drank all of [1:their] hot chocolate.'); }
+					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('hot chocolate'); this.combat.overseer.injectBack('<br>[1] has drank all of [1:their] hot chocolate.'); }
 				},
 				req: ['hot_chocolate any%0.05|injured']
 			});
