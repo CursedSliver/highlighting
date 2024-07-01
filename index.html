@@ -4953,7 +4953,7 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			};
 			new G.move({
-				chance: 16,
+				chance: 12,
 				text: '[1] sets [1:their] flamethrower alight and a turbulence of flames flare out of the barrel! <br>It [S]!',
 				element: new G.element({
 					interact: 5,
@@ -4968,7 +4968,7 @@ G={
 						cl[i].gain('singed');
 						let chance = cl[i].adjust(0.55 + (this.has('pyromania')?0.1:0), 'fireDefense');
 
-						if (Math.random() < chance / 3) { this.kill(cl[i], 'reduced to ashes'); afflictions.push('burns ['+(i + 1)+'] to a crisp'); continue; }
+						if (Math.random() < chance / 2 && cl[i].isDisabled()) { this.kill(cl[i], 'reduced to ashes'); afflictions.push('burns ['+(i + 1)+'] to a crisp'); continue; }
 						if (Math.random() < chance / 2) { cl[i].gain('fallen'); cl[i].gain('seared'); afflictions.push('blows ['+(i + 1)+'] to the ground and torches ['+(i + 1)+':them]'); continue; }
 						if (Math.random() < chance / 1.5 && this.has('pyromania')) { cl[i].gain('seared'); cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('shell shocked'); afflictions.push('greatly traumatizes ['+(i + 1)+']'); continue; }
 						if (Math.random() < chance / 1.5) { cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('singed'); afflictions.push('heavily burns ['+(i + 1)+']'); continue; }
@@ -4978,7 +4978,7 @@ G={
 					}
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
-				req: ['flamethrower any%0.25|pyromania%0.5|able%0.25', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
+				req: ['flamethrower any%0.3|pyromania%0.4|able%0.2', 'delete%0.3 !=%0.6 any%0.6', 'delete%0.3 !=%0.6 any%0.6', 'delete%0.3 !=%0.6 any%0.6', 'delete%0.3 !=%0.6 any%0.6', 'delete%0.3 !=%0.6 any%0.6'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
 				pReq: ['e:12', 'e:12', 'e:12', 'e:12', 'e:22']
 			});
 			
