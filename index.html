@@ -655,6 +655,7 @@ G={
 		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.4) { this.owner.gain('lacerated'); } }, update:function() { if (Math.random() < 0.1) { this.count--; if (this.count == 0) { this.owner.lose('cut up'); }}}});
 		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } }});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
+		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:false,ailment:false});
 		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 3 && Math.random() < 0.5) { this.owner.gain('burnt'); } } });
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`,ailment:true});
 		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false,init:{embeddedItem:null},setItem:function(itemPerk) { itemPerk.owner = this.owner; this.embeddedItem = itemPerk; }});
@@ -676,7 +677,6 @@ G={
 		G.glob.ailment = true;
 		new G.perk({name:`sick`,desc:`Is feeling ill and feverish.`,disable:false});
 		new G.perk({name:`dizzy`,desc:`Has suffered recent head trauma making it harder to think.`,disable:false});
-		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:true,ailment:false});
 		new G.perk({name:`broken`,desc:`Something's broken, but its not an arm or a leg.`,disable:false});
 		new G.perk({name:`shot`,desc:`Has been shot by an arrow or bullet.`,disable:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } }});
 		new G.perk({name:`bitten`,desc:`Becoming a zombie isn't infectious, right?`,disable:false});
@@ -1645,7 +1645,7 @@ G={
 					let bigReq = null;
 					if (toMatch) { bigReq = deepArrCopy(toMatch); } else { bigReq = deepArrCopy(this.people); }
 
-					if (!interactMin) { interactMin = bigReq.length - 1; }
+					if (!interactMin && interactMin != 0) { interactMin = bigReq.length - 1; }
 
 					if (!me instanceof G.char) { console.log(me); throw 'The above is not an instance of char!'; }
 					
@@ -4929,7 +4929,7 @@ G={
 			//flamethrower (powerful but friendly fire 2 points weapon, 1 idle + 1 funny fire that can hit anywhere between 0 and 5 people)
 			new G.move({
 				chance: 2,
-				text: '[1] [wonders|thinks|ponders] about [the capabilities of [1:their] flamethrower|whether getting torched will hurt|whether flamethrowers are environmentally friendly|how it works|when to use it].',
+				text: '[1] [wonders|thinks|ponders] about [the capabilities of [1:their] flamethrower|whether getting torched will hurt|whether flamethrowers are environmentally friendly|how [1:their] flamethrower works|when to use [1:their] flamethrower].',
 				element: G.moveAssets.elements.alone,
 				req: ['flamethrower']
 			});
