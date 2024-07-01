@@ -655,8 +655,8 @@ G={
 		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.4) { this.owner.gain('lacerated'); } }, update:function() { if (Math.random() < 0.1) { this.count--; if (this.count == 0) { this.owner.lose('cut up'); }}}});
 		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } }});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
-		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:false,ailment:false});
-		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 3 && Math.random() < 0.5) { this.owner.gain('burnt'); } } });
+		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:false,ailment:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 2 && Math.random() < 0.5) { this.owner.gain('seared'); this.count = Math.max(this.count - 3, 1); } }});
+		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 3 && Math.random() < 0.5) { this.owner.gain('burnt'); this.count = Math.max(this.count - 3, 1); } } });
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`,ailment:true});
 		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false,init:{embeddedItem:null},setItem:function(itemPerk) { itemPerk.owner = this.owner; this.embeddedItem = itemPerk; }});
 		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true,injury:false}); // Removed Disabled
@@ -4935,13 +4935,28 @@ G={
 			});
 			new G.move({
 				chance: 16,
-				text: '[1] sets [1:their] flamethrower alight! <br>The turbulence of flames [S]!',
+				text: '[1] sets [1:their] flamethrower alight and a turbulence of flames flare out of the barrel! <br>It [S]!',
 				element: new G.element({
 					interact: 5,
 					interactMin: 0
 				}),
 				successFunc: function(cl, text) {
-					console.log(cl);
+					if (cl.length == 1 || Math.random() < this.adjust(0.25)) { return text.replace('[S]', ', but no one got hurt'); }
+
+					let afflictions = [];
+					for (let i = 1; i < cl.length; i++) {
+						cl[i].gain('singed');
+						let chance = 0.5;
+
+						if (Math.random() < chance / 3) { this.kill(cl[i], 'reduced to ashes'); afflictions.push('burns ['+i+'] to a crisp'); continue; }
+						if (Math.random() < chance / 2) { cl[i].gain('fallen'); cl[i].gain('seared'); afflictions.push('blows ['+i+'] to the ground and torches ['+i+':them]'); continue; }
+						if (Math.random() < chance / 1.5 && this.has('pyromania')) { cl[i].gain('seared'); cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('shell shocked'); afflictions.push('greatly traumatizes ['+i+']'); continue; }
+						if (Math.random() < chance / 1.5) { cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('singed'); afflictions.push('heavily burns ['+i+']'); continue; }
+						if (Math.random() < chance) { cl[i].gain('singed'); afflictions.push('burns ['+i+']'); continue; }
+
+						afflictions.push('hits ['+i+']');
+					}
+					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
 				req: ['flamethrower any%0.25|pyromania%0.5|able%0.25', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6', 'delete%0.5 !=%0.6 any%0.6'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
 				pReq: ['e:12', 'e:12', 'e:12', 'e:12', 'e:22']
