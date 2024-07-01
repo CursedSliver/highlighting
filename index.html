@@ -2252,8 +2252,8 @@ G={
 			new G.act(0.01,['lunatic'],`[BLUE][1] calms down for good, no longer subject to the whims of a changing brain.`,p=>{p[1].lose('lunatic');});
 			// - Status Effects
 			// - - Unstable
-			new G.act(0.5,['unstable !frenzied|peaceful%0.5|kind%0.2|naive%0.2|meek%0.2|analytical%0.2 bulky%0.5|lunatic%0.5|unstable%0.5|cursed_knife%0.5|bleeding_out%0.5|burnt%0.5|cut_up%0.3|broken%0.3|shot%0.3|singed%0.3|scratched%0.2|bruised%0.2'],`[RED][[1] finally snaps!|Something inside [1] snaps!]<br>[1] is now frenzied!`,p=>{p[1].gain('frenzied');});
-				new G.act(0.2,['frenzied peaceful%0.5|kind%0.5|analytical%0.2|meek%0.2|any%0.5'],`[1]'s frenzy finally dies down.`,p=>{p[1].lose('frenzied');});
+			new G.act(0.2,['unstable !frenzied|peaceful%0.5|kind%0.2|naive%0.2|meek%0.2|analytical%0.2 bulky%0.5|lunatic%0.5|unstable%0.5|cursed_knife%0.5|bleeding_out%0.5|burnt%0.5|cut_up%0.3|broken%0.3|shot%0.3|singed%0.3|scratched%0.2|bruised%0.2'],`[RED][[1] finally snaps!|Something inside [1] snaps!]<br>[1] is now frenzied!`,p=>{p[1].gain('frenzied');});
+				new G.act(0.5,['frenzied peaceful%0.5|kind%0.5|analytical%0.2|meek%0.2|any%0.5'],`[1]'s frenzy finally dies down.`,p=>{p[1].lose('frenzied');});
 			// - - Evil Laughing
 			new G.act(0.2,['sociopath%0.8|devious%0.5|rich%0.2|cursed_knife%0.2 devious%0.5|sociopath%0.5|unstable%0.5|lunatic%0.5|glasses%0.5 !peaceful%0.8|kind%0.5|naive%0.5|meek%0.5|cowardly%0.5'],`[1] finds a [high up|quiet|out of the way] place to practice [1:their] evil laugh! [Muahahahaha|Ehehehehe|Buahahahaaa]!`,p=>{p[1].gain('laughed');});
 				new G.act(0.5,['laughed !sociopath%0.5|devious%0.2|unstable%0.2|lunatic%0.2|cursed_knife%0.5 any'],`[1] seems to have most of the laughing out of their system, for now.`,p=>{p[1].lose('laughed');});
@@ -2277,7 +2277,7 @@ G={
 			var victimKill=injuredMajor+' '+victimMinor;
 			// Injury/murder chances
 			// Greatly reduced, replaced by the descriptive combat system
-			var anyAttackMult=0.5;  // Actual chance about halved due to trait checks.
+			var anyAttackMult=0.1;  // Actual chance about halved due to trait checks.
 			var perkAttackMult=0.15; // Actual chance about halved due to trait checks.
 			var anyDefenseMult=0.5;
 			
@@ -2421,11 +2421,11 @@ G={
 				new G.act(0.01,['ancient_scepter%0.5|magic_wand%0.2|wizard_robe%0.2|the_gift%0.2 ancient_scepter%0.5|magic_wand%0.2|wizard_robe%0.2|the_gift%0.2 leader%0.5|kind%0.5|medic%0.5|shell-shocked%0.5|any%0.2 !sociopath|devious%0.8|survivalist%0.8','+ dead'],`[BLUE][1] invokes [dark|desperate|arcane|last resort] magic with everything [1:they] have!<br>...it's a miracle! [1] brought [2] back to the edge of life!`,p=>{p[1].lose('shell-shocked');p[2].lose('dead');p[2].gain('revived');});
 				new G.act(0.01,['ancient_scepter%0.5|magic_wand%0.2|wizard_robe%0.2|the_gift%0.5 ancient_scepter%0.5|magic_wand%0.2|wizard_robe%0.2|the_gift%0.5 leader%0.5|kind%0.5|medic%0.5|suicidal%0.8|any%0.2 !sociopath|devious%0.8|survivalist%0.8','+ dead peaceful%0.5|kind%0.5|cute%0.5|medic%0.5|any%0.5'],`[BLUE][1] invokes [dark|desperate|arcane|last resort] magic with everything [1:they] have left!<br>One life for one life. With [1]'s life spent, [2] slowly begins to wake up once more...<br>When [2] realizes what has happened, it is already too late... Was it really worth it?`,p=>{p[1].kill(p[1],`self sacrifice`);p[2].gain('shell-shocked');p[2].lose('dead');p[2].gain('revived');});
 			// Wish Ring
-			new G.act(perkAttackMult*attackKill*0.2,[hesitentKiller+' wish_ring the_gift%0.2|naive%0.5|goth%0.5|any%0.5','- any annoying|any%0.8 !lucky_coin%0.2|plot_armor%0.5'],`[RED][1] wishes [2] would disappear... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...nobody seems to remember [2] ever existed at all.`,p=>{p[1].kill(p[2],`ceased to exist`);p[2].gain('nihil');});
-				new G.act(perkAttackMult*attackKill*0.1,['wish_ring naive%0.5|peaceful%0.5|meek%0.5|the_gift%0.5|any%0.5 !survivalist%0.8|devious%0.5|stubborn%0.5|analytical%0.5|plot_armor%0.5'],`[RED][1] wishes [1:g|he wasn't|she wasn't|they weren't] here... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...nobody seems to remember [1] ever existed at all.`,p=>{p[1].kill(p[1],`ceased to exist`);p[1].gain('nihil');});
-			new G.act(0.1,['wish_ring sheep|plot_armor meek%0.5|devious%0.5|survivalist%0.5|analytical%0.5|any%0.5 !naive%0.5|peaceful%0.2|bulky%0.2'],`[RED][1] wishes [1:they] [were immortal|were invincibile|could survive anything].<br>[1]'s wish ring shimmers ominonusly, and [1] realizes what they've done.<br>It couldn't have been that easy, could it?`,p=>{p[1].gain('plot armor');});
-			new G.act(0.05,['wish_ring peaceful%0.5|kind%0.5|the_gift%0.2|medic%0.2|any%0.5 !sociopath|devious%0.8|survivalist%0.8','+ dead !nihil'],`[BLUE][1] wishes [1:they] could see [2] one last time... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...it's a miracle! [2] came back to life!`,p=>{p[2].lose('dead');p[2].gain('revived');});
-			new G.act(0.2,['wish_ring peaceful%0.5|kind%0.5|the_gift%0.2|cowardly%0.5|any%0.5 !sociopath|survivalist%0.8|devious%0.5 alive:1 dead:>0'],`[BLUE][1] wishes [1:g|he wasn't|she wasn't|they weren't] alone anymore... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...it's a miracle! Everybody's been brought back to life!`,p=>{
+			new G.act(perkAttackMult*attackKill*0.5,[hesitentKiller+' wish_ring the_gift%0.2|naive%0.5|goth%0.5|any%0.5','- any annoying|any%0.8 !lucky_coin%0.2|plot_armor%0.5'],`[RED][1] wishes [2] would disappear... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...nobody seems to remember [2] ever existed at all.`,p=>{p[1].kill(p[2],`ceased to exist`);p[2].gain('nihil');});
+				new G.act(perkAttackMult*attackKill*0.15,['wish_ring naive%0.5|peaceful%0.5|meek%0.5|the_gift%0.5|any%0.5 !survivalist%0.8|devious%0.5|stubborn%0.5|analytical%0.5|plot_armor%0.5'],`[RED][1] wishes [1:g|he wasn't|she wasn't|they weren't] here... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...nobody seems to remember [1] ever existed at all.`,p=>{p[1].kill(p[1],`ceased to exist`);p[1].gain('nihil');});
+			new G.act(0.2,['wish_ring sheep|plot_armor meek%0.5|devious%0.5|survivalist%0.5|analytical%0.5|any%0.5 !naive%0.5|peaceful%0.2|bulky%0.2'],`[RED][1] wishes [1:they] [were immortal|were invincibile|could survive anything].<br>[1]'s wish ring shimmers ominonusly, and [1] realizes what they've done.<br>It couldn't have been that easy, could it?`,p=>{p[1].gain('plot armor');});
+			new G.act(0.15,['wish_ring peaceful%0.5|kind%0.5|the_gift%0.2|medic%0.2|any%0.5 !sociopath|devious%0.8|survivalist%0.8','+ dead !nihil'],`[BLUE][1] wishes [1:they] could see [2] one last time... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...it's a miracle! [2] came back to life!`,p=>{p[2].lose('dead');p[2].gain('revived');});
+			new G.act(0.15,['wish_ring peaceful%0.5|kind%0.5|the_gift%0.2|cowardly%0.5|any%0.5 !sociopath|survivalist%0.8|devious%0.5 alive:1 dead:>0'],`[BLUE][1] wishes [1:g|he wasn't|she wasn't|they weren't] alone anymore... [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...it's a miracle! Everybody's been brought back to life!`,p=>{
 				for (var i in G.chars){G.chars[i].lose('dead');G.chars[i].gain('revived');}
 			});
 			new G.act(0.01,['wish_ring peaceful%0.5|kind%0.5|naive%0.5|meek%0.2|any%0.2 !sociopath%0.8|devious%0.5|survivalist%0.5|analytical%0.2|stubborn%0.2 alive:>1'],`[BLUE][1] wishes [everyone|people] would get along! [1:g|His|Her|Their] wish ring shimmers for a second, and then -<br>...it seems the world has been made a softer place.`,p=>{
@@ -2463,10 +2463,10 @@ G={
 			var healthModerate='bulky%0.2|stubborn%0.2|plot_armor%0.4|any%0.5 !cut_up%0.3|broken%0.3|shot%0.3|singed%0.3';
 			var healthMajor='bulky%0.1|stubborn%0.1|plot_armor%0.6|any%0.5 !bleeding_out%0.5|burnt%0.5|missing_arm%0.5|missing_leg%0.5|badly_poisoned%0.5';
 			
-			var healthRecover=1;
-			var healthWorsen=1;
-			var healthHeal=1;
-			var healthDeath=1;
+			var healthRecover=1.5;
+			var healthWorsen=0.75;
+			var healthHeal=1.5;
+			var healthDeath=0.75;
 			
 			// - Minor (
 			new G.act(healthRecover*0.3,['scratched '+healthMinor],`[1] has mostly recovered from their scratches.`,p=>{p[1].lose(`scratched`);});
