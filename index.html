@@ -2978,9 +2978,9 @@ G={
 			}
 			G.combatOverseer.prototype.addChar = function(char, index, subIndex, widgets) {
 				if (!index) { index = this.out.length - 1; }
-				if (!subIndex) { subIndex = this.out[index].charList.length - 1; }
+				if (!subIndex) { subIndex = this.out[index].charList.length; }
 				this.out[index].charList.splice(subIndex, 0, new G.charIcon(char));
-				if (widgets) { this.out[index].charList[subIndex + 1].widgets = widgets; }
+				if (widgets) { this.out[index].charList[subIndex].widgets = widgets; }
 			}
 			G.combatOverseer.prototype.getPrompt = function(boxIndex) {
 				if (!this.out.length) { return ''; }
