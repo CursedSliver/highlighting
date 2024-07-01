@@ -649,6 +649,7 @@ G={
 		G.glob.injury = true;
 		G.glob.ailment = false;
 		G.glob.combat = false;
+		new G.perk({name:`wet`,desc:`Is dripping with water.`,disable:false,injury:false});
 		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false}); // Removed Disabled
 		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
 		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`});
@@ -4944,6 +4945,7 @@ G={
 				if (this.has('knight armor')) { pow *= 1.5; }
 				if (this.has('ironskin')) { pow *= 0.7; } 
 				if (this.has('defensive')) { pow *= 0.9; }
+				if (this.has('wet')) { pow *= 0.5; }
 				if (this.has('singed')) { pow *= Math.pow(1.05, this.has('singed').count); }
 				if (this.has('seared')) { pow *= Math.pow(0.85, this.has('seared').count); }
 				if (this.has('burnt')) { pow *= Math.pow(0.7, this.has('burnt').count); }
