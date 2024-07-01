@@ -1668,7 +1668,7 @@ G={
 							neg = true;
 						}
 						for (let ii in req[i]) {
-							if (me.testCond(req[i][ii], prevTeam, neg)) { fitORMe = true; break; }
+							if (me.testCond(req[i][ii], prevTeam, firstTeam, neg)) { fitORMe = true; break; }
 						} 
 						if (!fitORMe) { fitANDMe = false; break; }
 					} 
