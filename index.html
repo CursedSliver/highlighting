@@ -2001,7 +2001,7 @@ G={
 			new G.act(newItemMult*0.03,['scrappy%0.5|medic%0.2|lucky_coin%0.2|survivalist%0.2|any%0.5 !AED'],`[BLUE][1] somehow finds a riot shield.<br>[1] begins crouching and acting all tactical!`,p=>{p[1].gain('AED');});
 			//Combo Events (10%) -TW
 			new G.act(newItemMult*0.01,['scrappy%0.5|lucky_coin%0.2|sociopath%0.2|survivalist%0.2|any%0.5 !axe%0.8|leather_scraps%0.8|peaceful%0.5|kind%0.2'],`[BLUE][1] finds a dead body dressed in leather and holding an axe.<br>[1] loots the body, maybe some of this could be useful?`,p=>{p[1].gain('axe');p[1].gain('leather scraps');});
-			new G.act(newItemMult*0.01,['scrappy%0.5|lucky_coin%0.2|marksmen%0.2|any%0.5 !handgun%0.8|kevlar_vest%0.8|peaceful%0.5'],`[BLUE][1] finds a box with a gun, ammo, and vest inside.<br>Who left this here...?`,p=>{p[1].gain('handgun');p[1].gain('kevlar_vest');});
+			new G.act(newItemMult*0.01,['scrappy%0.5|lucky_coin%0.2|marksmen%0.2|any%0.5 !handgun%0.8|kevlar_vest%0.8|peaceful%0.5'],`[BLUE][1] finds a box with a gun, ammo, and vest inside.<br>Who left this here...?`,p=>{p[1].gain('handgun');p[1].gain('kevlar vest');});
 			new G.act(newItemMult*0.01,['scrappy%0.5|lucky_coin%0.2|the_gift%0.5|naive%0.2|any%0.5 !magic_wand%0.8|magic_dust%0.8'],`[BLUE][1] follows a trail of sparkly dust to a still sparking wand.<br>It continues to leak the colorful dust long after [1] picks it up.`,p=>{p[1].gain('magic wand');p[1].gain('magic dust');});
 			new G.act(newItemMult*0.01,['scrappy%0.5|lucky_coin%0.2|annoying%0.2|any%0.5 !slingshot%0.8|grenade%0.8|peaceful%0.8'],`[BLUE][1] finds an abandoned slingshot with a single grenade next to it.<br>That could be an interesting combination...`,p=>{p[1].gain('slingshot');p[1].gain('grenade');});
 			new G.act(newItemMult*0.01,['scrappy%0.5|lucky_coin%0.2|sociopath%0.2|survivalist%0.2|any%0.33 !sword%0.8|kite_shield%0.8|knight_armor%0.8|peaceful%0.5|kind%0.2'],`[BLUE][1] finds the dead body of an armored knight<br>[1] begins putting on the armor before grabing the sword and shield.<br>Hopefully, [1]'s fate won't be the same.`,p=>{p[1].gain('sword');p[1].gain('kite shield');p[1].gain('knight armor');});
@@ -4982,7 +4982,7 @@ G={
 
 						if (Math.random() < chance / 2.5 && cl[i].isDisabled() && (cl[i].has('seared') || cl[i].has('burnt'))) { this.kill(cl[i], 'reduced to ashes'); afflictions.push('burns ['+(i + 1)+'] to a crisp'); continue; }
 						if (Math.random() < chance / 2) { cl[i].gain('fallen'); cl[i].gain('seared'); afflictions.push('blows ['+(i + 1)+'] to the ground and torches ['+(i + 1)+':them]'); continue; }
-						if (Math.random() < chance / 1.5 && this.has('pyromania')) { cl[i].gain('seared'); cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('shell shocked'); afflictions.push('greatly traumatizes ['+(i + 1)+']'); continue; }
+						if (Math.random() < chance / 1.5 && this.has('pyromania')) { cl[i].gain('seared'); cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('shell-shocked'); afflictions.push('greatly traumatizes ['+(i + 1)+']'); continue; }
 						if (Math.random() < chance / 1.5) { cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('singed'); afflictions.push('heavily burns ['+(i + 1)+']'); continue; }
 						if (Math.random() < chance) { cl[i].gain('singed'); afflictions.push('burns ['+(i + 1)+']'); continue; }
 
