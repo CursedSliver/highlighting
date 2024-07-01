@@ -4933,6 +4933,21 @@ G={
 				element: G.moveAssets.elements.alone,
 				req: ['flamethrower']
 			});
+			G.adjustFuncs.fireDefense = function(chance) {
+				let pow = 1;
+
+				pow += this.isDisabled() * 0.6;
+				pow += this.isInjured() * 0.25;
+
+				if (this.has('combat gear')) { pow *= 0.9; }
+				if (this.has('freezing sapphire')) { pow *= 0.8; }
+				if (this.has('knight armor')) { pow *= 1.5; }
+				if (this.has('ironskin')) { pow *= 0.7; } 
+				if (this.has('defensive')) { pow *= 0.9; }
+				if (this.has('singed')) { pow *= Math.pow(1.05, this.has('singed').count); }
+				if (this.has('seared')) { pow *= Math.pow(0.85, this.has('seared').count); }
+				if (this.has('burnt')) { pow *= Math.pow(0.7, this.has('burnt').count); }
+			};
 			new G.move({
 				chance: 16,
 				text: '[1] sets [1:their] flamethrower alight and a turbulence of flames flare out of the barrel! <br>It [S]!',
@@ -4947,13 +4962,13 @@ G={
 					let afflictions = [];
 					for (let i = 1; i < cl.length; i++) {
 						cl[i].gain('singed');
-						let chance = 0.7;
+						let chance = cl[i].adjust(0.55 + (this.has('pyromania')?0.1:0), 'fireDefense');
 
-						if (Math.random() < chance / 3) { this.kill(cl[i], 'reduced to ashes'); afflictions.push('burns ['+i+'] to a crisp'); continue; }
-						if (Math.random() < chance / 2) { cl[i].gain('fallen'); cl[i].gain('seared'); afflictions.push('blows ['+i+'] to the ground and torches ['+i+':them]'); continue; }
-						if (Math.random() < chance / 1.5 && this.has('pyromania')) { cl[i].gain('seared'); cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('shell shocked'); afflictions.push('greatly traumatizes ['+i+']'); continue; }
-						if (Math.random() < chance / 1.5) { cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('singed'); afflictions.push('heavily burns ['+i+']'); continue; }
-						if (Math.random() < chance) { cl[i].gain('singed'); afflictions.push('burns ['+i+']'); continue; }
+						if (Math.random() < chance / 3) { this.kill(cl[i], 'reduced to ashes'); afflictions.push('burns ['+(i + 1)+'] to a crisp'); continue; }
+						if (Math.random() < chance / 2) { cl[i].gain('fallen'); cl[i].gain('seared'); afflictions.push('blows ['+(i + 1)+'] to the ground and torches ['+(i + 1)+':them]'); continue; }
+						if (Math.random() < chance / 1.5 && this.has('pyromania')) { cl[i].gain('seared'); cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('shell shocked'); afflictions.push('greatly traumatizes ['+(i + 1)+']'); continue; }
+						if (Math.random() < chance / 1.5) { cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('singed'); afflictions.push('heavily burns ['+(i + 1)+']'); continue; }
+						if (Math.random() < chance) { cl[i].gain('singed'); afflictions.push('burns ['+(i + 1)+']'); continue; }
 
 						afflictions.push('hits ['+(i + 1)+']');
 					}
