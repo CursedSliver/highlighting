@@ -715,7 +715,7 @@ G={
 		new G.perk({name:`flamethrower`,desc:`Careful! May set both foes and friends on fire.`,tier:2,init:{ammo:0}});
 		new G.perk({name:`rocket launcher`,desc:`A dangerous weapon; excels at blowing stuff up.`,tier:3});
 		new G.perk({name:`lasergun`,desc:`Ultra-concentrated energy shots that burn through practically anything.`,tier:3});
-		new G.perk({name:`magic wand`,desc:`Casts a variety of spells upon your foes.`,tier:2});
+		new G.perk({name:`magic wand`,desc:`Casts a variety of spells upon your friends and foes.`,tier:2,init:{charges:1}});
 		new G.perk({name:`ancient scepter`,desc:`Calls forth ancient hexes and curses on your adversaries.`,tier:3});
 		
 		new G.perk({name:`pet wolf`,desc:`A ravenous pet wolf to devour your opponents.`,tier:2});
@@ -4206,11 +4206,11 @@ G={
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 
 					let toFind = (Math.random() < 0.5);
-					if (cl[1].has('knight armor') && Math.random() < chance) { this.lose('pet rock'); cl[1].lose('knight armor'); return text + ' The rock impacts [2]\'s knight armor and shatters, bringing [2:their] armor down with it!'; }
+					if (cl[1].has('knight armor') && Math.random() < chance) { this.lose('pet rock'); cl[1].lose('knight armor'); return text.replace('[T]', '') + ' The rock impacts [2]\'s knight armor and shatters, bringing [2:their] armor down with it!'; }
 					if (!toFind) { this.lose('pet rock'); }
 					if (Math.random() < chance) { cl[1].gain('bruised'); return text.replace('[S]', ', bruising [2:them]').replace('[T]', toFind?' [1] loses track of [1:their] pet rock, and it is never found again.':''); }
 					if (Math.random() < chance) { cl[1].gain('fallen'); if (Math.random() < chance) { cl[1].gain('dizzy'); } return text.replace('[S]', ', knocking [2:them] onto the ground').replace('[T]', toFind?' [1] loses track of [1:their] pet rock, and it is never found again.':''); }
-					if (Math.random() < chance) { this.lose('pet rock'); this.kill(cl[1], 'fractured skull'); return text.replace('[S]', 'hitting [2:them] and shattering right on the head'); }
+					if (Math.random() < chance) { this.lose('pet rock'); this.kill(cl[1], 'fractured skull'); return text.replace('[S]', ', hitting [2:them] and shattering right on the head').replace('[T]', ''); }
 					return text.replace('[T]', '');
 				},
 				req: ['pet_rock !determined any%0.75|sociopath', 'any'],
@@ -5030,7 +5030,33 @@ G={
 				element: G.moveAssets.elements.alone,
 				req: ['magic_wand']
 			});
-			
+			new G.move({
+				chance: 4,
+				text: '[1] concentrates on [1:their] magic wand to [saturate|infuse] it with magic.',
+				element: G.moveAssets.elements.alone,
+				req: ['magic_wand any'],
+				successFunc: function() {
+					this.has('magic wand').charges = Math.max(this.has('magic wand').charges, 1);
+					if (this.has('wizard robe')) { this.has('magic wand').charges += 4; }
+				},
+				reqFunc: function() {
+					return (this.has('magic wand').charges <= 0);
+				}
+			});
+			G.moveDefault.reqFunc = function() {
+				return (this.has('magic wand').charges > 0);
+			}
+			new G.move({
+				text: 'Seeing [2] in trouble, [1] [waves|taps|calls upon] [1:their] magic wand, and [whisks [2] to safety|[2] disappears in a puff of smoke]!',
+				successFunc: function(cl) {
+					this.has('magic wand').charges--;
+					cl[1].fleeCombat();
+				},
+				req: ['magic_wand any', '+ !able'],
+				pReq: ['d:25']
+			});
+
+			G.moveDefault.reqFunc = null;
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
 				for (let i in G.teams) {
