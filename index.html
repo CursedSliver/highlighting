@@ -1405,9 +1405,10 @@ G={
 						if (this.has('dazed')) { pow += 0.25; }
 						if (this.has('dizzy')) { pow += 0.2; }
 						if (this.has('crippled')) { pow += 0.35; }
+						if (this.has('unconscious')) { pow += 2; }
 						pow += 0.1 * this.isDisabled();
 						pow += 0.15 * this.isAiled();
-						if (this.has('blind')) { pow += 0.35; }
+						if (this.has('blind')) { pow += 0.7; }
 
 						return 1 - Math.pow(1 - c, pow);
 					}
@@ -3868,19 +3869,22 @@ G={
 				//modifies chance based on how well they are at dodging (NOTE: higher pow = better dodging)
 				//funny function that can potentially make your chance of dodging 0 (but I think this is a good thing since having bloodied people lying very much almost dead on the ground barely surviving somehow still dodging bullets is bruh
 				let pow = 1;
-				if (this.has('frenzied')) { pow -= 0.2; }
-				if (this.has('dazed')) { pow -= 0.15; }
-				if (this.has('dizzy')) { pow -= 0.1; }
-				if (this.has('blind') || this.has('crippled') || this.has('missing leg')) { pow -= 1; }
-				if (this.has('bulky')) { pow -= 0.1; }
-				if (this.has('bruised')) { pow *= Math.pow(0.9, this.has('bruised').count); }
-				pow *= Math.pow(0.75, this.isDisabled()); 
+				
 				if (this.has('cute') || this.has('seductive') || this.has('artist')) { pow += 0.05; }
 				if (this.has('haste')) { pow += 0.1; }
 				if (this.has('ninja')) { pow += 0.2; }
 				if (this.has('survivalist')) { pow += 0.3; }
 				if (this.has('vigilant')) { pow += 0.4; }
 				if (this.has('defensive')) { pow += 0.2; }
+				
+				if (this.has('unconscious')) { pow *= 0.99; }
+				if (this.has('frenzied')) { pow *= 0.8; }
+				if (this.has('dazed')) { pow *= 0.85; }
+				if (this.has('dizzy')) { pow *= 0.9; }
+				if (this.has('blind') || this.has('crippled') || this.has('missing leg')) { pow *= 0.2; }
+				if (this.has('bulky')) { pow *= 0.9; }
+				if (this.has('bruised')) { pow *= Math.pow(0.9, this.has('bruised').count); }
+				pow *= Math.pow(0.75, this.isDisabled()); 
 
 				return 1 - Math.pow(1 - chance, pow);
 			};
@@ -4498,6 +4502,12 @@ G={
 				let e = Math.abs(hDiff) + vDiff * 10 + 1;
 				let pow = 1;
 
+				if (this.has('blind')) { pow += 0.3; }
+				if (this.has('unconscious')) { pow += 10; }
+				pow += 1.5 * this.isDisabled();
+				pow += 1 * this.isInjured();
+				pow += 0.5 * this.isAiled();
+				
 				if (this.has('vigilant')) { pow *= 0.9; }
 				if (this.has('ninja') || this.has('haste')) { pow *= 0.9; }
 
@@ -4637,6 +4647,7 @@ G={
 				if (this.has('clumsy')) { pow += 0.2; }
 				if (this.has('meek')) { pow += 0.25; }
 				if (this.has('fortified')) { pow += 1; }
+				if (this.has('unconscious')) { pow += 10; }
 				pow += 1 * this.isDisabled(); 
 				pow += 0.5 * this.isInjured(); 
 				pow += 0.25 * this.isAiled(); 
