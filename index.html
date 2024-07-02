@@ -5262,7 +5262,7 @@ G={
 							str+=`<div class="box action${action.classes?(' '+action.classes):''}"><div>${pics}</div><div>${action.text}</div></div>`;
 						}
 					}
-					else if (me.includes('combat')) {
+					else if (typeof me === 'string' && me.includes('combat')) {
 						//get html for combat sequence
 						var overseer = G.ongoingCombats[parseInt(me.replace('combat', ''))];
 						if (overseer.processed) { continue; }
