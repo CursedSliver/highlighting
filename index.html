@@ -1715,7 +1715,9 @@ G={
 							let it=pool[ii];
 							if (selected.includes(it)) { continue; }
 							let fitAND = true;
+							let processed = false;
 							for (let iii in req) {
+								processed = true;
 								let fitOR = false;
 								let neg = false;
 								if (req[iii][0][0] == '!') {
@@ -1727,6 +1729,7 @@ G={
 								if (fitOR && neg) { fitOR = false; } else if (!fitOR && neg) { fitOR = true; }
 								if (!fitOR) { fitAND = false; break; }
 							}
+							if (!processed) { console.log('process warning!'); }
 							
 							if (fitAND)
 							{
