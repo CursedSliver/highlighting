@@ -470,7 +470,7 @@ function oxfordsConcat(strs) {
 	if (strs.length == 0) { return ''; }
 	if (strs.length == 1) { return strs[0]; }
 	if (strs.length == 2) { return strs[0] + ' and ' + strs[1]; }
-	let str = '';
+	var str = '';
 	for (let i = 0; i < strs.length - 1; i++) {
 		str += strs[i] + ', ';
 	}
@@ -2939,7 +2939,7 @@ G={
 				this.moveCount++;
 			}
 			G.parseBoxes = function(arr) {
-				let str = '';
+				var str = '';
 				for (let i in arr) {
 					let box = arr[i];
 					str += '<div class="box action '+box.color+'"><div>';
@@ -3055,7 +3055,7 @@ G={
 				//iterate through every move available and collects any that fit both reqs, then select one to perform
 				//when performing, it first checks for available intercepting moves, then if not successfully intercepted it sees if it succeeds, then if succeeds it calls the func
 				//returns text for display (in one box)
-				let str = '';
+				var str = '';
 				if (!this.combat) { return; }
 				for (let i in this.perks) {
 					if (typeof this.perks[i].mt == 'number') { this.perks[i].mt++; }
@@ -5162,7 +5162,7 @@ G={
 				let actions=[];
 				G.deadThisRound=[];
 				
-				let str='';
+				var str='';
 				
 				for (let i in G.teams){G.teams[i].acted=false;}
 				for (let i in G.chars){G.chars[i].acted=false;}
@@ -5314,8 +5314,8 @@ G={
 					var nodes=l('round').getElementsByClassName('action');
 					for (var i=nodes.length-1;i>=0;i--){animAdd(nodes[i]);}
 				}
-				var str='';
-				var dead=0,alive=0,others=0;
+				str = '';
+				let dead=0,alive=0,others=0;
 				for (var i in G.chars)
 				{
 					var me=G.chars[i];
@@ -5353,15 +5353,15 @@ G={
 				}
 				else l('deadThisRound').style.display='none';
 				
-				var end=false;
+				let end=false;
 				
 				if (alive>0)
 				{
-					var teamsAlive=[];
-					var soleSurvivor=0;
-					for (var i in G.chars)
+					let teamsAlive=[];
+					let soleSurvivor=0;
+					for (let i in G.chars)
 					{
-						var me=G.chars[i];
+						let me=G.chars[i];
 						if (me.has('dead')) {}
 						else if (me.has('ghost') || me.has('zombie')) {}
 						else
