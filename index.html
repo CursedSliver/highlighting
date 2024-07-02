@@ -4208,8 +4208,8 @@ G={
 					let toFind = (Math.random() < 0.5);
 					if (cl[1].has('knight armor') && Math.random() < chance) { this.lose('pet rock'); cl[1].lose('knight armor'); return text.replace('[T]', '') + ' The rock impacts [2]\'s knight armor and shatters, bringing [2:their] armor down with it!'; }
 					if (!toFind) { this.lose('pet rock'); }
-					if (Math.random() < chance) { cl[1].gain('bruised'); return text.replace('[S]', ', bruising [2:them]').replace('[T]', toFind?' [1] loses track of [1:their] pet rock, and it is never found again.':''); }
-					if (Math.random() < chance) { cl[1].gain('fallen'); if (Math.random() < chance) { cl[1].gain('dizzy'); } return text.replace('[S]', ', knocking [2:them] onto the ground').replace('[T]', toFind?' [1] loses track of [1:their] pet rock, and it is never found again.':''); }
+					if (Math.random() < chance) { cl[1].gain('bruised'); return text.replace('[S]', ', bruising [2:them]').replace('[T]', toFind?'':' [1] loses track of [1:their] pet rock, and it is never found again.'); }
+					if (Math.random() < chance) { cl[1].gain('fallen'); if (Math.random() < chance) { cl[1].gain('dizzy'); } return text.replace('[S]', ', knocking [2:them] onto the ground').replace('[T]', toFind?'':' [1] loses track of [1:their] pet rock, and it is never found again.'); }
 					if (Math.random() < chance) { this.lose('pet rock'); this.kill(cl[1], 'fractured skull'); return text.replace('[S]', ', hitting [2:them] and shattering right on the head').replace('[T]', ''); }
 					return text.replace('[T]', '');
 				},
