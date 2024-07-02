@@ -3296,7 +3296,7 @@ G={
 					for (let i in this.combat.overseer.participants) {
 						if (this.combat.overseer.participants[i] == this.team || this.team == 0) { count++; }
 					}
-					return 8 / Math.pow(Math.max(1, count + 1), 1.5);
+					return 12 / Math.pow(Math.max(1, count + 1), 2);
 				},
 				text: '[1] calls for [help from [2]|reinforcements], and [2] answers[.|!]',
 				failText: '[1] tries to call for help[ from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...|, but no one hears [1:them]...|, but no one hears [1:them]...|, but nothing happens...|, but nothing happens...]',
