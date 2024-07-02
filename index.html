@@ -1283,15 +1283,22 @@ G={
 				{
 					let alreadyHasPerk = false;
 					let token = null;
-					if (perk instanceof G.perkToken) { token = perk; token.owner = this; perk = token.perk; } else if (perk instanceof G.perk) { token = new G.perkToken(perk, this); }
-					if (typeof perk==='string')
-					{
-						if (!G.perksBN[perk]) { console.log('No perk named','"'+perk+'"'); return false; }
-						perk = G.perksBN[perk];
-						token = new G.perkToken(perk, this);
+					if (this.has(perk)) { 
+						token = this.has(perk); 
+						alreadyHasPerk = true;
+						if (typeof perk==='string') {
+							if (!G.perksBN[perk]) { console.log('No perk named','"'+perk+'"'); return false; }
+							perk = G.perksBN[perk];
+						}
+					} else {
+						if (perk instanceof G.perkToken) { token = perk; token.owner = this; perk = token.perk; } else if (perk instanceof G.perk) { token = new G.perkToken(perk, this); }
+						if (typeof perk==='string') {
+							if (!G.perksBN[perk]) { console.log('No perk named','"'+perk+'"'); return false; }
+							perk = G.perksBN[perk];
+							token = new G.perkToken(perk, this);
+						}
 					}
-					if (perk.type=='item' || !this.has(perk)) { this.perks.push(token); } else if (this.has(perk)) { alreadyHasPerk = true; }
-					if (perk.type=='trait' || !this.has(perk)) { this.perks.push(token); }
+					if (!alreadyHasPerk) { this.perks.push(token); }
 					if (token.perk.onGain) { token.perk.onGain.call(token, alreadyHasPerk); }
 					return token;
 				}
