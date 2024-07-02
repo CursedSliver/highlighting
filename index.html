@@ -3291,7 +3291,13 @@ G={
 				req: ['unstable'] //why unstable is a good trait lmao
 			});
 			new G.move({
-				chance: 5.5,
+				chance: function() {
+					let count = 0;
+					for (let i in this.combat.overseer.participants) {
+						if (this.combat.overseer.participants[i] == this.team || this.team == 0) { count++; }
+					}
+					return 12 / Math.pow(count, 2);
+				},
 				text: '[1] calls for [help from [2]|reinforcements], and [2] answers[.|!]',
 				failText: '[1] tries to call for help[ from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...|, but no one hears [1:them]...|, but no one hears [1:them]...|, but nothing happens...|, but nothing happens...]',
 				req: ['inTeam|noTeam%0.25 any%0.06|peaceful%0.04|leader|vigilant%0.04|the_gift%0.06|snake_charmer\'s_flute%0.1|*able !frenzied|laughed|dizzy%0.25|dazed%0.25|able%0.5 '+hardDisables],
