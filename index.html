@@ -5179,10 +5179,10 @@ G={
 					}
 				}
 				G.ongoingCombats = shuffle(G.ongoingCombats);
-				let combatCodes = [];
-				for (let i in G.ongoingCombats) { combatCodes.push('combat' + i); }
+				let currentFights = [];
+				for (let i in G.ongoingCombats) { currentFights.push(G.ongoingCombats[i]); }
 				
-				let everybody=shuffle(deepArrCopy(G.teams).concat(deepArrCopy(G.chars)).concat(combatCodes));
+				let everybody=shuffle(deepArrCopy(G.teams).concat(deepArrCopy(G.chars)).concat(currentFights));
 				for (var iAct=0;iAct<everybody.length;iAct++)
 				{
 					var me=everybody[iAct];
@@ -5193,7 +5193,7 @@ G={
 						if (me.perks[i]) { me.perks[i].t++; }
 					} }
 					
-					if (typeof me !== 'string' && !me.combat && (me.tier==0 || (Math.random()<1/5))) {
+					if (!(me instanceof G.combatOverseer) && !me.combat && (me.tier==0 || (Math.random()<1/5))) {
 						var acts=[];
 						for (var i in actsList)
 						{
@@ -5262,7 +5262,7 @@ G={
 							str+=`<div class="box action${action.classes?(' '+action.classes):''}"><div>${pics}</div><div>${action.text}</div></div>`;
 						}
 					}
-					else if (typeof me === 'string' && me.includes('combat')) {
+					else if (me instanceof G.combatOverseer) {
 						//get html for combat sequence
 						var overseer = G.ongoingCombats[parseInt(me.replace('combat', ''))];
 						if (overseer.processed) { continue; }
