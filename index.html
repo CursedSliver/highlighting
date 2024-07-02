@@ -1541,7 +1541,7 @@ G={
 						if (item == 'noTeam') { return cNegate(actualTrue, this.team); }
 						if (item == '-') { return cNegate(actualTrue, (this.team === prevTeam && !(prevTeam == 0 || this.team == 0))); }
 						if (item == '+') { return cNegate(actualTrue, (!(this.team === prevTeam) && !(prevTeam == 0 || this.team == 0))); }
-						if (item == '=') { return cNegate(actualTrue, !(this.team === firstTeam && !(prevTeam == 0 || this.team == 0))); }
+						if (item == '=') { console.log(firstTeam); return cNegate(actualTrue, !(this.team === firstTeam && !(prevTeam == 0 || this.team == 0))); }
 						if (item == 'ailed') { return cNegate(actualTrue, !this.isAiled()); }
 						if (item == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
 						if (item == 'inCombat') { return cNegate(actualTrue, !this.combat); }
@@ -1669,7 +1669,6 @@ G={
 						let fitORMe = false;
 						let neg = false;
 						if (req[i][0][0] == '!') {
-							req[i][0] = req[i][0].slice(1, req[i][0].length);
 							neg = true;
 						}
 						for (let ii in req[i]) {
@@ -4926,7 +4925,7 @@ G={
 					return text.replace('[S]', ', but [2:they] didn\'t anything more than a few scratches!');
 				},
 				failFunc: function() { this.has('shotgun').loaded = 0; },
-				req: ['shotgun any%0.75|marksmen', 'any'],
+				req: ['shotgun any%0.75|marksmen', '- any'],
 				pReq: ['h:10 v:1'],
 				reqFunc: function() { return this.has('shotgun').loaded; }
 			});
