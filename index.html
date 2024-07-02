@@ -572,6 +572,7 @@ G={
 			this.roundN = 0;
 			this.t = 0;
 			if (obj) { for (let i in obj) { this[i] = obj[i]; } }
+			if (this.combat) { this.mt = 0; }
 			if (this.perk.init) { for (let i in this.perk.init) { this[i] = this.perk.init[i]; } }
 		}
 		
@@ -639,12 +640,19 @@ G={
 		G.glob.combat = true;
 		G.glob.disable = false;
 		G.glob.ailment = false;
+
+		G.glob.onGain = function() { this.mt = 0; };
 		new G.perk({name:`fallen`,desc:`Has fallen to the ground and can\'t get back up...`,disable:true}); //quite possibly the most used perk ever
 		new G.perk({name:`defensive`,desc:`In a defensive stance.`});
 		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true});
 		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},cannotLose:true,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { this.count--; if (this.count <= 0) { this.count += 1000; this.owner.lose('skipped', true); } }});
 		new G.perk({name:`in stasis`,desc:`Can no longer make turns!`});
+		new G.perk({name:`high morale`,desc:`Confidence at an all-time high!`,onMove:function() { if (this.mt > 8) { this.owner.lose(this); } }});
+		new G.perk({name:`ironskin`,desc:`Skin as hard as steel!`,onMove:function() { if (this.mt > 5) { this.owner.lose(this); } }});
+		new G.perk({name:`weak`,desc:`Muscles no longer work properly.`,onMove:function() { if (this.mt > 6) { this.owner.lose(this); } }});
+		new G.perk({name:`vulnerable`,desc:`No matter what you wear, it still hurts...`,onMove:function() { if (this.mt > 7) { this.owner.lose(this); } }});
 
+		delete G.glob.onGain;
 		G.glob.disable = true;
 		G.glob.injury = true;
 		G.glob.ailment = false;
@@ -687,7 +695,6 @@ G={
         new G.perk({name:`laughed`,desc:`AH HA HA HA HA -Tidus`});
 		new G.perk({name:`act again`,desc:`Act another time in the same round!`});
 		new G.perk({name:`fleed`,desc:`Has managed to successfully flee from combat!`});
-		new G.perk({name:`ironskin`,desc:`Skin as hard as steel!`});
         //Make sure people stay "gone" -TW
         new G.perk({name:`nihil`,desc:`Has ceased to exist entirely.`,out:true});
         new G.perk({name:`confirmed`,desc:`Has been confirmed to not be mostly dead.`,out:true});
@@ -3050,6 +3057,10 @@ G={
 				//returns text for display (in one box)
 				let str = '';
 				if (!this.combat) { return; }
+				for (let i in this.perks) {
+					if (typeof this.perks[i].mt == 'number') { this.perks[i].mt++; }
+					if (this.perks[i].perk.onMove) { this.perks[i].perk.onMove.call(this.perks[i]); }
+				}
 				if (!this.has('frenzied') && !this.has('haste') && ((Math.random() < 0.05) || (this.isDisabled() && Math.random() < 0.15) || (this.isInjured() && Math.random() < 0.1) || (this.isAiled() && Math.random() < 0.05))) { return this.has('fleed'); } //everyone can just be slow sometimes
 				if (this.has('skipped')) { this.lose('skipped'); return this.has('fleed'); }
 				if (this.has('in stasis')) { return this.has('fleed'); }
@@ -4627,6 +4638,14 @@ G={
 				let chance = target.adjust(target.adjust(0.75, 'shockwaveDefense'), 'bulletDefense', hDiff, vDiff);
 				target.combat.horizontal += (Math.random() - 0.5) * 30;
 				target.combat.vertical += Math.random();
+				if (Math.random() < chance / 2 && (target.isDisabled() > 1) && target.isInjured()) {
+					this.kill(target, 'grenade blast');
+					return '[brutally |]kills [N]';
+				}
+				if (Math.random() < chance / 2 && (target.isInjured() || target.isAiled())) {
+					target.gain('unconscious'); target.gain('fallen'); target.gain('lacerated'); target.gain('cut up');
+					return 'knocks out [N]';
+				}
 				if (Math.random() < chance && !target.has('dazed') && !target.has('lacerated') && !target.has('crippled')) {
 					target.gain('dazed'); if (Math.random() < chance) { target.gain('fallen'); return 'stuns and knocks over [N]'; }
 					return 'stuns [N]';
@@ -4634,14 +4653,6 @@ G={
 				if (Math.random() < chance && !target.has('shell-shocked') && !target.has('lacerated') && !target.has('crippled')) {
 					target.gain('shell-shocked'); target.gain('fallen'); if (Math.random() < chance) { target.gain('cut up'); if (Math.random() < chance) { target.gain('bleeding out'); return 'knocking [N] out in a bloodied mess'; } }
 					return 'critically traumatizes [N]';
-				}
-				if (Math.random() < chance / 2) {
-					target.gain('comatose'); target.gain('fallen'); target.gain('lacerated'); target.gain('cut up');
-					return 'sends [N] into a coma';
-				}
-				if (Math.random() < chance / 2) {
-					this.kill(target, 'grenade blast');
-					return '[brutally |]kills [N]';
 				}
 				if (target.isDisabled()) { return 'gives [N] a big scare'; } else { return 'makes [N] squirm'; }
 			}
@@ -4911,17 +4922,17 @@ G={
 					chance = cl[1].adjust(chance, 'spreadDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical);
 
 					this.has('shotgun').loaded = 0;
+					if (Math.random() < chance / 3) {
+						this.kill(cl[1], 'shotgun'); return text + '<br>[2] yelps in surprise as [2:their] brain collapses on itself.';
+					}
+					if (Math.random() < chance / 2) {
+						cl[1].gain('unconscious'); cl[1].gain('shot'); cl[1].gain('lacerated'); return text.replace('[S]', ', knocking [2] out!');
+					}
 					if (Math.random() < chance && !cl[1].has('shot')) {
 						cl[1].gain('shot');
 						if (Math.random() < chance) { cl[1].gain('shot'); }
 						if (Math.random() < chance / 2) { cl[1].gain('bleeding out'); return text + '<br>[2] is now bleeding out!'; }
 						cl[1].gain('fallen'); return text + '<br>[2] yelps in surprise as [2:they] falls to the ground.';
-					}
-					if (Math.random() < chance / 2) {
-						this.kill(cl[1], 'shotgun'); return text + '<br>[2] yelps in surprise as [2:their] brain collapses on itself.';
-					}
-					if (Math.random() < chance / 2) {
-						cl[1].gain('comatose'); return text.replace('[S]', ', sending [2] into a coma');
 					}
 					return text.replace('[S]', ', but [2:they] didn\'t anything more than a few scratches!');
 				},
@@ -5000,6 +5011,8 @@ G={
 					return (this.has('flamethrower').ammo > 0);
 				}
 			});
+
+			
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
