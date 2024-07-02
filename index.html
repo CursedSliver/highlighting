@@ -3341,13 +3341,13 @@ G={
 			new G.move({
 				text: '[1] [taunts|sneers at|insults|teases] [2][, menacingly|, aggressively|, confidently||].',
 				id: 'taunt',
-				req: ['sociopath%0.6|devious%0.6|annoying%0.6|able%0.15 !peaceful|meek%0.5|clumsy%0.5', '- any']
+				req: ['sociopath%0.6|devious%0.6|annoying%0.6|able%0.15 !peaceful|meek%0.5|clumsy%0.5 '+hardDisables, '- any']
 			});
 			new G.move({
 				chance: 2,
 				text: '[1] [taunts|throws insults at|teases|ridicules] [2] back[ with [colorful|horrific|threatening] words|].',
 				id: 'taunt2',
-				req: ['any%0.5|lunatic%0.5|annoying|devious', '-'],
+				req: ['any%0.5|lunatic%0.5|annoying|devious '+hardDisables, '-'],
 				cReq: ['m:taunt|m:taunt2']
 			});
 			new G.move({
@@ -3369,7 +3369,7 @@ G={
 				text: '[1] seems a little bored.',
 				element: G.moveAssets.elements.alone,
 				cReq: ['interact:0'],
-				req: ['any%0.5|suicidal|naive|kind|unstable|sociopath|vigilant']
+				req: ['any%0.5|suicidal|naive|kind|unstable|sociopath|vigilant '+hardDisables]
 			});
 
 			//status
@@ -3380,7 +3380,7 @@ G={
 				req: ['!able']
 			});
 			new G.move({
-				chance: 2,
+				chance: 3,
 				text: '[1] takes out [1:their] batch of [freshly baked |]cookies and [gorges on|devours|eats] them, recovering from [1:their] ailments!',
 				successFunc: function() {
 					this.cureAilments();
@@ -3389,7 +3389,7 @@ G={
 				req: ['batch_of_cookies any%0.05|ailed']
 			});
 			new G.move({
-				chance: 2,
+				chance: 3,
 				text: '[1] takes out [1:their] [hot |steaming |fragrant |magical |]hot chocolate and [consumes|drinks|drains] it, recovering from [1:their] injuries!',
 				successFunc: function() {
 					this.healInjuries();
@@ -3398,7 +3398,7 @@ G={
 				req: ['hot_chocolate any%0.05|injured']
 			});
 			new G.move({
-				chance: 1,
+				chance: 1.5,
 				text: '[1] [manages to shake|shakes] off [1:their] dizziness and stands up.',
 				failText: '[1] [[tries [1:their] best to [stand up|recover]|tries to muster up the strength to stand], but just can\'t quite do it.|[struggles to recover, but failing.|is having trouble [recovering|standing up].]]',
 				fail: function() {
@@ -3469,7 +3469,13 @@ G={
 			new G.move({
 				chance: 2,
 				text: '[1] sleeps peacefully...',
-				req: ['comatose']
+				req: ['comatose|unconscious']
+			});
+			new G.move({
+				chance: 0.5,
+				text: '[1] wakes up from [1:their] [dreamless |]slumber!',
+				req: ['unconscious'],
+				successFunc: function() { this.lose('unconscious'); }
 			});
 			new G.move({
 				chance: 2.5,
@@ -4954,10 +4960,10 @@ G={
 
 				pow += this.isDisabled() * 0.6;
 				pow += this.isInjured() * 0.25;
-
+				if (this.has('knight armor')) { pow += 0.75; }
+				
 				if (this.has('combat gear')) { pow *= 0.9; }
 				if (this.has('freezing sapphire')) { pow *= 0.8; }
-				if (this.has('knight armor')) { pow *= 1.5; }
 				if (this.has('ironskin')) { pow *= 0.7; } 
 				if (this.has('defensive')) { pow *= 0.9; }
 				if (this.has('wet')) { pow *= 0.5; }
@@ -5012,7 +5018,12 @@ G={
 				}
 			});
 
-			
+			new G.move({
+				chance: 0.5,
+				text: '[1] looks at [1:their] magic wand, mesmerized.',
+				element: G.moveAssets.elements.alone,
+				req: ['magic_wand']
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
