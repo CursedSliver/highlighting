@@ -3376,7 +3376,7 @@ G={
 				text: '[1] seems a little bored.',
 				element: G.moveAssets.elements.alone,
 				cReq: ['interact:0'],
-				req: ['any%0.5|suicidal|naive|kind|unstable|sociopath|vigilant '+hardDisables]
+				req: ['any%0.5|suicidal|naive|kind|unstable|sociopath|vigilant !*able%0.5'+hardDisables]
 			});
 
 			//status
@@ -3384,7 +3384,7 @@ G={
 			new G.move({
 				chance: 1,
 				text: '[1] struggles [helplessly|uselessly|painfully] against [1:their] injuries.',
-				req: ['!able']
+				req: ['!able '+hardDisables]
 			});
 			new G.move({
 				chance: 3,
@@ -3393,7 +3393,7 @@ G={
 					this.cureAilments();
 					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('batch of cookies'); this.combat.overseer.injectBack('<br>[1] has eaten all of [1:their] cookies.'); }
 				},
-				req: ['batch_of_cookies any%0.05|ailed']
+				req: ['batch_of_cookies any%0.05|ailed '+hardDisables]
 			});
 			new G.move({
 				chance: 3,
@@ -3402,7 +3402,7 @@ G={
 					this.healInjuries();
 					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('hot chocolate'); this.combat.overseer.injectBack('<br>[1] has drank all of [1:their] hot chocolate.'); }
 				},
-				req: ['hot_chocolate any%0.05|injured']
+				req: ['hot_chocolate any%0.05|injured '+hardDisables]
 			});
 			new G.move({
 				chance: 1.5,
@@ -3447,6 +3447,20 @@ G={
 				req: ['!able !fallen !survivalist']
 			});
 			new G.move({
+				text: '[1] mumbles incoherently, staring at nothing.',
+				req: ['shell-shocked']
+			});
+			new G.move({
+				chance: function() {
+					return Math.pow(this.isDisabled() + this.isInjured() * 0.5 + this.isAiled() * 0.1, 1.5) * 1.5;
+				},
+				text: '[1] [loses consciousness|passes out|stops thinking|faints] from [1:their] injuries.',
+				successFunc: function() {
+					this.gain('unconscious');
+				},
+				req: ['!able '+hardDisables],
+			});
+			new G.move({
 				chance: 5,
 				text: '[1] can feel the blood loss from [1:their] numerous injuries getting to [1:their] head...',
 				successFunc: function() {
@@ -3471,7 +3485,7 @@ G={
 				},
 				text: '[1] [finally |at last |]succumbs to [1:their] [extensive |]blood loss.',
 				successFunc: function() { this.die('blood loss'); },
-				req: ['bleeding_out !survivalist']
+				req: ['bleeding_out unconscious !survivalist']
 			});
 			new G.move({
 				chance: 2,
