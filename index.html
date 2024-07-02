@@ -1722,10 +1722,7 @@ G={
 									neg = true;
 								}
 								for (let iiii in req[iii]) {
-
-									if (it.team == firstTeam) { console.log('lets see'); }
-									
-									if (it.testCond(req[iii][iiii], prevTeam, firstTeam)) { fitOR = true; console.log('passed, '+(it.team?it.team.name:'none')); break; }
+									if (it.testCond(req[iii][iiii], prevTeam, firstTeam)) { fitOR = true; break; }
 								}
 								if (fitOR && neg) { fitOR = false; } else if (!fitOR && neg) { fitOR = true; }
 								if (!fitOR) { fitAND = false; break; }
