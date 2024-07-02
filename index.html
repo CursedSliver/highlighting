@@ -5159,10 +5159,10 @@ G={
 			G.round=0;
 			G.nextRound=function()
 			{
-				var actions=[];
+				let actions=[];
 				G.deadThisRound=[];
 				
-				var str='';
+				let str='';
 				
 				for (let i in G.teams){G.teams[i].acted=false;}
 				for (let i in G.chars){G.chars[i].acted=false;}
@@ -5264,10 +5264,10 @@ G={
 					}
 					else if (me instanceof G.combatOverseer) {
 						//get html for combat sequence
-						var overseer = G.ongoingCombats[parseInt(me.replace('combat', ''))];
+						let overseer = me;
 						if (overseer.processed) { continue; }
 						overseer.processed = true;
-						var count = 0;
+						let count = 0;
 						overseer.participants = shuffle(overseer.participants);
 						for (let i in overseer.participants) {
 							for (let ii in overseer.participants) {
