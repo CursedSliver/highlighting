@@ -3296,7 +3296,7 @@ G={
 					for (let i in this.combat.overseer.participants) {
 						if (this.combat.overseer.participants[i] == this.team || this.team == 0) { count++; }
 					}
-					return 12 / Math.pow(count, 2);
+					return 12 / Math.pow(count, 1.5);
 				},
 				text: '[1] calls for [help from [2]|reinforcements], and [2] answers[.|!]',
 				failText: '[1] tries to call for help[ from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...|, but no one hears [1:them]...|, but no one hears [1:them]...|, but nothing happens...|, but nothing happens...]',
@@ -4925,19 +4925,19 @@ G={
 				return 1 - Math.pow(1 - chance, pow); 
 			};
 			new G.move({
-				chance: 10,
+				chance: 15,
 				text: '[1] presses down the trigger on [1:their] shotgun, aiming at [2][S]!',
 				failText: '[1] presses down the trigger on [1:their] shotgun at [2], but it appears that none of the [slugs|shells|shots] actually hit [2:them].',
 				fail: function(cl) { return this.adjust(0.1, 'spreadAccuracy', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical); },
 				successFunc: function(cl, text) {
-					let chance = 0.75;
+					let chance = 0.85;
 					chance = cl[1].adjust(chance, 'spreadDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical);
 
 					this.has('shotgun').loaded = 0;
-					if (Math.random() < chance / 3) {
+					if (Math.random() < chance / 2.5 && (cl[1].isDisabled() || cl[1].isInjured())) {
 						this.kill(cl[1], 'shotgun'); return text + '<br>[2] yelps in surprise as [2:their] brain collapses on itself.';
 					}
-					if (Math.random() < chance / 2) {
+					if (Math.random() < chance / 1.75) {
 						cl[1].gain('unconscious'); cl[1].gain('shot'); cl[1].gain('lacerated'); return text.replace('[S]', ', knocking [2] out!');
 					}
 					if (Math.random() < chance && !cl[1].has('shot')) {
@@ -4984,7 +4984,7 @@ G={
 				text: '[1] [refills|refuels] [1:their] flamethrower.',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
-					this.has('flamethrower').ammo += 2; 
+					this.has('flamethrower').ammo = Math.min(this.has('flamethrower').ammo + 2, 3); 
 				},
 				req: ['flamethrower any'],
 				reqFunc: function() {
@@ -5018,7 +5018,7 @@ G={
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
 				req: ['flamethrower any%0.3|pyromania%0.4|able%0.2', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
-				pReq: ['e:30', 'e:30', 'e:30', 'e:20', 'e:10'],
+				pReq: ['e:12', 'e:12', 'e:12', 'e:12', 'e:22'],
 				reqFunc: function() {
 					return (this.has('flamethrower').ammo > 0);
 				}
