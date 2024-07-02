@@ -3452,7 +3452,8 @@ G={
 			});
 			new G.move({
 				chance: function() {
-					return Math.pow(this.isDisabled() + this.isInjured() * 0.5 + this.isAiled() * 0.1, 1.5) * 1.5;
+					if (!this.isDisabled() || this.has('frenzied')) { return 0; }
+					return Math.pow(this.isDisabled() + this.isInjured() * 0.5 + this.isAiled() * 0.1 - 0.25 - (this.has('determined')?1:0), 1.5) * 1.5;
 				},
 				text: '[1] [loses consciousness|passes out|stops thinking|faints] from [1:their] injuries.',
 				successFunc: function() {
