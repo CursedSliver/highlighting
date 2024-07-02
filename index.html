@@ -1715,7 +1715,6 @@ G={
 							let it=pool[ii];
 							if (selected.includes(it)) { continue; }
 							let fitAND = true;
-							console.log(req);
 							for (let iii in req) {
 								let fitOR = false;
 								let neg = false;
@@ -1723,7 +1722,7 @@ G={
 									neg = true;
 								}
 								for (let iiii in req[iii]) {
-									if (it.testCond(req[iii][iiii], prevTeam, firstTeam)) { fitOR = true; break; }
+									if (it.testCond(req[iii][iiii], prevTeam, firstTeam)) { fitOR = true; console.log('passed, '+(it.team?it.team.name:'none')); break; }
 								}
 								if (fitOR && neg) { fitOR = false; } else if (!fitOR && neg) { fitOR = true; }
 								if (!fitOR) { fitAND = false; break; }
