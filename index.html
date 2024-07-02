@@ -3949,14 +3949,14 @@ G={
 
 			//finishing moves
 			new G.move({
-				chance: 2,
+				chance: 4,
 				text: 'Seeing [2] all knocked out, [1] decides to finish it once and for all and takes [2:their] life!',
 				successFunc: function(cl) {
 					this.kill(cl[1], choose(['merciful asphyxation', 'collapsing brain', 'severed neck', 'heart transplant donor', 'mummified', 'buried alive', 'leaky blood transfusion']));
 				},
 				func: G.moveAssets.veryCloseCombat,
 				pReq: ['e:1'],
-				req: ['any%0.2|able%0.5|frenzied|devious%0.5|sociopath', 'out *able|out']
+				req: ['any%0.2|able%0.5|frenzied|devious%0.5|sociopath', 'out|unconscious *able|out']
 			});
 			new G.move({
 				chance: 3,
@@ -3965,7 +3965,7 @@ G={
 					this.combat.moveToward(cl[1], Math.random() * 10 + 10);
 				},
 				pReq: ['e:1/100'],
-				req: ['any%0.2|able%0.5|frenzied|devious%0.5|sociopath', 'out *able|out']
+				req: ['any%0.2|able%0.5|frenzied|devious%0.5|sociopath', 'out|unconscious *able|out']
 			});
 
 			//stick & pitchfork
