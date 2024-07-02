@@ -4994,7 +4994,7 @@ G={
 					}
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
-				req: ['flamethrower any%0.3|pyromania%0.4|able%0.2', 'delete%0.3 !=%0.6 any%0.9', 'delete%0.3 !=%0.6 any%0.9', 'delete%0.3 !=%0.6 any%0.9', 'delete%0.3 !=%0.6 any%0.9', 'delete%0.3 !=%0.6 any%0.9'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
+				req: ['flamethrower any%0.3|pyromania%0.4|able%0.2', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
 				pReq: ['e:30', 'e:30', 'e:30', 'e:20', 'e:10'],
 				reqFunc: function() {
 					return (this.has('flamethrower').ammo > 0);
