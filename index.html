@@ -3296,7 +3296,7 @@ G={
 					for (let i in this.combat.overseer.participants) {
 						if (this.combat.overseer.participants[i] == this.team || this.team == 0) { count++; }
 					}
-					return 12 / Math.pow(Math.max(1, count), 1.5);
+					return 8 / Math.pow(Math.max(1, count + 1), 1.5);
 				},
 				text: '[1] calls for [help from [2]|reinforcements], and [2] answers[.|!]',
 				failText: '[1] tries to call for help[ from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...|, but no one hears [1:them]...|, but no one hears [1:them]...|, but nothing happens...|, but nothing happens...]',
@@ -5179,8 +5179,10 @@ G={
 					}
 				}
 				G.ongoingCombats = shuffle(G.ongoingCombats);
+				let combatCodes = [];
+				for (let i in G.ongoingCombats) { combatCodes.push('combat' + i); }
 				
-				var everybody=shuffle(G.teams).concat(shuffle(G.chars));
+				let everybody=shuffle(deepArrCopy(G.teams).concat(deepArrCopy(G.chars)).concat(combatCodes));
 				for (var iAct=0;iAct<everybody.length;iAct++)
 				{
 					var me=everybody[iAct];
@@ -5191,7 +5193,7 @@ G={
 						if (me.perks[i]) { me.perks[i].t++; }
 					} }
 					
-					if (!me.combat && (me.tier==0 || (Math.random()<1/5))) {
+					if (typeof me !== 'string' && !me.combat && (me.tier==0 || (Math.random()<1/5))) {
 						var acts=[];
 						for (var i in actsList)
 						{
@@ -5259,9 +5261,10 @@ G={
 							}
 							str+=`<div class="box action${action.classes?(' '+action.classes):''}"><div>${pics}</div><div>${action.text}</div></div>`;
 						}
-					} else if (me.combat) {
+					}
+					else if (me.includes('combat')) {
 						//get html for combat sequence
-						var overseer = me.combat.overseer;
+						var overseer = G.ongoingCombats[parseInt(me.replace('combat', ''))];
 						if (overseer.processed) { continue; }
 						overseer.processed = true;
 						var count = 0;
