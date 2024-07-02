@@ -3118,7 +3118,7 @@ G={
 						availableMoves.push([m, targets]);
 					}
 				}
-				if (availableMoves.length == 0) { overseer.addBox('[1] no longer knows what to do!', [this]); return this.has('fleed'); }
+				if (availableMoves.length == 0) { console.log(this.name+' no longer knows what to do!'); return this.has('fleed'); }
 				
 				let m = choose(availableMoves);
 				boxCharList = m[1];
@@ -5275,7 +5275,7 @@ G={
 								overseer.participants[i].combat.moveToward(overseer.participants[ii], Math.pow(Math.abs(overseer.participants[i].combat.horizontal - overseer.participants[ii].combat.horizontal) + 1, 0.25) - 1);
 							}
 						}
-						while(true) {
+						for (let i = 0; i < 20; i++) {
 							for (let i in overseer.participants) {
 								if (overseer.participants[i].makeMove()) { overseer.participants[i].fleeCombat(); }
 							}
