@@ -1541,7 +1541,7 @@ G={
 						if (item == 'noTeam') { return cNegate(actualTrue, this.team); }
 						if (item == '-') { return cNegate(actualTrue, (this.team === prevTeam && !(prevTeam == 0 || this.team == 0))); }
 						if (item == '+') { return cNegate(actualTrue, (!(this.team === prevTeam) && !(prevTeam == 0 || this.team == 0))); }
-						if (item == '=') { console.log(firstTeam); return cNegate(actualTrue, !(this.team === firstTeam && !(prevTeam == 0 || this.team == 0))); }
+						if (item == '=') { return cNegate(actualTrue, !(this.team === firstTeam && !(prevTeam == 0 || this.team == 0))); }
 						if (item == 'ailed') { return cNegate(actualTrue, !this.isAiled()); }
 						if (item == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
 						if (item == 'inCombat') { return cNegate(actualTrue, !this.combat); }
@@ -1731,6 +1731,7 @@ G={
 							if (fitAND)
 							{
 								selected.push(it);
+								pool.splice(pool.indexOf(it), 1);
 								prevTeam=it.team;
 								found=it;
 								break;
