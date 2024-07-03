@@ -4753,7 +4753,7 @@ G={
 
 				target.gain('singed');
 				if (Math.random() < chance / 2 && (target.isDisabled() > 1) && target.isInjured()) {
-					this.kill(target, 'grenade blast');
+					this.kill(target, 'lethal blast');
 					return '[brutally |]kills [N]';
 				}
 				if (Math.random() < chance / 2 && (target.isInjured() || target.isAiled())) {
@@ -4778,8 +4778,9 @@ G={
 				element: new G.element(),
 				successFunc: function(cl, text) {
 					this.lose('grenade');
+					if (cl.length == 1) { return text.replace('It hits [ALL-1], which [S]!', 'However, it did not hit anyone.'); }
 					let afflictions = [];
-					let posX = this.combat.horizontal + (Math.random() - 0.5) * 10;
+					let posX = this.combat.horizontal + Math.random() * 20 * (this.combat.horizontal <= choose(cl.slice(1, cl.length)).combat.horizontal?1:-1);
 					let posY = this.combat.vertical + Math.random() * 3; 
 					for (let i = 1; i < cl.length; i++) {
 						afflictions.push(G.moveAssets.grenadeBlastEffects.call(this, cl[i], cl[i].combat.horizontal - posX, cl[i].combat.vertical - posY));
@@ -5264,8 +5265,27 @@ G={
 				},
 				req: ['rocket_launcher any%0.5|able '+hardDisables],
 				reqFunc: function() {
-					return (this.has('rocket launcher').loaded == 0)
+					return (this.has('rocket launcher').loaded == 0);
 				}
+			});
+			//actually just a reusable grenade that never fails (laziness at its finest)
+			new G.move({
+				chance: 9,
+				text: 'With a coordinated click and a pull, [1] fires [1:their] rocket launcher!<br>It hits [ALL-1], which [S]!',
+				element: new G.element({ interact: 5, interactMin: 1 }),
+				successFunc: function(cl, text) {
+					this.has('rocket launcher').loaded = 0;
+					let afflictions = [];
+					let posX = this.combat.horizontal + Math.random() * 20 * (this.combat.horizontal <= choose(cl.slice(1, cl.length)).combat.horizontal?1:-1);
+					let posY = this.combat.vertical + Math.random() * 3; 
+					for (let i = 1; i < cl.length; i++) {
+						afflictions.push(G.moveAssets.grenadeBlastEffects.call(this, cl[i], cl[i].combat.horizontal - posX, cl[i].combat.vertical - posY));
+					}
+					for (let i = 0; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + 2)+']'); }
+					return text.replace('[S]', oxfordsConcat(afflictions));
+				},
+				req: ['rocket_launcher any%0.25|able', '!=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any'],
+				reqFunc: function() { return (this.has('rocket launcher').loaded == 1); }
 			});
 			
 			G.char.prototype.initiateCombat = function() {
