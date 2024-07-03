@@ -647,25 +647,25 @@ G={
 		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true});
 		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},cannotLose:true,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { this.count--; if (this.count <= 0) { this.count += 1000; this.owner.lose('skipped', true); } }});
 		new G.perk({name:`in stasis`,desc:`Can no longer make turns!`});
-		new G.perk({name:`high morale`,desc:`Confidence at an all-time high!`,onMove:function() { if (this.mt > 8) { this.owner.lose(this); } }});
-		new G.perk({name:`ironskin`,desc:`Skin as hard as steel!`,onMove:function() { if (this.mt > 5) { this.owner.lose(this); } }});
-		new G.perk({name:`weak`,desc:`Muscles no longer work properly.`,onMove:function() { if (this.mt > 6) { this.owner.lose(this); } }});
-		new G.perk({name:`vulnerable`,desc:`No matter what you wear, it still hurts...`,onMove:function() { if (this.mt > 7) { this.owner.lose(this); } }});
+		new G.perk({name:`high morale`,desc:`Confidence at an all-time high!`,init:{duration:5},onMove:function() { this.duration--; }});
+		new G.perk({name:`ironskin`,desc:`Skin as hard as steel!`,init:{duration:5},onMove:function() { this.duration--; }});
+		new G.perk({name:`weak`,desc:`Muscles no longer work properly.`,init:{duration:5},onMove:function() { this.duration--; }});
+		new G.perk({name:`vulnerable`,desc:`No matter what you wear, it still hurts...`,init:{duration:5},onMove:function() { this.duration--; }});
 
 		delete G.glob.onGain;
 		G.glob.disable = true;
 		G.glob.injury = true;
 		G.glob.ailment = false;
 		G.glob.combat = false;
-		new G.perk({name:`wet`,desc:`Is dripping with water.`,disable:false,injury:false});
+		new G.perk({name:`wet`,desc:`Is dripping with water.`,disable:false,injury:false})
 		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false}); // Removed Disabled
-		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
+		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 4 && Math.random() < 0.75) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
 		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`});
 		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.4) { this.owner.gain('lacerated'); } }, update:function() { if (Math.random() < 0.1) { this.count--; if (this.count == 0) { this.owner.lose('cut up'); }}}});
 		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } }});
 		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
-		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:false,ailment:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 2 && Math.random() < 0.5) { this.owner.gain('seared'); this.count = Math.max(this.count - 3, 1); } }});
-		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 3 && Math.random() < 0.5) { this.owner.gain('burnt'); this.count = Math.max(this.count - 3, 1); } } });
+		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:false,ailment:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('seared'); this.count = Math.max(this.count - 3, 1); } }});
+		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('burnt'); this.count = Math.max(this.count - 3, 1); } } });
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`,ailment:true});
 		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false,init:{embeddedItem:null},setItem:function(itemPerk) { itemPerk.owner = this.owner; this.embeddedItem = itemPerk; }});
 		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true,injury:false}); // Removed Disabled
@@ -3690,9 +3690,8 @@ G={
 				func: G.moveAssets.readyToWrestle,
 				successFunc: function(cl, text) {
 					let chance = 0.4;
-					if (cl[1].has('bulky') || cl[1].has('combat gear')) { chance -= 0.2; }
-					if (cl[1].has('knight armor')) { chance += 0.15; if (cl[1].has('stubborn') || cl[1].has('meek')) { chance += 0.1; } }
-					chance = this.adjust(chance, 'strength');
+					chance = cl[1].adjust(this.adjust(chance, 'strength'));
+					
 					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', ', causing [2] to fall'); }
 					return text.replace('[S]', '');
 				},
@@ -3727,11 +3726,9 @@ G={
 				func: G.moveAssets.readyForPunch,
 				successFunc: function(cl, text) {
 					let chance = 0.3;
-					if (this.has('knight armor')) { chance += 0.3; }
-					if (cl[1].has('knight armor')) { chance -= 0.75; }
-					if (cl[1].has('kite shield')) { chance -= 0.1; }
 
-					chance = this.adjust(chance, 'strength');
+					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'overall');
+					
 					if (Math.random() < chance) {
 						if (Math.random() < 0.4) {
 							return G.moveAssets.hardBodyHit().call(this, cl, text);
@@ -3765,24 +3762,21 @@ G={
 				fail: function() { return this.adjust(0.2); },
 				func: G.moveAssets.veryCloseCombat,
 				successFunc: function(cl, text) {
-					let chance = 0.5;
-					if (this.has('knight armor')) { chance += 0.2; }
-					if (this.has('bulky')) { chance += 0.1; }
-					if (cl[1].has('knight armor')) { chance -= 0.1; }
-					if (cl[1].has('bulky')) { chance -= 0.1; }
-					if (cl[1].has('crippled')) { chance += 0.25; }
+					let chance = 0.6;
+
+					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 					cl[1].gain('bruised');
-					if (Math.random() < chance && !cl[1].has('crippled')) {
-						cl[1].gain('bruised');
-						return text.replace('[S]', ', greatly bruising [2:them]');
+					if (Math.random() < chance / 3 || (cl[1].has('crippled') && Math.random() < chance / 3)) {
+						this.kill(cl[1], 'Counterproductive CPR');
+						return text.replace('[S]', ', causing [2:their] death!');
 					}
 					if (Math.random() < chance / 2 || (cl[1].has('crippled') && Math.random() < chance / 2)) {
 						cl[1].gain('broken');
 						return text.replace('[S]', ', breaking [2:their] [ribs|neck]');
 					}
-					if (Math.random() < chance / 3 || (cl[1].has('crippled') && Math.random() < chance / 3)) {
-						this.kill(cl[1], 'Counterproductive CPR');
-						return text.replace('[S]', ', causing [2:their] death!');
+					if (Math.random() < chance && !cl[1].has('crippled')) {
+						cl[1].gain('bruised');
+						return text.replace('[S]', ', greatly bruising [2:them]');
 					}
 				},
 				pReq: ['h:6 v:1'],
@@ -3796,20 +3790,19 @@ G={
 				func: G.moveAssets.veryCloseCombat,
 				successFunc: function(cl, text) {
 					let chance = 0.5;
-					if (this.has('frenzied')) { chance += 0.1; }
-					if (this.has('bulky')) { chance += 0.1; }
-					if (cl[1].has('bulky')) { chance -= 0.1; }
+					chance = cl[1].adjust(this.adjust('tryGrab'), 'dodge');
+					
+					if (Math.random() < chance / 2.5) {
+						this.kill(cl[1], 'Suffocation');
+						return text.replace('[S]', ', suffocating [2:them] to death!');
+					}
+					if (Math.random() < chance / 1.5) {
+						cl[1].gain('unconscious');
+						return text.replace('[S]', ', eventually knocking out [2], but not being able to quite kill [2:them]');
+					}
 					if (Math.random() < chance) {
 						cl[1].gain('dizzy');
 						return text.replace('[S]', ', making [2] very dizzy');
-					}
-					if (Math.random() < chance / 3) {
-						cl[1].gain('comatose');
-						return text.replace('[S]', ', eventually sending [2] into a coma, but not being able to quite kill [2:them]');
-					}
-					if (Math.random() < chance / 4) {
-						this.kill(cl[1], 'Suffocation');
-						return text.replace('[S]', ', suffocating [2:them] to death!');
 					}
 				},
 				pReq: ['h:6 v:1'],
@@ -3960,7 +3953,7 @@ G={
 				},
 				func: G.moveAssets.veryCloseCombat,
 				pReq: ['e:1'],
-				req: ['able%0.2|able%0.5|frenzied|devious%0.5|sociopath', 'out|unconscious *able|out']
+				req: ['able able%0.2|able%0.5|frenzied|devious%0.5|sociopath', 'out|unconscious *able|out']
 			});
 			new G.move({
 				chance: 3,
@@ -3969,7 +3962,7 @@ G={
 					this.combat.moveToward(cl[1], Math.random() * 10 + 10);
 				},
 				pReq: ['e:1/100'],
-				req: ['able%0.2|able%0.5|frenzied|devious%0.5|sociopath', 'out|unconscious *able|out']
+				req: ['able able%0.2|able%0.5|frenzied|devious%0.5|sociopath', 'out|unconscious *able|out']
 			});
 
 			//stick & pitchfork
@@ -4037,11 +4030,11 @@ G={
 				},
 				successFunc: function(cl, text) {
 					let chance = 0.9; //chance to do stuff idk
-					if (cl[1].has('combat gear') || cl[1].has('bulky')) { chance -= 0.1; }
-					if (cl[1].has('knight armor')) { chance /= 2; }
+					chance = cl[1].adjust(this.adjust('strength'), 'defenseGen');
+					
 					if (Math.random() < chance) {
 						if (cl[1].has('knight armor')) { cl[1].lose('knight armor'); return text.replace('[S]', ', breaking [2:their] knight armor in the process!'); }
-						if (Math.random() < chance / 3) { this.kill(cl[1], 'fractured skull'); return; }
+						if (Math.random() < chance / 2.5) { this.kill(cl[1], 'fractured skull'); return; }
 						cl[1].gain('dazed'); return text.replace('[S]', ', [sending [2:them] into unconsciousness|knocking [2:them] out]');
 					}
 				},
@@ -4049,7 +4042,7 @@ G={
 			});
 			new G.move({
 				chance: 1,
-				text: '[1] [swings|flails] [1:their] big stick at [2][S].',
+				text: '[1] [swings|flails] [1:their] big stick at [2], hitting [2:them] and[S].',
 				failText: '[1] [swings|flails] [1:their] big stick at [2], but it missed and hit nothing.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'swing'), 'dodge'); },
 				req: ['big_stick'],
@@ -4061,8 +4054,11 @@ G={
 
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 					if (Math.random() < chance) {
-						if (cl[1].has('knight armor') && Math.random() < chance) { cl[1].lose('knight armor'); return text.replace('[S]', ', breaking [2:their] knight armor in the process!'); }
-						cl[1].gain('fallen'); return text.replace('[S]', ', [knocking|catapulting] [2:them] onto the [ground|floor]');
+						cl[1].gain('bruised');
+					}
+					if (Math.random() < chance) {
+						if (cl[1].has('knight armor') && Math.random() < chance) { cl[1].lose('knight armor'); return text.replace('[S]', ' breaking [2:their] knight armor in the process!'); }
+						cl[1].gain('bruised'); cl[1].gain('fallen'); return text.replace('[S]', ' [knocking|catapulting] [2:them] onto the [ground|floor]');
 					}
 				},
 				pReq: ['e:15']
@@ -4074,21 +4070,21 @@ G={
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'useSpearhead'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.floor(Math.random() * 3 + 5)); },
 				successFunc: function(cl, text) {
-					let chance = 0.3;
-					if (cl[1].has('combat gear') || cl[1].has('knight armor') || cl[1].has('kevlar vest') || cl[1].has('ironskin')) { return text.replace('[S]', ', but it did nothing'); }
-					if (this.has('knight armor')) { chance -= 0.1; }
-					if (this.has('bulky')) { chance += 0.15; }
-					if (this.has('analytical')) { chance += 0.1; }
+					let chance = 0.7;
+					
+					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 
-					chance = this.adjust(chance, 'strength');
-
-					if (Math.random() < chance) {
-						cl[1].gain('cut up');
-						return text.replace('[S]', ', which sees blood');
+					if (Math.random() < chance / 2.5 && cl[1].has('fallen')) {
+						this.kill(cl[1], 'pitchforked');
+						return text.replace('[S]', 'piercing [2:their] vital organs');
 					}
 					if (Math.random() < chance / 2 && !cl[1].has('fallen')) {
 						cl[1].gain('fallen');
-						return text.replace('[S], pushing [2:them] onto the ground.');
+						return text.replace('[S]', 'pushing [2:them] onto the ground.');
+					}
+					if (Math.random() < chance) {
+						cl[1].gain('cut up'); cl[1].gain('cut up');
+						return text.replace('[S]', ', which sees blood');
 					}
 				},
 				req: ['pitchfork', '- any'],
@@ -4677,6 +4673,8 @@ G={
 				let chance = target.adjust(target.adjust(0.75, 'shockwaveDefense'), 'bulletDefense', hDiff, vDiff);
 				target.combat.horizontal += (Math.random() - 0.5) * 30;
 				target.combat.vertical += Math.random();
+
+				target.gain('singed');
 				if (Math.random() < chance / 2 && (target.isDisabled() > 1) && target.isInjured()) {
 					this.kill(target, 'grenade blast');
 					return '[brutally |]kills [N]';
@@ -4686,8 +4684,8 @@ G={
 					return 'knocks out [N]';
 				}
 				if (Math.random() < chance && !target.has('dazed') && !target.has('lacerated') && !target.has('crippled')) {
-					target.gain('dazed'); if (Math.random() < chance) { target.gain('fallen'); return 'stuns and knocks over [N]'; }
-					return 'stuns [N]';
+					target.gain('singed'); target.gain('singed'); target.gain('singed'); target.gain('singed'); target.gain('singed'); if (Math.random() < chance) { target.gain('fallen'); return 'burns and knocks over [N]'; }
+					return 'burns [N]';
 				}
 				if (Math.random() < chance && !target.has('shell-shocked') && !target.has('lacerated') && !target.has('crippled')) {
 					target.gain('shell-shocked'); target.gain('fallen'); if (Math.random() < chance) { target.gain('cut up'); if (Math.random() < chance) { target.gain('bleeding out'); return 'knocking [N] out in a bloodied mess'; } }
@@ -5070,10 +5068,20 @@ G={
 					return (this.has('magic wand').charges <= 0);
 				}
 			});
+			new G.move({
+				chance: 4,
+				text: '[1] tries to cast a spell with [1:their] magic wand, but the wand just shimmered briefly before fading...',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.has('magic wand').charges--;
+				},
+				req: ['magic_wand !wizard_robe%0.5']
+			});
 			G.moveDefault.reqFunc = function() {
 				return (this.has('magic wand').charges > 0);
 			}
 			new G.move({
+				chance: 2,
 				text: 'Seeing [2] in trouble, [1] [waves|taps|calls upon] [1:their] magic wand, and [whisks [2] to safety|[2] disappears in a puff of smoke]!',
 				successFunc: function(cl) {
 					this.has('magic wand').charges--;
@@ -5082,8 +5090,62 @@ G={
 				req: ['magic_wand any', '+ !able'],
 				pReq: ['d:25']
 			});
+			new G.move({
+				chance: 2,
+				text: '[1] [waves|taps|calls upon] [1:their] magic wand at [2], and in [2:their] astonishment, [2:their] skin suddenly becomes as hard as steel!',
+				successFunc: function(cl) {
+					this.has('magic wand').charges--;
+					cl[1].gain('ironskin').duration = 4;
+				},
+				req: ['magic_wand able|any%0.4', '+ any%0.4|*able'],
+				pReq: ['d:20']
+			});
+			new G.move({
+				chance: 2,
+				text: '[1] [waves|taps|calls upon] [1:their] magic wand at [2], and [2:their] armor turns translucent with [2:their] [legs|arms] beginning to quiver!',
+				successFunc: function(cl) {
+					this.has('magic wand').charges--;
+					cl[1].gain('weak').duration = 3;
+					cl[1].gain('vulnerable').duration = 5;
+				},
+				req: ['magic_wand able|any%0.4', '- able|any%0.4'],
+				pReq: ['d:20']
+			});
+			new G.move({
+				chance: 2,
+				text: '[1] repeatedly [waves|taps|calls upon] [1:their] magic wand and dances in place, initiating an ancient ritual as strong torrents of wind spiral out of [1:them]! <br>The unstoppable wind brings [ALL-1] to the ground!',
+				element: new G.element({
+					interact: 7,
+					interactMin: 0
+				}),
+				successFunc: function(cl, text) {
+					this.has('magic wand').charges--;
+					if (cl.length == 1) { return text.replace('<br>The unstoppable wind brings [ALL-1] to the ground!', 'However, it didn\'t do anything.'); }
+					
+					for (let i = 1; i < cl.length; i++) {
+						cl[i].gain('fallen');
+						if (Math.random() < cl[i].adjust(0.2)) { cl[i].gain('bruised'); }
+					}
+				},
+				req: ['magic_wand', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen']
+			});
+			new G.move({
+				chance: 2,
+				text: '[1] repeatedly [waves|taps|calls upon] [1:their] magic wand and dances in place, with the sky darkening and gusts of wind starting to blow. An immense wall of water rises out of the horizon, masking the sun as it approaches [1:them]...<br>Then, with a sudden jolt, the sun\'s rays breaks through the tsunami as it disintegrates into a massive shower of mist and rain!<br>Everyone is now wet!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					for (let i in this.combat.overseer.participants) {
+						this.combat.overseer.participants[i].gain('wet');
+						if (this.combat.overseer.participants[i] == this) { continue; }
+						this.combat.overseer.addChar(this.combat.overseer.participants[i]);
+					}
+				},
+				req: ['magic_wand nerd']
+			});
 
+			
 			G.moveDefault.reqFunc = null;
+			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
 				for (let i in G.teams) {
