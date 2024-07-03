@@ -5260,14 +5260,13 @@ G={
 					this.has('rocket launcher').loaded = 1;
 				},
 				failFunc: function(cl, text) {
-					if (Math.random() < this.adjust(0.1, 'chargeWeapon')) { this.kill(this, 'clumsiness'); return text.replace('[S]', ', and the rocket blows up in [1:their] face'); }
-					if (Math.random() < this.adjust(0.1, 'chargeWeapon')) { this.lose('rocket launcher'); return text.replace('[S]', ' and also broke the rocket launcher with it'); }
+					if (Math.random() < this.adjust(0.06, 'chargeWeapon')) { this.kill(this, 'clumsiness'); return text.replace('[S]', ', and the rocket blows up in [1:their] face'); }
+					if (Math.random() < this.adjust(0.06, 'chargeWeapon')) { this.lose('rocket launcher'); return text.replace('[S]', ' and also broke the rocket launcher with it'); }
 				},
 				req: ['rocket_launcher any%0.5|able '+hardDisables],
 				reqFunc: function() {
 					return (this.has('rocket launcher').loaded == 0);
-				},
-				pReq: ['d:30']
+				}
 			});
 			//actually just a reusable grenade that never fails (laziness at its finest)
 			new G.move({
@@ -5286,7 +5285,8 @@ G={
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
 				req: ['rocket_launcher any%0.25|able', '!=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any'],
-				reqFunc: function() { return (this.has('rocket launcher').loaded == 1); }
+				reqFunc: function() { return (this.has('rocket launcher').loaded == 1); },
+				pReq: ['d:30']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
