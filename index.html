@@ -5259,9 +5259,9 @@ G={
 				successFunc: function() {
 					this.has('rocket launcher').loaded = 1;
 				},
-				failFunc: function() {
-					if (Math.random() < this.adjust(0.05, 'chargeWeapon')) { this.kill(this, 'clumsiness'); return text.replace('[S]', ', and the rocket blows up in [1:their] face'); }
-					if (Math.random() < this.adjust(0.05, 'chargeWeapon')) { this.lose('rocket launcher'); return text.replace('[S]', ' and also broke the rocket launcher with it'); }
+				failFunc: function(cl, text) {
+					if (Math.random() < this.adjust(0.1, 'chargeWeapon')) { this.kill(this, 'clumsiness'); return text.replace('[S]', ', and the rocket blows up in [1:their] face'); }
+					if (Math.random() < this.adjust(0.1, 'chargeWeapon')) { this.lose('rocket launcher'); return text.replace('[S]', ' and also broke the rocket launcher with it'); }
 				},
 				req: ['rocket_launcher any%0.5|able '+hardDisables],
 				reqFunc: function() {
