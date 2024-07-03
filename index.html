@@ -3891,7 +3891,7 @@ G={
 					if (landings > thresholds[4]) { this.kill(cl[1], 'cranial spillage'); return text.replace('[S]', ', causing [2]\'s death.'); }
 				},
 				pReq: ['h:6 v:1'],
-				req: ['any%0.5|ninja%0.6|frenzied|suicidal%0.5', 'any']
+				req: ['any%0.5|ninja%0.6|frenzied|suicidal%0.5 '+hardDisables, 'any']
 			});
 
 			//savage kill methods (devious/sociopath path) - CS
@@ -4010,7 +4010,7 @@ G={
 				},
 				func: G.moveAssets.veryCloseCombat,
 				pReq: ['e:1'],
-				req: ['able able%0.2|able%0.5|frenzied|devious%0.5|sociopath', 'out|unconscious *able|out']
+				req: ['able any%0.2|able%0.5|frenzied|devious%0.5|sociopath '+hardDisables, 'out|unconscious *able|out']
 			});
 			new G.move({
 				chance: 3,
@@ -4019,7 +4019,7 @@ G={
 					this.combat.moveToward(cl[1], Math.random() * 10 + 10);
 				},
 				pReq: ['e:1/100'],
-				req: ['able able%0.2|able%0.5|frenzied|devious%0.5|sociopath', 'out|unconscious *able|out']
+				req: ['able able%0.5|frenzied|devious%0.5|sociopath '+hardDisables, 'out|unconscious *able|out']
 			});
 
 			//stick & pitchfork
@@ -4148,12 +4148,12 @@ G={
 				pReq: ['d:5']
 			});
 			new G.move({
-				chance: 6,
+				chance: 9,
 				text: '[1] uses [1:their] pitchfork to keep [2] away from [1:them].',
 				successFunc: function(cl) { 
-					cl[1].combat.moveToward(this, -4); 
+					cl[1].combat.moveToward(this, -8); 
 				},
-				req: ['pitchfork any%0.5|cowardly', '- any'],
+				req: ['pitchfork any|cowardly !able%0.75'+hardDisables, '- any'],
 				pReq: ['d:2/6']
 			});
 
@@ -4222,6 +4222,7 @@ G={
 					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', 'The pebbles managed to knock over [2:them]!'); }
 					if (Math.random() < chance / (this.has('marksmen')?1:2)) { cl[1].gain('dazed'); return text.replace('[S]', 'The pebbles managed to hit [2:them] right on the head, stunning [2:them]!'); }
 				},
+				req: ['slingshot able|any%0.5 '+hardDisables, 'any'],
 				pReq: ['e:10/100']
 			});
 
@@ -4235,7 +4236,7 @@ G={
 				successFunc: function() {
 					this.gain('determined');
 				},
-				req: ['pet_rock !determined any%0.4|animal_ken']
+				req: ['pet_rock !determined any%0.4|animal_ken '+hardDisables]
 			});
 			new G.move({
 				chance: 15,
@@ -4244,7 +4245,7 @@ G={
 				successFunc: function() {
 					this.gain('determined');
 				},
-				req: ['pet_turtle !determined any%0.4|animal_ken']
+				req: ['pet_turtle !determined any%0.4|animal_ken '+hardDisables]
 			});
 			new G.move({
 				chance: 2.5,
@@ -4253,7 +4254,7 @@ G={
 				successFunc: function() {
 					this.gain('determined');
 				},
-				req: ['pet_hawk !determined any%0.4|animal_ken']
+				req: ['pet_hawk !determined any%0.4|animal_ken '+hardDisables]
 			});
 			new G.move({
 				chance: 2,
@@ -4262,7 +4263,7 @@ G={
 				successFunc: function() {
 					this.gain('determined');
 				},
-				req: ['pet_wolf !determined any%0.4|animal_ken']
+				req: ['pet_wolf !determined any%0.4|animal_ken '+hardDisables]
 			});
 
 			G.moveDefault.element = new G.element();
@@ -4286,7 +4287,7 @@ G={
 					if (Math.random() < chance) { this.lose('pet rock'); this.kill(cl[1], 'fractured skull'); return text.replace('[S]', ', hitting [2:them] and shattering right on the head').replace('[T]', ''); }
 					return text.replace('[T]', '');
 				},
-				req: ['pet_rock !determined any%0.75|sociopath', 'any'],
+				req: ['pet_rock !determined any%0.75|sociopath '+hardDisables, 'any'],
 				pReq: ['e:10/50 d:5/80']
 			});
 
@@ -4397,13 +4398,13 @@ G={
 			});
 			//cursed knife (4 moves) 
 			new G.move({ //cursed knife nerf
-				chance: 2.5,
+				chance: 1.25,
 				text: '[1] feels an overwhelming surge of energy from [1:their] cursed knife, and freezes in place.',
 				element: G.moveAssets.elements.alone,
 				req: ['cursed_knife !sociopath|frenzied'],
 			});
 			new G.move({
-				chance: 2.5,
+				chance: 3,
 				text: '[Motivated|Driven|Compelled] by [1:their] [cursed|ominous|unforgettable|creepy] knife, [1] [lurches|throws [1:themself]] at [2] with [incredible speed|surprising agility] and [slices|chops] [2]\'s [[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] eyelid [right |]off!]',
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.sliceLight(),
@@ -4411,7 +4412,7 @@ G={
 				pReq: ['e:15']
 			});
 			new G.move({
-				chance: 1.5,
+				chance: 2,
 				text: '[Motivated|Driven|Compelled] by [1:their] [cursed|ominous|unforgettable|creepy] knife, [1] [lurches|throws [1:themself]] at [2] with [incredible speed|surprising agility] and [stabs|penetrates] at [2]\'s [appendix|gallbladder|[left|right] kidney|belly button|dorsal venous arch|pancreas|liver]! [S]',
 				failText: '[Motivated|Driven|Compelled] by [1:their] [cursed|ominous|unforgettable|creepy] knife, [1] [lurches|throws [1:themself]] at [2] with [incredible speed|surprising agility], but only managed to stab the ground.',
 				fail: function(cl) { return cl[1].adjust(0.05, 'dodge'); },
@@ -4422,7 +4423,7 @@ G={
 				pReq: ['d:5']
 			});
 			new G.move({
-				chance: 2.5, //normal move that dont have comically low fail rates and unusually high kill rates
+				chance: 3, //normal move that dont have comically low fail rates and unusually high kill rates
 				text: '[1] uses their [ominous|strange|creepy] knife to stab [2][S]!',
 				failText: '[1] tries to use their [ominous|strange|creepy] knife to stab [2], but [2] [blocked it|got out of the way].',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
@@ -4455,7 +4456,7 @@ G={
 				}
 			};
 			new G.move({
-				chance: 2,
+				chance: 3,
 				text: '[1] stabs [2] with [1:their] sword[S]!',
 				failText: '[1] tries to stab [2] with [1:their] sword, but the sword just went past [2:them] without touching.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
@@ -4465,7 +4466,7 @@ G={
 				pReq: ['e:15']
 			});
 			new G.move({
-				chance: 3,
+				chance: 4,
 				text: '[1] slashes [2] with [1:their] sword[S]!',
 				failText: '[1] slashes [2] with [1:their] sword, but the sword only slashed the air.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.2, 'overall'), 'dodge'); },
@@ -4477,13 +4478,13 @@ G={
 			new G.move({
 				chance: 2.5,
 				text: '[1] keeps [2] away with [1:their] sword.',
-				successFunc: function(cl) { cl[1].combat.moveToward(this, -8); },
-				req: ['sword', 'able'],
+				successFunc: function(cl) { cl[1].combat.moveToward(this, -12); },
+				req: ['sword any '+hardDisables, 'able'],
 				pReq: ['d:5']
 			})
 			//axe (1 move simpler alternative to sword without nearly as many possible modifiers)
 			new G.move({
-				chance: 5.5,
+				chance: 8,
 				text: '[1] hacks at [2] with [1:their] axe[S]!',
 				failText: '[1] hacks at [2] with [1:their] axe, but [2:they] avoided all the swings [1] made at [2:them].',
 				fail: function(cl) { return this.adjust(0.4, 'overall'); },
@@ -4500,7 +4501,7 @@ G={
 					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', ', and also knocking [2:them] onto the ground'); }
 					if (Math.random() < chance / 3) { this.kill(cl[1], 'beheaded'); return text.replace('[S]', ', and also severing [2:their] jugular veins'); }
 				},
-				req: ['axe', 'any'],
+				req: ['axe any%0.5|able '+hardDisables, 'any'],
 				pReq: ['e:12']
 			});
 			//embedded removal (causes potential death)
@@ -4630,12 +4631,12 @@ G={
 				chance: 7.5,
 				text: '[1] [fires a few shots|shoots at] [2] with [1:their] handgun, some hitting [2:their] body[S]!',
 				failText: '[1] [fires a few shots|shoots at] [2] with [1:their] handgun, but all the shots missed.',
-				fail: function(cl) { let hDiff = cl[1].combat.horizontal - this.combat.horizontal; let vDiff = cl[1].combat.horizontal - this.combat.horizontal; return cl[1].adjust(this.adjust(0.5, 'bulletAccuracy', hDiff, vDiff), 'bulletDodge', hDiff, vDiff); },
+				fail: function(cl) { let hDiff = cl[1].combat.horizontal - this.combat.horizontal; let vDiff = cl[1].combat.horizontal - this.combat.horizontal; return cl[1].adjust(this.adjust(0.2, 'bulletAccuracy', hDiff, vDiff), 'bulletDodge', hDiff, vDiff); },
 				successFunc: function(cl, text) {
 					this.has('handgun').loaded = 0;
 					let chance = 1; //chance to get the shot perk
 
-					chance = cl[1].adjust(chance, 'bulletDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical, 0.25);
+					chance = cl[1].adjust(chance, 'bulletDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical, 0.1);
 
 					if (Math.random() < chance) { 
 						cl[1].gain('shot');
@@ -4652,16 +4653,16 @@ G={
 							return text.replace('[S]', ', some hitting [2:their] [heart|head]');
 						}
 					} else {
-						if (cl[1].has('kevlar vest') && Math.random() < 0.3) { cl[1].lose('kevlar vest'); }
-						if (cl[1].has('combat gear') && Math.random() < 0.3) { cl[1].lose('combat gear'); }
-						if (cl[1].has('knight armor') && Math.random() < 0.4) { cl[1].lose('knight armor'); }
+						if (cl[1].has('kevlar vest') && Math.random() < 0.5) { cl[1].lose('kevlar vest'); }
+						if (cl[1].has('combat gear') && Math.random() < 0.5) { cl[1].lose('combat gear'); }
+						if (cl[1].has('knight armor') && Math.random() < 0.75) { cl[1].lose('knight armor'); }
 						return text + ' However, [2]\'s clothes absorbed any shots that did land on [2:them].';
 					}
 				},
 				failFunc: function() {
 					this.has('handgun').loaded = 0;
 				},
-				req: ['handgun any%0.6|marksmen'],
+				req: ['handgun any%0.6|marksmen '+hardDisables],
 				reqFunc: function() {
 					return this.has('handgun').loaded;
 				},
@@ -4756,8 +4757,6 @@ G={
 				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it hits [ALL-1], but also [1:themself], which [S]!',
 				fail: function(cl) { let chance = this.adjust(this.adjust(0.25, 'throw'), 'runFail'); },
 				element: new G.element(),
-				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2|*able '+hardDisables, '- any', '- any', 'any'],
-				pReq: ['h:2/20 v:2'],
 				successFunc: function(cl, text) {
 					this.lose('grenade');
 					let afflictions = [];
@@ -4779,7 +4778,9 @@ G={
 					}
 					for (let i = 1; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+i+']'); }
 					return text.replace('[S]', oxfordsConcat(afflictions));
-				}
+				},
+				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2|*able '+hardDisables, '- any', '- any', 'any'],
+				pReq: ['h:2/20 v:2'],
 			};
 			new G.move(grenadeObj);
 			grenadeObj.element = new G.element({interact: 2, interactMin: 2}); grenadeObj.chance += 2.5; grenadeObj.req[0] = 'grenade any%0.6|suicidal|devious%0.2|sociopath%0.2';
@@ -4880,7 +4881,7 @@ G={
 					this.lose('random orb');
 					return text.replace('[S]', result);
 				},
-				req: ['random_orb any%0.75|inventor|scrappy !frenzied%0.5 !able%0.5']
+				req: ['random_orb any%0.75|inventor|scrappy !frenzied%0.5 !able%0.5 '+hardDisables]
 			});
 
 			//bows (1 move + 1 idling)
@@ -4925,7 +4926,7 @@ G={
 			});
 			//shuriken throw
 			new G.move({
-				chance: 3,
+				chance: 4.5,
 				text: '[1] [throws|hurls] [1:their] shuriken at [2], hitting [2:them] on the [arm|shoulder|chest|thigh][S]!',
 				failText: '[1] [throws|hurls] [1:their] shuriken at [2], but it flew right past [2:them], never to be found again.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'simpleProjectile'), 'dodge'); },
@@ -5031,7 +5032,7 @@ G={
 					return text.replace('[S]', ', but [2:they] didn\'t anything more than a few scratches!');
 				},
 				failFunc: function() { this.has('shotgun').loaded = 0; },
-				req: ['shotgun any%0.75|marksmen', '- any'],
+				req: ['shotgun any%0.75|marksmen '+hardDisables, '- any'],
 				pReq: ['h:10 v:1'],
 				reqFunc: function() { return this.has('shotgun').loaded; }
 			});
@@ -5099,7 +5100,7 @@ G={
 					}
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
-				req: ['flamethrower any%0.3|pyromania%0.4|able%0.2', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
+				req: ['flamethrower any%0.3|pyromania%0.4|able%0.2 '+hardDisables, 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
 				pReq: ['e:12', 'e:12', 'e:12', 'e:12', 'e:22'],
 				reqFunc: function() {
 					return (this.has('flamethrower').ammo > 0);
