@@ -5231,13 +5231,13 @@ G={
 				var overseer = new G.combatOverseer();
 				this.combat = new G.combatTracker(overseer, this);
 				opponent.combat = new G.combatTracker(overseer, opponent);
-				opponent.combat.horizontal = (Math.random() - 0.5) * 100;
+				opponent.combat.horizontal = (Math.random() - 0.5) * 80;
 			}
 			G.char.prototype.joinCombat = function(overseer) {
 				if (this.combat) { return false; }
 				this.combat = new G.combatTracker(overseer, this);
 				console.log(this.combat.horizontal);
-				this.combat.horizontal = (Math.pow(Math.random(), 0.33) * 75) * ((Math.random() < 0.5)?1:-1);
+				this.combat.horizontal = (Math.pow(Math.random(), 0.33) * 60) * ((Math.random() < 0.5)?1:-1);
 				console.log(this.combat.horizontal);
 			}
 			G.char.prototype.fleeCombat = function(silent) {
@@ -5457,7 +5457,7 @@ G={
 						for (let i in overseer.participants) {
 							for (let ii in overseer.participants) {
 								if (i == ii) { continue; }
-								overseer.participants[i].combat.moveToward(overseer.participants[ii], Math.pow(Math.abs(overseer.participants[i].combat.horizontal - overseer.participants[ii].combat.horizontal) + 1, 0.25) - 1);
+								overseer.participants[i].combat.moveToward(overseer.participants[ii], Math.pow(Math.abs(overseer.participants[i].combat.horizontal - overseer.participants[ii].combat.horizontal) + 1, 0.35) - 1);
 							}
 						}
 						for (let i = 0; i < 20; i++) {
