@@ -3065,7 +3065,7 @@ G={
 					if (typeof this.perks[i].mt == 'number') { this.perks[i].mt++; }
 					if (this.perks[i].perk.onMove) { this.perks[i].perk.onMove.call(this.perks[i]); }
 				}
-				if (!this.has('frenzied') && !this.has('haste') && ((Math.random() < 0.05) || (this.isDisabled() && Math.random() < 0.15) || (this.isInjured() && Math.random() < 0.1) || (this.isAiled() && Math.random() < 0.05))) { return this.has('fleed'); } //everyone can just be slow sometimes
+				if (!this.has('frenzied') && !this.has('haste') && ((Math.random() < 0.05) || Math.random() < 1 - Math.pow(1 - 0.15, this.isDisabled()) || Math.random() < 1 - Math.pow(1 - 0.1, this.isInjured()) || Math.random() < 1 - Math.pow(1 - 0.05, this.isAiled()))) { return this.has('fleed'); } //everyone can just be slow sometimes
 				if (this.has('skipped')) { this.lose('skipped'); return this.has('fleed'); }
 				if (this.has('in stasis')) { return this.has('fleed'); }
 				let overseer = this.combat.overseer;
@@ -3154,7 +3154,7 @@ G={
 					if (re) { overseer.replacePrompt(re); }
 				}
 				
-				if (this.has('frenzied') && Math.random() < 0.25) { return this.makeMove(); }
+				if ((this.has('frenzied') && Math.random() < 0.25) || (this.has('haste') && Math.random() < 0.05)) { return this.makeMove(); }
 				return this.has('fleed');
 			}
 			G.char.prototype.makeIntercept = function() {
