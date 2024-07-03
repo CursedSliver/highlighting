@@ -4107,7 +4107,7 @@ G={
 			});
 			new G.move({
 				chance: 1,
-				text: '[1] [swings|flails] [1:their] big stick at [2], hitting [2:them] and[S].',
+				text: '[1] [swings|flails] [1:their] big stick at [2], hitting [2:them][S].',
 				failText: '[1] [swings|flails] [1:their] big stick at [2], but it missed and hit nothing.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.2, 'swing'), 'dodge'); },
 				req: ['big_stick'],
@@ -4123,7 +4123,7 @@ G={
 					}
 					if (Math.random() < chance) {
 						if (cl[1].has('knight armor') && Math.random() < chance) { cl[1].lose('knight armor'); return text.replace('[S]', ' breaking [2:their] knight armor in the process!'); }
-						cl[1].gain('bruised'); cl[1].gain('fallen'); return text.replace('[S]', ' [knocking|catapulting] [2:them] onto the [ground|floor]');
+						cl[1].gain('bruised'); cl[1].gain('fallen'); return text.replace('[S]', ' and [knocking|catapulting] [2:them] onto the [ground|floor]');
 					}
 				},
 				pReq: ['e:15']
