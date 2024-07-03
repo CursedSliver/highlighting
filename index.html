@@ -1399,8 +1399,6 @@ G={
 					overall: function(c) {
 						let pow = 1;
 						if (this.has('bruised')) { pow += 0.1; }
-						if (this.has('frenzied')) { pow -= 0.2; }
-						if (this.has('ninja')) { pow -= 0.05; }
 						if (this.has('clumsy')) { pow += 0.25; }
 						if (this.has('plot armor')) { pow += 0.5; }
 						if (this.has('dazed')) { pow += 0.25; }
@@ -1410,6 +1408,9 @@ G={
 						pow += 0.1 * this.isDisabled();
 						pow += 0.15 * this.isAiled();
 						if (this.has('blind')) { pow += 0.7; }
+						
+						if (this.has('frenzied')) { pow *= 0.8; }
+						if (this.has('ninja')) { pow *= 0.95; }
 
 						return 1 - Math.pow(1 - c, pow);
 					}
@@ -3646,7 +3647,8 @@ G={
 				if (this.has('frenzied')) { pow += 1.4; }
 				if (this.has('determined')) { pow += 1.25; }
 				if (this.has('heroic')) { pow += 1.1; }
-				
+
+				if (this.has('weak')) { pow *= 0.5; }
 				if (this.has('terrified')) { pow *= 0.6; }
 				if (this.has('cowardly')) { pow *= 0.8; }
 				if (this.has('bruised')) { pow *= 1 - this.has('bruised').count * 0.05; }
@@ -3658,8 +3660,15 @@ G={
 			};
 			G.adjustFuncs.defenseGen = function(chance) {
 				//defense against simple physical attacks, e.g. fists, but also includes simple projectiles
-				//more pow = more chance
+				//more pow = more chance to die
 				let pow = 1;
+				if (this.has('frenzied')) { pow += 0.15; }
+				if (this.has('vulnerable')) { pow += 1.5; }
+				if (this.has('bruised')) { pow += 1 + this.has('bruised').count * 0.04; }
+				pow += 0.4 * this.isDisabled();
+				pow += 0.2 * this.isInjured();
+				if (this.has('clumsy')) { pow *= 1.1; }
+				
 				if (this.has('kevlar vest')) { pow *= 0.8; }
 				if (this.has('knight armor')) { pow *= 0.5; }
 				if (this.has('combat gear')) { pow *= 0.5; }
@@ -3668,13 +3677,6 @@ G={
 				if (this.has('bulky')) { pow *= 0.9; }
 				if (this.has('defensive')) { pow *= 0.75; }
 				if (this.has('survivalist') || this.has('dapper suit')) { pow *= 0.95; }
-
-				if (this.has('frenzied')) { pow += 0.15; }
-
-				if (this.has('bruised')) { pow *= 1 + this.has('bruised').count * 0.04; }
-				pow *= Math.pow(1.4, this.isDisabled());
-				pow *= Math.pow(1.2, this.isInjured());
-				if (this.has('clumsy')) { pow *= 1.1; }
 
 				return 1 - Math.pow(1 - chance, pow);
 			}
@@ -3900,10 +3902,6 @@ G={
 				let pow = 1;
 				if (this.has('bruised')) { pow += 0.1 * this.has('bruised').count; }
 				if (this.has('crippled')) { pow += 0.5; }
-				if (this.has('frenzied')) { pow -= 0.35; }
-				if (this.has('haste')) { pow -= 0.1; }
-				if (this.has('ninja')) { pow -= 0.2; }
-				if (this.has('marksmen')) { pow -= 0.2; }
 				if (this.has('clumsy')) { pow += 0.5; }
 				if (this.has('cowardly')) { pow += 0.1; }
 				if (this.has('plot armor')) { pow += 0.5; }
@@ -3912,6 +3910,12 @@ G={
 				pow += 0.2 * this.isDisabled();
 				pow += 0.15 * this.isAiled();
 				if (this.has('blind')) { pow += 2; }
+				if (this.has('weak')) { pow += 2; }
+
+				if (this.has('frenzied')) { pow *= 0.65; }
+				if (this.has('haste')) { pow *= 0.9; }
+				if (this.has('ninja')) { pow *= 0.8; }
+				if (this.has('marksmen')) { pow *= 0.8; }
 				
 				return 1 - Math.pow(1 - chance, pow);
 			};
@@ -3934,6 +3938,8 @@ G={
 				if (this.has('blind') || this.has('crippled') || this.has('missing leg')) { pow *= 0.2; }
 				if (this.has('bulky')) { pow *= 0.9; }
 				if (this.has('bruised')) { pow *= Math.pow(0.9, this.has('bruised').count); }
+				if (this.has('vulnerable')) { pow *= 0.8; }
+				if (this.has('weak')) { pow *= 0.8; }
 				pow *= Math.pow(0.75, this.isDisabled()); 
 
 				return 1 - Math.pow(1 - chance, pow);
@@ -4035,6 +4041,7 @@ G={
 				pow += 0.2 * this.isDisabled();
 				pow += 0.15 * this.isAiled();
 				if (this.has('blind')) { pow += 1; }
+				if (this.has('weak')) { pow += 2; }
 
 				if (this.has('analytical')) { pow *= 0.55; }
 				if (this.has('marksmen')) { pow *= 0.75; }
@@ -4058,6 +4065,7 @@ G={
 				pow += 0.2 * this.isDisabled(); 
 				pow += 0.15 * this.isAiled(); 
 				if (this.has('blind')) { pow += 0.25; }
+				if (this.has('weak')) { pow += 2; }
 				
 				if (this.has('analytical')) { pow *= 0.8; }
 				if (this.has('marksmen')) { pow *= 0.85; }
@@ -4172,6 +4180,7 @@ G={
 				if (this.has('dizzy')) { pow += 0.5; }
 				pow += 0.5 * this.isDisabled(); 
 				if (this.has('blind')) { pow += 5; }
+				if (this.has('weak')) { pow += 1; }
 				
 				if (this.has('marksmen')) { pow *= 0.5; }
 				if (this.has('the gift')) { pow *= 0.85; }
@@ -4302,6 +4311,7 @@ G={
 				if (this.has('dizzy')) { pow += 0.5; }
 				if (this.has('dazed')) { pow += 0.5; }
 				if (this.has('bruised')) { pow += this.has('bruised').count * 0.05; }
+				if (this.has('weak')) { pow += 0.5; }
 
 				if (this.has('haste')) { pow *= 0.8; }
 				if (this.has('marksmen')) { pow *= 0.8; }
@@ -4328,6 +4338,7 @@ G={
 				if (this.has('blind')) { pow *= 0.2; }
 				if (this.has('dizzy')) { pow *= 0.85; }
 				if (this.has('dazed')) { pow *= 0.85; }
+				if (this.has('weak')) { pow *= 0.5; }
 				pow *= Math.pow(0.9, this.isDisabled());
 				pow *= Math.pow(0.75, this.isAiled());
 
@@ -4337,6 +4348,9 @@ G={
 				//very significant; more pow = more chances to die
 				//intended for body (how do you stab a head, anyways)
 				let pow = 1;
+				if (this.has('vulnerable')) { pow += 2; }
+				if (this.has('meek') || this.has('clumsy')) { pow += 0.25; }
+				
 				if (this.has('knight armor')) { pow *= 0.3; }
 				if (this.has('combat gear') || this.has('kevlar vest')) { pow *= 0.6; }
 				if (this.has('ironskin')) { pow *= 0.6; }
@@ -4344,8 +4358,6 @@ G={
 				if (this.has('parka') || this.has('dapper suit')) { pow *= 0.85; }
 				if (this.has('survivalist')) { pow *= 0.8; }
 				if (this.has('defensive')) { pow *= 0.8; }
-
-				if (this.has('meek') || this.has('clumsy')) { pow *= 1.2; }
 
 				return 1 - Math.pow(1 - chance, pow);
 			};
@@ -4558,6 +4570,7 @@ G={
 
 				if (this.has('blind')) { pow += 0.3; }
 				if (this.has('unconscious')) { pow += 10; }
+				if (this.has('vulnerable')) { pow += 1; }
 				pow += 1.5 * this.isDisabled();
 				pow += 1 * this.isInjured();
 				pow += 0.5 * this.isAiled();
@@ -4584,6 +4597,7 @@ G={
 				if (this.has('parka')) { pow *= 0.95; hasOne = true; }
 				if (this.has('wizard robe')) { pow *= 0.9; hasOne = true; }
 				if (this.has('defensive')) { pow *= 0.85; hasOne = true; }
+				if (this.has('vulnerable')) { pow *= 10; hasOne = true; }
 				if (!hasOne) { return chance - (chanceMinus?chanceMinus:0); }
 
 				pow *= Math.min(25 / e, 1);
@@ -4679,18 +4693,19 @@ G={
 			G.adjustFuncs.throw = function(chance) {
 				let pow = 1;
 
+				if (this.has('blind')) { pow += 2; }
+				if (this.has('clumsy')) { pow += 0.5; }
+				if (this.has('meek')) { pow += 0.25; }
+				pow += 0.4 * this.isInjured(); 
+				pow += 0.45 * this.isAiled(); 
+				pow += 0.3 * this.isDisabled(); 
+				if (this.has('weak')) { pow += 2; }
+
 				if (this.has('marksmen')) { pow *= 0.8; }
 				if (this.has('analytical')) { pow *= 0.8; }
 				if (this.has('vigilant')) { pow *= 0.9; }
 				if (this.has('determined')) { pow *= 0.9; }
 				if (this.has('frenzied')) { pow *= 0.75; }
-
-				if (this.has('blind')) { pow *= 2; }
-				if (this.has('clumsy')) { pow *= 1.4; }
-				if (this.has('meek')) { pow *= 1.2; }
-				pow *= Math.pow(1.34, this.isInjured()); 
-				pow *= Math.pow(1.36, this.isAiled()); 
-				pow *= Math.pow(1.2, this.isDisabled()); 
 
 				return 1 - Math.pow(1 - chance, pow);
 			};
@@ -4717,12 +4732,14 @@ G={
 				//more pow = more chances to die
 				let pow = 1;
 
+				if (this.has('bleeding out')) { pow += 0.75; }
+				if (this.has('vulnerable')) { pow += 4; }
+				
 				if (this.has('bulky')) { pow *= 0.8; }
 				if (this.has('combat gear')) { pow *= 0.8; }
 				if (this.has('knight armor')) { pow *= 1.4; }
 				if (this.has('survivalist')) { pow *= 0.85; }
 				if (this.has('defensive')) { pow *= 0.9; }
-				if (this.has('bleeding out')) { pow *= 1.5; }
 				//alright guys im done
 
 				return 1 - Math.pow(1 - chance, pow);
@@ -4976,6 +4993,7 @@ G={
 				if (this.has('dazed')) { pow += 0.25; }
 				if (this.has('clumsy')) { pow += 0.15; }
 				if (this.has('shell-shocked')) { pow += 1; }
+				if (this.has('weak')) { pow += 1; }
 				if (this.isDisabled()) { pow += 0.15 * this.isDisabled(); }
 				if (this.isAiled()) { pow += 0.25 * this.isAiled(); }
 
@@ -4992,7 +5010,9 @@ G={
 				//more pow = more chances to die
 				let e = Math.abs(hDiff) + vDiff * 10 + 1;
 				let pow = 1;
-
+				
+				if (this.has('vulnerable')) { pow += 6; }
+				
 				if (this.has('kevlar vest')) { pow *= 0.4; }
 				if (this.has('combat gear')) { pow *= 0.65; }
 				if (this.has('knight armor')) { pow *= 0.65; }
@@ -5050,6 +5070,7 @@ G={
 				pow += this.isDisabled() * 0.6;
 				pow += this.isInjured() * 0.25;
 				if (this.has('knight armor')) { pow += 0.75; }
+				if (this.has('vulnerable')) { pow += 5; }
 				
 				if (this.has('combat gear')) { pow *= 0.9; }
 				if (this.has('freezing sapphire')) { pow *= 0.8; }
@@ -5127,7 +5148,7 @@ G={
 				}
 			});
 			new G.move({
-				chance: 4,
+				chance: 2.5,
 				text: '[1] tries to cast a spell with [1:their] magic wand, but the wand just shimmered briefly before fading...',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
@@ -5149,7 +5170,7 @@ G={
 				pReq: ['d:25']
 			});
 			new G.move({
-				chance: 2,
+				chance: 1,
 				text: '[1] [waves|taps|calls upon] [1:their] magic wand at [2], and in [2:their] astonishment, [2:their] skin suddenly becomes as hard as steel!',
 				successFunc: function(cl) {
 					this.has('magic wand').charges--;
@@ -5159,7 +5180,7 @@ G={
 				pReq: ['d:20']
 			});
 			new G.move({
-				chance: 2,
+				chance: 1,
 				text: '[1] [waves|taps|calls upon] [1:their] magic wand at [2], and [2:their] armor turns translucent with [2:their] [legs|arms] beginning to quiver!',
 				successFunc: function(cl) {
 					this.has('magic wand').charges--;
@@ -5170,7 +5191,7 @@ G={
 				pReq: ['d:20']
 			});
 			new G.move({
-				chance: 2,
+				chance: 1,
 				text: '[1] [waves|taps|calls upon] [1:their] magic wand at [2], infesting [2:their] cornea with visions of gloom and doom...',
 				successFunc: function(cl) {
 					this.has('magic wand').charges--;
