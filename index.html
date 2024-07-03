@@ -3420,7 +3420,7 @@ G={
 				successFunc: function() {
 					this.lose('dazed');
 				},
-				req: ['dazed']
+				req: ['dazed '+hardDisables]
 			});
 			new G.move({
 				chance: 1,
@@ -3438,7 +3438,7 @@ G={
 				successFunc: function() {
 					this.lose('fallen');
 				},
-				req: ['fallen']
+				req: ['fallen '+hardDisables]
 			});
 			new G.move({
 				chance: 2,
