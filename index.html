@@ -5145,7 +5145,7 @@ G={
 					this.has('magic wand').charges--;
 					cl[1].fleeCombat();
 				},
-				req: ['magic_wand any', '+ !able'],
+				req: ['magic_wand any '+hardDisables, '+ !able'],
 				pReq: ['d:25']
 			});
 			new G.move({
@@ -5155,7 +5155,7 @@ G={
 					this.has('magic wand').charges--;
 					cl[1].gain('ironskin').duration = 4;
 				},
-				req: ['magic_wand able|any%0.4', '+ any%0.4|*able'],
+				req: ['magic_wand able|any%0.4 '+hardDisables, '+ any%0.4|*able'],
 				pReq: ['d:20']
 			});
 			new G.move({
@@ -5166,7 +5166,7 @@ G={
 					cl[1].gain('weak').duration = 3;
 					cl[1].gain('vulnerable').duration = 5;
 				},
-				req: ['magic_wand able|any%0.4', '- able|any%0.4'],
+				req: ['magic_wand able|any%0.4 '+hardDisables, '- able|any%0.4'],
 				pReq: ['d:20']
 			});
 			new G.move({
@@ -5178,7 +5178,7 @@ G={
 					cl[1].gain('hallucinating').duration = 4;
 					cl[1].gain('terrified');
 				},
-				req: ['magic_wand able|any%0.4', '-'],
+				req: ['magic_wand able|any%0.4 '+hardDisables, '-'],
 				pReq: ['d:20']
 			});
 			new G.move({
