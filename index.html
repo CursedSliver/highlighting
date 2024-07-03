@@ -4003,7 +4003,7 @@ G={
 
 			//finishing moves
 			new G.move({
-				chance: 4,
+				chance: 6,
 				text: 'Seeing [2] all knocked out, [1] decides to finish it once and for all and takes [2:their] life!',
 				successFunc: function(cl) {
 					this.kill(cl[1], choose(['merciful asphyxation', 'collapsing brain', 'severed neck', 'heart transplant donor', 'mummified', 'buried alive', 'leaky blood transfusion']));
@@ -4080,7 +4080,7 @@ G={
 					delay: 1.5,
 					size: 2
 				}),
-				fail: function(cl) { return cl[1].adjust(this.adjust(0.65, 'useSpearhead'), 'dodge'); },
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.5, 'useSpearhead'), 'dodge'); },
 				req: ['big_stick'],
 				func: function(cl) {
 					this.combat.moveInFrontOf(cl[1], Math.floor(Math.random() * 3 + 1));
@@ -4101,7 +4101,7 @@ G={
 				chance: 1,
 				text: '[1] [swings|flails] [1:their] big stick at [2], hitting [2:them] and[S].',
 				failText: '[1] [swings|flails] [1:their] big stick at [2], but it missed and hit nothing.',
-				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'swing'), 'dodge'); },
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.2, 'swing'), 'dodge'); },
 				req: ['big_stick'],
 				func: function(cl) {
 					this.combat.moveInFrontOf(cl[1], Math.floor(Math.random() * 5 + 2));
@@ -5243,7 +5243,7 @@ G={
 			G.char.prototype.fleeCombat = function(silent) {
 				this.lose('fleed');
 				if (!this.combat) { return false; }
-				if (!silent) { this.combat.overseer.injectBack('<br>[1] has fleed from the fight!'); }
+				if (!silent) { this.combat.overseer.injectBack('<br><e>'+this.name+'</e> has fleed from the fight!'); }
 				for (let i in this.perks) {
 					if (this.perks[i].perk.combat) { this.lose(this.perks[i], true); }
 				}
