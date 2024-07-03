@@ -651,6 +651,7 @@ G={
 		new G.perk({name:`ironskin`,desc:`Skin as hard as steel!`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`weak`,desc:`Muscles no longer work properly.`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`vulnerable`,desc:`No matter what you wear, it still hurts...`,init:{duration:5},onMove:function() { this.duration--; }});
+		new G.perk({name:`hallucinating`,desc:`Enchanted in a trance.`,init:{duration:5},onMove:function() { this.duration--; },disable:true})
 
 		delete G.glob.onGain;
 		G.glob.disable = true;
@@ -3175,7 +3176,7 @@ G={
 			G.moveAssets = {};
 			G.moveAssets.elements = {};
 			G.moveAssets.elements.alone = new G.element({ interact: 0, interactMin: 0 });
-			let hardDisables = '!unconscious|trapped|shell-shocked';
+			let hardDisables = '!unconscious|trapped|shell-shocked|hallucinating';
 			new G.move({
 				text: '[1] does something ????????',
 				chance: 0.001,
@@ -3448,8 +3449,21 @@ G={
 				req: ['!able !fallen !survivalist']
 			});
 			new G.move({
+				chance: 20,
+				text: '[1] loses [1:their] balance and falls to the ground.',
+				successFunc: function() {
+					this.gain('fallen');
+				},
+				req: [hardDisables.slice(1, hardDisables.length)+' !fallen']
+			})
+			new G.move({
 				text: '[1] mumbles incoherently, staring at nothing.',
-				req: ['shell-shocked']
+				req: ['shell-shocked|hallucinating']
+			});
+			new G.move({
+				chance: 2,
+				text: '[1] [stares into the distance and mumbles some nonsense|runs in place, laughing hysterically|breaks down in tears|mourns about the endless expanse of nothing in front of [1:them]|clutches [1:their] face in imaginary pain|freezes in shock from the violent imagery in [1:their] eyes].',
+				req: ['hallucinating']
 			});
 			new G.move({
 				chance: function() {
@@ -3500,6 +3514,48 @@ G={
 				req: ['unconscious'],
 				successFunc: function() { this.lose('unconscious'); }
 			});
+			G.moveDefault.chance = 5;
+			new G.move({
+				text: 'Much to [1]\'s disappointment, [1:their] skin\'s incredible durability fades as the spell loses its power...',
+				successFunc: function() {
+					this.lose('ironskin');
+				},
+				req: ['ironskin'],
+				reqFunc: function() { return (this.has('ironskin').duration <= 0); }
+			});
+			new G.move({
+				text: 'The high morale fades within [1]...',
+				successFunc: function() {
+					this.lose('high morale');
+				},
+				req: ['high_morale'],
+				reqFunc: function() { return (this.has('high morale').duration <= 0); }
+			});
+			new G.move({
+				text: '[1] muscles return to its original strength, finally freed of the curse placed on them.',
+				successFunc: function() {
+					this.lose('weak');
+				},
+				req: ['weak'],
+				reqFunc: function() { return (this.has('weak').duration <= 0); }
+			});
+			new G.move({
+				text: '[1] armor and skeleton hardens as [1:he is|she is|they are] finally freed from the vulnerability curse.',
+				successFunc: function() {
+					this.lose('vulnerable');
+				},
+				req: ['vulnerable'],
+				reqFunc: function() { return (this.has('vulnerable').duration <= 0); }
+			});
+			new G.move({
+				text: '[1] returns to [1:their] senses as the vivid imagery in [1:their] eyes fade, with the real world finally coming into view.',
+				successFunc: function() {
+					this.lose('hallucinating');
+				},
+				req: ['hallucinating'],
+				reqFunc: function() { return (this.has('hallucinating').duration <= 0); }
+			});
+			G.moveDefault.chance = 1;
 			new G.move({
 				chance: 2.5,
 				text: 'Something about [1]\'s bullet wounds changes, and [suddenly|abruptly], [1:they] feels an immeasurable wave of pain wash over them.',
@@ -5117,7 +5173,7 @@ G={
 				successFunc: function(cl) {
 					this.has('magic wand').charges--;
 					this.combat.overseer.injectColor('red');
-					cl[1].gain('shell-shocked');
+					cl[1].gain('hallucinating').duration = 4;
 					cl[1].gain('terrified');
 				},
 				req: ['magic_wand able|any%0.4', '-']
