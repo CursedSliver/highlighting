@@ -714,7 +714,7 @@ G={
 		new G.perk({name:`slingshot`,desc:`Fires small projectiles. Not quite deadly as much as slightly annoying.`,tier:0});
 		new G.perk({name:`bow`,desc:`Its arrows can easily chop a head clean off from a distance if skillfully wielded.`,tier:1});
 		new G.perk({name:`flamethrower`,desc:`Careful! May set both foes and friends on fire.`,tier:2,init:{ammo:0}});
-		new G.perk({name:`rocket launcher`,desc:`A dangerous weapon; excels at blowing stuff up.`,tier:3});
+		new G.perk({name:`rocket launcher`,desc:`A dangerous weapon; excels at blowing stuff up.`,tier:3,init:{loaded:1}});
 		new G.perk({name:`lasergun`,desc:`Ultra-concentrated energy shots that burn through practically anything.`,tier:3});
 		new G.perk({name:`magic wand`,desc:`Casts a variety of spells upon your friends and foes.`,tier:2,init:{charges:1}});
 		new G.perk({name:`ancient scepter`,desc:`Calls forth ancient hexes and curses on your adversaries.`,tier:3});
@@ -2239,7 +2239,7 @@ G={
 			new G.act(baseItemLoss*0.04,['tourniquet clumsy%0.5|naive%0.2|cowardly%0.2|any%0.5 !scrappy%0.5|medic%0.5|survivalist%0.2'],`[RED][1] practices with [1:their] tourniquet just in case, but it rips inhalf with the [4|5|6]th twist.`,p=>{p[1].lose('tourniquet');});
 			new G.act(baseItemLoss*0.03,['AED clumsy%0.5|naive%0.2|cowardly%0.2|any%0.5 !scrappy%0.5|medic%0.2|survivalist%0.2'],`[RED][1] tried turning on [1:their] AED, but the batteries seem to have died...`,p=>{p[1].lose('AED');});
 			// - Material 20%
-			new G.act(baseItemLoss*0.04,['scrap_metal clumsy%0.5|naive%0.2|any%0.5 !scrappy%0.5|inventor%0.5|survivalist%0.2'],`[RED][1] tried [forging/trading] [1:their] scrap metal but only ended up with [slag|a hat].`,p=>{p[1].lose('scrap metal');});
+			new G.act(baseItemLoss*0.04,['scrap_metal clumsy%0.5|naive%0.2|any%0.5 !scrappy%0.5|inventor%0.5|survivalist%0.2'],`[RED][1] tried [forging|trading] [1:their] scrap metal but only ended up with [slag|a hat].`,p=>{p[1].lose('scrap metal');});
 			new G.act(baseItemLoss*0.04,['gun_parts clumsy%0.5|naive%0.2|any%0.5 !scrappy%0.5|inventor%0.5|marksmen%0.5|survivalist%0.2'],`[RED][1] finally managed to piece togeather [1:their] gun parts, but when test firing, the whole thing fell apart into [impossibly small pieces|too many directions to track|even more broken and unusable parts].`,p=>{p[1].lose('gun parts');});
 			new G.act(baseItemLoss*0.04,['roll_of_fabric clumsy%0.5|naive%0.2|any%0.5 !scrappy%0.5|inventor%0.5|artist%0.5|survivalist%0.2'],`[RED][1]'s roll of fabric [fell|was dropped] into [sharp rocks|brambles|rubble] and is ripped and torn in the process.`,p=>{p[1].lose('roll of fabric');});
 			new G.act(baseItemLoss*0.08,['magic_dust clumsy%0.5|naive%0.2|any%0.5 !scrappy%0.5|the_gift%0.5|inventor%0.2|artist%0.2|survivalist%0.2'],`[RED][1] trips and spills [1:their] magic dust everywhere.<br>[1] is going to be finding sparkles for weeks...`,p=>{p[1].lose('magic dust');});
@@ -5130,6 +5130,7 @@ G={
 				}
 			});
 
+			//magic wand stuff (lots of spells yay)
 			new G.move({
 				chance: 0.5,
 				text: '[1] looks at [1:their] magic wand, mesmerized.',
@@ -5238,13 +5239,30 @@ G={
 				req: ['magic_wand nerd'],
 				reqFunc: function() {
 					for (let i in this.combat.overseer.participants) {
-						if (!this.combat.overseer.participants[i].has('wet')) { return true; }
+						if (!this.combat.overseer.participants[i].has('wet')) { return (this.has('magic wand').charges > 0); }
 					}
 					return false;
 				}
 			});
 			
 			G.moveDefault.reqFunc = null;
+
+			new G.move({
+				chance: 3,
+				text: '[1] loads up [1:their] rocket launcher.',
+				failText: '[1] tries to load up [1:their] rocket launcher, but [1:they] [messed up|fumbled it|didn\'t follow instructions quite right][S].',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					
+				},
+				failFunc: function() {
+					
+				},
+				req: ['rocket_launcher any%0.5|able '+hardDisables],
+				reqFunc: function() {
+					return (this.has('rocket launcher').loaded >= 1)
+				}
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
