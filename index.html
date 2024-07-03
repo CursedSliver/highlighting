@@ -3299,7 +3299,7 @@ G={
 					for (let i in this.combat.overseer.participants) {
 						if (this.combat.overseer.participants[i].team == this.team || this.team == 0) { count++; }
 					}
-					return 12 / Math.pow(Math.max(1, count + 1), 3);
+					return 12 / Math.pow(Math.max(1, count), 2.5);
 				},
 				text: '[1] calls for [help from [2]|reinforcements], and [2] answers[.|!]',
 				failText: '[1] tries to call for help[ from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...|, but no one hears [1:them]...|, but no one hears [1:them]...|, but nothing happens...|, but nothing happens...]',
@@ -3779,7 +3779,7 @@ G={
 				chance: 1.5,
 				text: '[1] head bonks [2]\'s head[S].',
 				failText: '[1] head bonks [2], but [2] is prepared and [avoids it|smashes right back].',
-				fail: function() { return cl[1].adjust(this.adjust(0.4), 'defenseGen'); },
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.4), 'defenseGen'); },
 				func: G.moveAssets.readyForPunch,
 				successFunc: function(cl, text) {
 					let chance = 0.3;
