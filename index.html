@@ -5279,6 +5279,7 @@ G={
 					let posX = this.combat.horizontal + Math.random() * 20 * (this.combat.horizontal <= choose(cl.slice(1, cl.length)).combat.horizontal?1:-1);
 					let posY = this.combat.vertical + Math.random() * 3; 
 					for (let i = 0; i < cl.length; i++) {
+						if (i == 0 && Math.random() < 0.66) { continue; }
 						afflictions.push(G.moveAssets.grenadeBlastEffects.call(this, cl[i], cl[i].combat.horizontal - posX, cl[i].combat.vertical - posY));
 					}
 					for (let i = 0; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + 1)+']'); }
