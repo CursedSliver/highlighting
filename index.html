@@ -5278,11 +5278,12 @@ G={
 					let afflictions = [];
 					let posX = this.combat.horizontal + Math.random() * 20 * (this.combat.horizontal <= choose(cl.slice(1, cl.length)).combat.horizontal?1:-1);
 					let posY = this.combat.vertical + Math.random() * 3; 
+					let offset = 1;
 					for (let i = 0; i < cl.length; i++) {
-						if (i == 0 && Math.random() < 0.66) { continue; }
+						if (i == 0 && Math.random() < 0.66) { offset = 2; continue; }
 						afflictions.push(G.moveAssets.grenadeBlastEffects.call(this, cl[i], cl[i].combat.horizontal - posX, cl[i].combat.vertical - posY));
 					}
-					for (let i = 0; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + 1)+']'); }
+					for (let i = 0; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + offset)+']'); }
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
 				req: ['rocket_launcher any%0.25|able%0.5|pyromania%0.25|sociopath%0.25 '+hardDisables, '!=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any'],
