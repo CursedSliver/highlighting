@@ -5266,7 +5266,8 @@ G={
 				req: ['rocket_launcher any%0.5|able '+hardDisables],
 				reqFunc: function() {
 					return (this.has('rocket launcher').loaded == 0);
-				}
+				},
+				pReq: ['d:30']
 			});
 			//actually just a reusable grenade that never fails (laziness at its finest)
 			new G.move({
