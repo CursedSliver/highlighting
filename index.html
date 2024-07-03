@@ -3693,8 +3693,8 @@ G={
 				failText: '[1] swings [1:their] fist upward in a [crescent|magnificent] arc, but [2] falls backward, [narrowingly|barely||] avoiding the punch.',
 				fail: function(cl) {
 					if (cl[1].isDisabled() || cl[1].has('fallen')) { return 0; }
-					let chance = 0.6;
-					if (cl[1].has('ninja')) { chance -= 0.3; }
+					let chance = 0.3;
+					if (cl[1].has('ninja')) { chance -= 0.15; }
 					chance = this.adjust(chance);
 					return chance;
 				},
@@ -3713,8 +3713,8 @@ G={
 				text: '[1] hooks [1:their] fist onto [2]\'s [head|skull][S].',
 				failText: '[1] tried to do a hook with [1:their] fist, but [went a bit too far|was not far enough]!',
 				fail: function(cl) {
-					let chance = 0.6;
-					if (cl[1].has('ninja') || cl[1].has('marksmen')) { chance -= 0.2; }
+					let chance = 0.3;
+					if (cl[1].has('ninja') || cl[1].has('marksmen')) { chance -= 0.1; }
 					chance = this.adjust(chance);
 					return chance;
 				},
@@ -3737,9 +3737,9 @@ G={
 				text: '[1] grabs [2] by [2:their] shoulders, and began pushing [2:them] backwards[S].',
 				failText: '[1] grabs [2] by [2:their] shoulders, but [2:they] did the same thing simultaneously, locking them in place.',
 				fail: function(cl) {
-					let chance = 0.4;
+					let chance = 0.2;
 					if (cl[1].has('bulky') || cl[1].has('knight armor')) { chance -= 0.2; }
-					if (this.has('bulky')) { chance += 0.3; }
+					if (this.has('bulky')) { chance += 0.1; }
 					chance = this.adjust(chance);
 					return chance;
 				},
@@ -3765,8 +3765,8 @@ G={
 				func: G.moveAssets.readyForPunch,
 				successFunc: G.moveAssets.mediumBodyHit(),
 				fail: function() {
-					if (this.has('frenzied')) { return this.adjust(0.6); }
-					return this.adjust(0.3);
+					if (this.has('frenzied')) { return this.adjust(0.2); }
+					return this.adjust(0.15);
 				},
 				failFunc: function(cl, text) {
 					if (Math.random() < this.has('frenzied')?0.1:0.3 && !this.has('fallen')) { this.gain('fallen'); return text.replace('[S]', ', bringing [1:themself] onto the ground in the process'); }
@@ -3779,6 +3779,7 @@ G={
 				chance: 1.5,
 				text: '[1] head bonks [2]\'s head[S].',
 				failText: '[1] head bonks [2], but [2] is prepared and [avoids it|smashes right back].',
+				fail: function() { return cl[1].adjust(this.adjust(0.4), 'defenseGen'); },
 				func: G.moveAssets.readyForPunch,
 				successFunc: function(cl, text) {
 					let chance = 0.3;
@@ -3815,7 +3816,7 @@ G={
 				chance: 7,
 				text: 'Seeing [2]\'s weakness, [1] stomps on [2:them][S]!',
 				failText: 'Seeing [2]\'s weakness, [1] stomps on [2:them], but somehow [2:they] manages to roll out of the way!',
-				fail: function() { return this.adjust(0.2); },
+				fail: function() { return this.adjust(0.15); },
 				func: G.moveAssets.veryCloseCombat,
 				successFunc: function(cl, text) {
 					let chance = 0.6;
@@ -3842,7 +3843,7 @@ G={
 				chance: 1,
 				text: 'Seeing [2]\'s weakness, [1] grabs [2] in a choke hold with [1:their] bare hands[S]!',
 				failText: 'Seeing [2]\'s weakness, [1] tries to grab [2:them], but somehow [2:they] manages to roll out of the way!',
-				fail: function() { return this.adjust(0.2); },
+				fail: function() { return this.adjust(0.15, 'tryGrab'); },
 				func: G.moveAssets.veryCloseCombat,
 				successFunc: function(cl, text) {
 					let chance = 0.5;
@@ -3937,7 +3938,7 @@ G={
 
 				return 1 - Math.pow(1 - chance, pow);
 			};
-			G.moveAssets.checkTryGrab = function(cl) { return cl[1].adjust(this.adjust(0.4, 'tryGrab'), 'dodge'); };
+			G.moveAssets.checkTryGrab = function(cl) { return cl[1].adjust(this.adjust(0.25, 'tryGrab'), 'dodge'); };
 			new G.move({
 				chance: 1,
 				text: 'Seeing [2]\'s weakness, [1] puts a tourniquet around [2]\'s neck[S]!',
