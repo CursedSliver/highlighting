@@ -3158,7 +3158,7 @@ G={
 				}
 				
 				if ((this.has('frenzied') && Math.random() < 0.25) || (this.has('haste') && Math.random() < 0.05)) { return this.makeMove(); }
-				if (overseer.nonInteractiveMoveCount > overseer.participants.length * 6 + 6) { overseer.addBox('Since nothing is really happening, the fight is now considered over.', []); for (let i in overseer.participants) { overseer.participants[i].fleeCombat(true); } }
+				if (overseer.nonInteractiveMoveCount > overseer.participants.length * 4 + 4) { overseer.addBox('Since nothing is really happening, the fight is now considered over.', []); for (let i in overseer.participants) { overseer.participants[i].fleeCombat(true); } }
 				return this.has('fleed');
 			}
 			G.char.prototype.makeIntercept = function() {
