@@ -3256,13 +3256,13 @@ G={
 			new G.move({
 				text: 'In a fit of [unrelenting|] rage, [1] runs at [2] full force, [screaming on the top of [1:their] lungs|hysterically flailing [1:their] arms|staring down [2]\'s soul].',
 				fail: function(cl) {
-					let chance = 0.2;
+					let chance = 0.1;
 					chance = this.adjust(chance);
 					return chance;
 				},
 				failText: 'In a fit of [unrelenting|] [rage|anger|frustration], [1] runs at [2] full force, only to trip on the way there[S]',
 				successFunc: function(cl) {
-					this.combat.moveToward(cl[1], 20);
+					this.combat.moveToward(cl[1], 30);
 				},
 				failFunc: function(cl, text) {
 					this.combat.moveToward(cl[1], Math.random() * 10);
@@ -3297,7 +3297,7 @@ G={
 				chance: function() {
 					let count = 0;
 					for (let i in this.combat.overseer.participants) {
-						if (this.combat.overseer.participants[i] == this.team || this.team == 0) { count++; }
+						if (this.combat.overseer.participants[i].team == this.team || this.team == 0) { count++; }
 					}
 					return 12 / Math.pow(Math.max(1, count + 1), 3);
 				},
