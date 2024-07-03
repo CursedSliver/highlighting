@@ -5115,6 +5115,7 @@ G={
 				chance: 2,
 				text: '[1] [waves|taps|calls upon] [1:their] magic wand at [2], infesting [2:their] cornea with visions of gloom and doom...',
 				successFunc: function(cl) {
+					this.has('magic wand').charges--;
 					this.combat.overseer.injectColor('red');
 					cl[1].gain('shell-shocked');
 					cl[1].gain('terrified');
