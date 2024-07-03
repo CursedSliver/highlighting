@@ -5252,15 +5252,19 @@ G={
 				text: '[1] loads up [1:their] rocket launcher.',
 				failText: '[1] tries to load up [1:their] rocket launcher, but [1:they] [messed up|fumbled it|didn\'t follow instructions quite right][S].',
 				element: G.moveAssets.elements.alone,
+				fail: function() {
+					return this.adjust(0.3, 'chargeWeapon');
+				},
 				successFunc: function() {
-					
+					this.has('rocket launcher').loaded = 1;
 				},
 				failFunc: function() {
-					
+					if (Math.random() < this.adjust(0.05, 'chargeWeapon')) { this.kill(this, 'clumsiness'); return text.replace('[S]', ', and the rocket blows up in [1:their] face'); }
+					if (Math.random() < this.adjust(0.05, 'chargeWeapon')) { this.lose('rocket launcher') return text.replace('[S]', ' and also broke the rocket launcher with it'); }
 				},
 				req: ['rocket_launcher any%0.5|able '+hardDisables],
 				reqFunc: function() {
-					return (this.has('rocket launcher').loaded >= 1)
+					return (this.has('rocket launcher').loaded == 0)
 				}
 			});
 			
