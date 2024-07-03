@@ -5113,6 +5113,16 @@ G={
 			});
 			new G.move({
 				chance: 2,
+				text: '[1] [waves|taps|calls upon] [1:their] magic wand at [2], infesting [2:their] cornea with visions of gloom and doom...',
+				successFunc: function(cl) {
+					this.combat.overseer.injectColor('red');
+					cl[1].gain('shell-shocked');
+					cl[1].gain('terrified');
+				},
+				req: ['magic_wand able|any%0.4', '-']
+			});
+			new G.move({
+				chance: 2,
 				text: '[1] repeatedly [waves|taps|calls upon] [1:their] magic wand and dances in place, initiating an ancient ritual as strong torrents of wind spiral out of [1:them]! <br>The unstoppable wind brings [ALL-1] to the ground!',
 				element: new G.element({
 					interact: 7,
@@ -5131,9 +5141,10 @@ G={
 			});
 			new G.move({
 				chance: 2,
-				text: '[1] repeatedly [waves|taps|calls upon] [1:their] magic wand and dances in place, with the sky darkening and gusts of wind starting to blow. An immense wall of water rises out of the horizon, masking the sun as it approaches [1:them]...<br>Then, with a sudden jolt, the sun\'s rays breaks through the tsunami as it disintegrates into a massive shower of mist and rain!<br>Everyone is now wet!',
+				text: 'With [1]\'s extensive knowledge of the nerdy and obscure, [1:they] repeatedly [waves|taps|calls upon] [1:their] magic wand and dances in place, with the sky darkening and gusts of wind starting to blow. An immense wall of water rises out of the horizon, masking the sun as it approaches [1:them]...<br>Then, with a sudden jolt, the sun\'s rays breaks through the tsunami as it disintegrates into a massive shower of mist and rain!<br>Everyone is now wet!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
+					this.has('magic wand').charges--;
 					for (let i in this.combat.overseer.participants) {
 						this.combat.overseer.participants[i].gain('wet');
 						if (this.combat.overseer.participants[i] == this) { continue; }
@@ -5142,7 +5153,6 @@ G={
 				},
 				req: ['magic_wand nerd']
 			});
-
 			
 			G.moveDefault.reqFunc = null;
 			
