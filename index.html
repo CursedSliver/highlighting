@@ -3128,6 +3128,7 @@ G={
 				let m = choose(availableMoves);
 				boxCharList = m[1];
 				G.lastCharList = boxCharList;
+				if (boxCharList.length == 1) { overseer.nonInteractiveMoveCount++; } else { overseer.nonInteractiveMoveCount = Math.max(overseer.nonInteractiveMoveCount - 3, 0); }
 				m = m[0];
 				m.func.call(this, boxCharList);
 
@@ -3156,6 +3157,7 @@ G={
 				}
 				
 				if ((this.has('frenzied') && Math.random() < 0.25) || (this.has('haste') && Math.random() < 0.05)) { return this.makeMove(); }
+				if (overseer.nonInteractiveMoveCount > overseer.participants.length * 6 + 6) { overseer.addBox('Since nothing is really happening, the fight is now considered over.', []); for (let i in overseer.participants) { overseer.participants[i].fleeCombat(true); } }
 				return this.has('fleed');
 			}
 			G.char.prototype.makeIntercept = function() {
