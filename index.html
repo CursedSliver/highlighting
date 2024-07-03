@@ -5177,10 +5177,11 @@ G={
 					cl[1].gain('hallucinating').duration = 4;
 					cl[1].gain('terrified');
 				},
-				req: ['magic_wand able|any%0.4', '-']
+				req: ['magic_wand able|any%0.4', '-'],
+				pReq: ['d:20']
 			});
 			new G.move({
-				chance: 2,
+				chance: 1.5,
 				text: '[1] repeatedly [waves|taps|calls upon] [1:their] magic wand and dances in place, initiating an ancient ritual as strong torrents of wind spiral out of [1:them]! <br>The unstoppable wind brings [ALL-1] to the ground!',
 				element: new G.element({
 					interact: 7,
@@ -5195,7 +5196,8 @@ G={
 						if (Math.random() < cl[i].adjust(0.2)) { cl[i].gain('bruised'); }
 					}
 				},
-				req: ['magic_wand', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen']
+				req: ['magic_wand', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen'],
+				pReq: ['d:30', 'd:30', 'd:30', 'd:30', 'd:30', 'd:30', 'd:60']
 			});
 			new G.move({
 				chance: 2,
