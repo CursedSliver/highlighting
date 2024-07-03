@@ -3321,7 +3321,7 @@ G={
 					let pool = [];
 					for (let i in this.team.chars) {
 						if (this.team.chars[i] == this) { continue; }
-						if (!this.team.chars[i].combat && !this.team.chars[i].isOut() %% !this.team.chars[i].isDisabled()) { pool.push(this.team.chars[i]); }
+						if (!this.team.chars[i].combat && !this.team.chars[i].isOut() && !this.team.chars[i].isDisabled()) { pool.push(this.team.chars[i]); }
 					}
 					let char = choose(pool);
 					if (char) { char.joinCombat(this.combat.overseer); this.combat.overseer.addChar(char); return text.replaceAll('[S]', '<e>'+char.name+'</e>'); }
