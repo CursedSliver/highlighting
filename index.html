@@ -715,7 +715,7 @@ G={
 		new G.perk({name:`bow`,desc:`Its arrows can easily chop a head clean off from a distance if skillfully wielded.`,tier:1});
 		new G.perk({name:`flamethrower`,desc:`Careful! May set both foes and friends on fire.`,tier:2,init:{ammo:0}});
 		new G.perk({name:`rocket launcher`,desc:`A dangerous weapon; excels at blowing stuff up.`,tier:3,init:{loaded:1}});
-		new G.perk({name:`lasergun`,desc:`Ultra-concentrated energy shots that burn through practically anything.`,tier:3});
+		new G.perk({name:`lasergun`,desc:`Ultra-concentrated energy shots that burn through practically anything.`,tier:3,init:{energy:2}});
 		new G.perk({name:`magic wand`,desc:`Casts a variety of spells upon your friends and foes.`,tier:2,init:{charges:1}});
 		new G.perk({name:`ancient scepter`,desc:`Calls forth ancient hexes and curses on your adversaries.`,tier:3});
 		
@@ -5274,7 +5274,7 @@ G={
 			});
 			//actually just a reusable grenade that never fails (laziness at its finest)
 			new G.move({
-				chance: 9,
+				chance: 12,
 				text: 'With a coordinated click and a pull, [1] fires [1:their] rocket launcher!<br>It [S]!',
 				element: new G.element({ interact: 5, interactMin: 1 }),
 				successFunc: function(cl, text) {
@@ -5290,9 +5290,59 @@ G={
 					for (let i = 0; i < afflictions.length; i++) { afflictions[i] = afflictions[i].replaceAll('[N]', '['+(i + offset)+']'); }
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
-				req: ['rocket_launcher any%0.25|able%0.5|pyromania%0.25|sociopath%0.25 '+hardDisables, '!=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any'],
+				req: ['rocket_launcher any%0.25|able%0.5|pyromania%0.25|sociopath%0.25|frenzied%0.25 '+hardDisables, '!=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any'],
 				reqFunc: function() { return (this.has('rocket launcher').loaded == 1); },
-				pReq: ['d:30']
+				pReq: ['d:30', 'd:30', 'd:30', 'd:30', 'd:40']
+			});
+
+			new G.move({
+				chance: 1,
+				text: '[1] takes aim with [1:their] laser gun at [2], but doesn\'t shoot yet.',
+				req: ['lasergun', 'able'],
+				pReq: ['d:50']
+			});
+			new G.move({
+				chance: 5,
+				text: '[1] charges up [1:their] laser gun.',
+				failText: '[1] charges up [1:their] laser gun, but [S]!',
+				fail: function() { return this.adjust(0.2, 'chargeWeapon'); },
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.has('lasergun').energy++;
+				},
+				failFunc: function(cl, text) {
+					if (Math.random() < this.adjust(0.1, 'chargeWeapon')) { this.has('lasergun').energy = Math.max(this.has('lasergun').energy - 1, 0); return text.replace('[S]', 'there was a leak, which leaked all the new energy away plus a bit more'); }
+					if (Math.random() < this.adjust(0.025, 'chargeWeapon')) { this.lose('lasergun'); return text.replace('[S]', 'something went wrong and the laser gun broke down into millions of impossibly small pieces'); }
+					if (Math.random() < this.adjust(0.0125, 'chargeWeapon')) { this.kill(this, 'charging accident'); return text.replace('[S]', 'it ended up blowing up in [1:their] face'); }
+				},
+				req: ['lasergun any%0.5|able '+hardDisables],
+				reqFunc: function() {
+					return (this.has('lasergun').energy < 4);
+				}
+			});
+			new G.move({
+				chance: 6,
+				text: '[1] activates [1:their] laser gun and fires a beam of concentrated light at [2][S]!',
+				failText: '[1] activates [1:their] laser gun and fires a beam of light at [2], but it missed.',
+				fail: function(cl) { return this.adjust(0.05, 'bulletAccuracy', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical); },
+				successFunc: function(cl, text) {
+					this.has('lasergun').energy = 0;
+					let chance = 0.9;
+					chance = cl[1].adjust(chance, 'fireDefense');
+
+					cl[1].gain('singed'); cl[1].gain('singed');
+					if (Math.random() < Math.pow(chance, 5)) { this.kill(cl[1], 'lightly grilled'); return text.replace('[S]', ', which burns a white-hot hole in [2:them]'); }
+					if (Math.random() < chance) { cl[1].gain('singed'); cl[1].gain('seared'); cl[1].gain('burnt'); cl[1].gain('weak').duration += 2; cl[1].gain('fallen'); return text.replace('[S]', ', which [thoroughly |]burns[| through] [2:them], leaving [2:them] immobile and defenseless'); }
+					return text.replace('[S]', ', but [2:their] protective clothing protected them from the laser');
+				},
+				failFunc: function() {
+					this.has('lasergun').energy = 0;
+				},
+				req: ['lasergun any%0.5|able%0.8|pyromania%0.2|frenzied%0.8 '+hardDisables],
+				reqFunc: function() {
+					return (this.has('lasergun').energy >= 4);
+				},
+				pReq: ['d:60']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
