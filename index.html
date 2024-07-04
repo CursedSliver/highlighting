@@ -3614,7 +3614,7 @@ G={
 
 					cl[1].gain('bruised');
 					if (Math.pow(chance, 4) > Math.random()) { this.kill(cl[1], 'overcompressed heart'); } 
-					if (Math.pow(chance, 2.5) > Math.random()) { cl[1].gain('dazed'); cl[1].gain('fallen') return text.replace('[S]', ', stunning and knocking down [2]'); } 
+					if (Math.pow(chance, 2.5) > Math.random()) { cl[1].gain('dazed'); cl[1].gain('fallen'); return text.replace('[S]', ', stunning and knocking down [2]'); } 
 					if (chance > Math.random()) { cl[1].gain('bruised'); return text.replace('[S]', ', heavily bruising [2]'); } 
 					return text.replace('[S]', '');
 				}
