@@ -4365,14 +4365,14 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			};
 			G.moveAssets.stabLight = function(item, chanceNew) {
-				if (!chanceNew) { chanceNew = 0.1; }
+				if (!chanceNew) { chanceNew = 0.2; }
 				return function(cl, text) {
 					let chance = chanceNew; //chance to embed; pow 2 is chance to bleed out instantly
 					chance = cl[1].adjust(this.adjust(chance, 'stabDamage'), 'stabDefense');
 
 					if (Math.random() < 0.9) { this.gain('cut up'); }
+					if (Math.random() < Math.pow(chance, 2)) { cl[1].gain('bleeding out'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
 					if (Math.random() < chance) { cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), this.has(item)); this.lose(item); return text + ' The '+item+' embedded deep into [2:their] [body|arteries|bloodstream] before [2:they] [kicked|threw] [1] off [2:themself].'; }
-					if (Math.random() < chance && Math.random() < chance) { cl[1].gain('bleeding out'); return text.replace('[S]', ', as blood erupts from the point of impact') + ' Without intervention, [2] won\'t last very long...'; }
 				}
 			}
 			G.moveAssets.sliceLight = function() {
@@ -4463,13 +4463,13 @@ G={
 			};
 			G.moveAssets.sliceBig = function() {
 				return function(cl, text) {
-					let chance = 0.3;
+					let chance = 0.5;
 					chance = cl[1].adjust(cl[1].adjust(this.adjust(this.adjust(chance, 'stabDamage'), 'overall'), 'stabDefense'), 'stabDefense');
 
 					cl[1].gain('cut up');
+					if (Math.random() < Math.pow(chance, 2)) { cl[1].gain('bleeding out'); return text.replace('[S]', ', with blood streaming down the wound'); }
 					if (Math.random() < chance) { cl[1].gain('cut up'); }
 					if (Math.random() < Math.pow(chance, 4)) { cl[1].gain('cut up'); }
-					if (Math.random() < chance) { cl[1].gain('bleeding out'); return text.replace('[S]', ', with blood streaming down the wound'); }
 				}
 			};
 			new G.move({
@@ -4515,8 +4515,9 @@ G={
 					if (cl[1].isDisabled() || cl[1].isInjured()) { chance += 0.2; }
 
 					cl[1].gain('cut up');
+					if (Math.random() < Math.pow(chance, 3)) { this.kill(cl[1], 'beheaded'); return text.replace('[S]', ', and also severing [2:their] jugular veins'); }
+					if (Math.random() < chance) { cl[1].gain('cut up'); return text.replace('[S]', ', and leaving a large gash on [2]\'s body'); }
 					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', ', and also knocking [2:them] onto the ground'); }
-					if (Math.random() < chance / 3) { this.kill(cl[1], 'beheaded'); return text.replace('[S]', ', and also severing [2:their] jugular veins'); }
 				},
 				req: ['axe any%0.5|able '+hardDisables, 'any'],
 				pReq: ['e:12']
@@ -4654,7 +4655,7 @@ G={
 					this.has('handgun').loaded = 0;
 					let chance = 1; //chance to get the shot perk
 
-					chance = cl[1].adjust(chance, 'bulletDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical, 0.1);
+					chance = cl[1].adjust(chance, 'bulletDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical, 0.25);
 
 					if (Math.random() < chance) { 
 						cl[1].gain('shot');
@@ -4749,7 +4750,7 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			}
 			G.moveAssets.grenadeBlastEffects = function(target, hDiff, vDiff) {
-				let chance = target.adjust(target.adjust(0.75, 'shockwaveDefense'), 'bulletDefense', hDiff, vDiff);
+				let chance = target.adjust(target.adjust(0.6, 'shockwaveDefense'), 'bulletDefense', hDiff, vDiff);
 				target.combat.horizontal += (Math.random() - 0.5) * 30;
 				target.combat.vertical += Math.random();
 
@@ -4923,17 +4924,17 @@ G={
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen'); //cant be bothered to create a new adjustfunc for this one specifically
 					//maybe if I implement more pitchfork but whatev
 
-					if (Math.random() < chance) {
+					if (Math.random() < Math.pow(chance, 1.5)) {
 						//embed
 						cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), new G.perkToken(G.perksBN['scrap metal'], cl[1]));
 						if (Math.random() < chance) { cl[1].gain('cut up'); }
 						return text.replace('[S]', ', which [embed into|sinks deep into|gets stuck in] [2:their] body');
 					}
-					if (Math.random() < Math.pow(chance, 1.5)) {
+					if (Math.random() < Math.pow(chance, 2)) {
 						cl[1].gain('bleeding out'); cl[1].gain('cut up');
 						return text.replace('[S]', ', which caused blood to spurt out of every orifice on [2:their] body');
 					}
-					if (Math.random() < Math.pow(chance, 2)) {
+					if (Math.random() < Math.pow(chance, 3)) {
 						this.kill(cl[1], 'cupid\'s arrow');
 						return text.replace('[S]', ', which flies true to [2:their] heart!');
 					}
@@ -5038,7 +5039,7 @@ G={
 				failText: '[1] presses down the trigger on [1:their] shotgun at [2], but it appears that none of the [slugs|shells|shots] actually hit [2:them].',
 				fail: function(cl) { return this.adjust(0.1, 'spreadAccuracy', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical); },
 				successFunc: function(cl, text) {
-					let chance = 0.85;
+					let chance = 0.8;
 					chance = cl[1].adjust(chance, 'spreadDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical);
 
 					this.has('shotgun').loaded = 0;
