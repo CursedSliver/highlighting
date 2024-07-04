@@ -626,8 +626,9 @@ G={
 			G.glob.ailment = true; 
 			G.glob.injury = false;
 			G.glob.combat = false; //whether this applies to combat only; any perks marked with this will be removed after fleeing from combat
+			G.glob.hard = false; //for perks marked with disable; indicates that the perk is "hard disable", meaning that most disabled actions wont apply but out actions wont apply either (such as unconscious, shell-shocked). For combat, each hard disabled counts as 5 disabled
 		new G.perk({name:`frenzied`,desc:`Experiencing a fit of violent rage and, when met with trouble, an incredible surge of adrenaline.`,disable:false});
-		new G.perk({name:`shell-shocked`,desc:`Has seen too much. May not be of much use for a while.`});
+		new G.perk({name:`shell-shocked`,desc:`Has seen too much. May not be of much use for a while.`,hard:true});
 		new G.perk({name:`dazed`,desc:`Not quite in full control of their faculties. May wander off unpredictably.`});
 		new G.perk({name:`heroic`,desc:`Having a moment of heroism. Resolved and unstoppable.`,ailment:false,onGain:function(){ if (this.owner.has('cowardly') || this.owner.has('terrified')) { this.owner.lose(this.perk.name); } }});
 		new G.perk({name:`determined`,desc:`Set to give their all, whatever the cost.`,ailment:false,onGain:function(){ if (this.owner.has('cowardly') || this.owner.has('terrified')) { this.owner.lose(this.perk.name); } }});
@@ -651,7 +652,7 @@ G={
 		new G.perk({name:`ironskin`,desc:`Skin as hard as steel!`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`weak`,desc:`Muscles no longer work properly.`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`vulnerable`,desc:`No matter what you wear, it still hurts...`,init:{duration:5},onMove:function() { this.duration--; }});
-		new G.perk({name:`hallucinating`,desc:`Enchanted in a trance.`,init:{duration:5},onMove:function() { this.duration--; },disable:true})
+		new G.perk({name:`hallucinating`,desc:`Enchanted in a trance.`,init:{duration:5},onMove:function() { this.duration--; },disable:true,hard:true});
 
 		delete G.glob.onGain;
 		G.glob.disable = true;
@@ -1356,10 +1357,14 @@ G={
 						if (this.perks[i].perk.injury) { this.lose(i); }
 					}
 				}
-				G.char.prototype.isDisabled = function() {
+				G.char.prototype.isDisabled = function(isHard) {
 					let count = 0;
 					for (let i in this.perks) {
-						if (this.perks[i].perk.disable) { count++; }
+						if (this.perks[i].perk.disable && !isHard) { 
+							count++; 
+							if (this.perks[i].perk.hard) { count += 4; }
+						}
+						if (isHard && this.perks[i].perk.disable && this.perks[i].perk.hard) { count++; }
 					}
 					return count;
 				}
@@ -1400,17 +1405,25 @@ G={
 						let pow = 1;
 						if (this.has('bruised')) { pow += 0.1; }
 						if (this.has('clumsy')) { pow += 0.25; }
-						if (this.has('plot armor')) { pow += 0.5; }
 						if (this.has('dazed')) { pow += 0.25; }
 						if (this.has('dizzy')) { pow += 0.2; }
 						if (this.has('crippled')) { pow += 0.35; }
-						if (this.has('unconscious')) { pow += 2; }
-						pow += 0.1 * this.isDisabled();
+						if (this.isDisabled(true)) { pow += 2; }
+						pow += 0.2 * this.isDisabled();
 						pow += 0.15 * this.isAiled();
+						pow += 0.1 * this.isInjured();
 						if (this.has('blind')) { pow += 0.7; }
-						
-						if (this.has('frenzied')) { pow *= 0.8; }
+						if (this.has('vulnerable')) { pow += 2; }
+						if (this.has('weak')) { pow += 1; }
+
+						if (this.has('bulky')) { pow *= 0.85; }
+						if (this.has('survivalist')) { pow *= 0.85; }
+						if (this.has('frenzied')) { pow *= 0.75; }
 						if (this.has('ninja')) { pow *= 0.95; }
+						if (this.has('combat gear')) { pow *= 0.7; }
+						if (this.has('knight armor')) { pow *= 0.8; }
+						if (this.has('kevlar vest')) { pow *= 0.9; }
+						if (this.has('ironskin')) { pow *= 0.7; }
 
 						return 1 - Math.pow(1 - c, pow);
 					}
@@ -3304,11 +3317,11 @@ G={
 					for (let i in this.combat.overseer.participants) {
 						if (this.combat.overseer.participants[i].team == this.team || this.team == 0) { count++; }
 					}
-					return 12 / Math.pow(Math.max(1, count), 2);
+					return 16 / Math.pow(Math.max(1, count), 3);
 				},
 				text: '[1] calls for [help from [S]|reinforcements|backups|more people], and [S] answers[.|!]',
 				failText: '[1] tries to call for help[ from [S], but it seems that [S] [isn\'t responding|couldn\'t hear it]...|, but no one hears [1:them]...|, but no one hears [1:them]...|, but nothing happens...|, but nothing happens...]',
-				req: ['inTeam|noTeam%0.25 any%0.06|peaceful%0.04|leader|vigilant%0.04|the_gift%0.06|snake_charmer\'s_flute%0.1|*able !frenzied|laughed|dizzy%0.25|dazed%0.25|able%0.5 '+hardDisables],
+				req: ['inTeam|noTeam%0.25 any%0.2|peaceful%0.1|leader|vigilant%0.06|the_gift%0.06|snake_charmer\'s_flute%0.1|*able !frenzied|laughed|dizzy%0.25|dazed%0.25|able%0.5 '+hardDisables],
 				element: G.moveAssets.elements.alone,
 				fail: function() {
 					let count = 0;
@@ -3579,32 +3592,25 @@ G={
 			//hand to hand combat
 			G.moveAssets.hardHeadHit = function() {
 				return function(cl, text) {
-					if (cl[1].has('knight armor')) { return; }
-					
 					let chance = 0.6;
-					if (cl[1].has('bulky') || cl[1].has('survivalist')) { chance -= 0.15; } 
-					if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
-					if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
-					if (cl[1].has('defensive')) { chance -= 0.2; }
-					if (cl[1].isInjured()) { chance += 0.15; }
-					if (cl[1].isDisabled()) { chance += 0.15; }
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'overall');
-					if (Math.pow(chance, 4) > Math.random()) { this.kill(cl[1], 'fractured skull'); return text.replace('[S]', ', caving [2:their] head in'); }
-					if (chance > Math.random()) { cl[1].gain('dazed'); cl[1].gain('bruised'); return text.replace('[S]', ', stunning and greatly bruising [2:them]'); }
-					return text.replace('[S]', '');
+					
+					if (Math.random() < Math.pow(chance, 4) && cl[1].isDisabled(true)) { this.kill(cl[1], 'fractured skull'); return text.replace('[S]', ', caving [2:their] head in'); }
+					if (Math.random() < Math.pow(chance, 3) && !cl[1].isDisabled(true)) { cl[1].gain('unconscious'); return text.replace('[S]', ', causing [2:them] to [pass out|faint] on the spot'); }
+					if (Math.random() < Math.pow(chance, 2)) { cl[1].gain('fallen'); cl[1].gain('dazed'); return text.replace('[S]', ', stunning and subsquently sending [2:them] onto the floor'); }
+					if (Math.random() < chance) { cl[1].gain('dazed'); cl[1].gain('bruised'); return text.replace('[S]', ', stunning and greatly bruising [2:them]'); }
 				}
 			}
 			G.moveAssets.mediumHeadHit = function() {
 				return function(cl, text) {
 					if (cl[1].has('knight armor')) { return; }
 					
-					let chance = 0.3;
+					let chance = 0.6;
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'overall');
 
 					cl[1].gain('bruised');
-					if (chance > Math.random()) { cl[1].gain('dazed'); return text.replace('[S]', ', stunning [2]'); }
-					
-					return text.replace('[S]', '');
+					if (Math.random() < Math.pow(chance, 2)) { cl[1].gain('dazed'); return text.replace('[S]', ', stunning [2:them]'); }
+					if (Math.random() < chance) { cl[1].gain('dizzy'); return text.replace('[S]', ', making [2:them] really, really dizzy'); }
 				}
 			}
 			G.moveAssets.hardBodyHit = function() {
@@ -3613,10 +3619,10 @@ G={
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 
 					cl[1].gain('bruised');
-					if (Math.pow(chance, 4) > Math.random()) { this.kill(cl[1], 'overcompressed heart'); } 
-					if (Math.pow(chance, 2.5) > Math.random()) { cl[1].gain('dazed'); cl[1].gain('fallen'); return text.replace('[S]', ', stunning and knocking down [2]'); } 
-					if (chance > Math.random()) { cl[1].gain('bruised'); return text.replace('[S]', ', heavily bruising [2]'); } 
-					return text.replace('[S]', '');
+					if (Math.pow(chance, 4) > Math.random() && cl[1].isDisabled(true)) { this.kill(cl[1], 'overcompressed heart'); } 
+					if (Math.pow(chance, 3) > Math.random() && !cl[1].isDisabled(true)) { cl[1].gain('unconscious'); return text.replace('[S]', ', knocking [2:them] out'); }
+					if (Math.pow(chance, 2.5) > Math.random()) { cl[1].gain('dazed'); cl[1].gain('fallen'); return text.replace('[S]', ', stunning and knocking [2:them] down'); } 
+					if (chance > Math.random()) { cl[1].gain('bruised'); return text.replace('[S]', ', heavily bruising [2:them]'); } 
 				}
 			}
 			G.moveAssets.mediumBodyHit = function() {
@@ -3627,7 +3633,6 @@ G={
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 					
 					if (chance > Math.random()) { cl[1].gain('bruised'); return text.replace('[S]', ', bruising [2]'); }
-					return text.replace('[S]', '');
 				}
 			}
 			G.moveAssets.readyForPunch = function(cl) {
@@ -3697,7 +3702,7 @@ G={
 				text: 'Uppercut! [1] smashes [1:their] fist right into [2]\'s [jaw|chest][S].',
 				failText: '[1] swings [1:their] fist upward in a [crescent|magnificent] arc, but [2] falls backward, [narrowingly|barely||] avoiding the punch.',
 				fail: function(cl) {
-					if (cl[1].isDisabled() || cl[1].has('fallen')) { return 0; }
+					if (cl[1].isDisabled()) { return 0; }
 					let chance = 0.3;
 					if (cl[1].has('ninja')) { chance -= 0.15; }
 					chance = this.adjust(chance);
@@ -3740,12 +3745,11 @@ G={
 			new G.move({
 				chance: 2,
 				text: '[1] grabs [2] by [2:their] shoulders, and began pushing [2:them] backwards[S].',
-				failText: '[1] grabs [2] by [2:their] shoulders, but [2:they] did the same thing simultaneously, locking them in place.',
+				failText: '[1] grabs [2] by [2:their] shoulders, but [2:they] managed to avoid it.',
 				fail: function(cl) {
 					let chance = 0.2;
-					if (cl[1].has('bulky') || cl[1].has('knight armor')) { chance -= 0.2; }
-					if (this.has('bulky')) { chance += 0.1; }
-					chance = this.adjust(chance);
+					chance = this.adjust(chance, 'tryGrab');
+					
 					return chance;
 				},
 				func: G.moveAssets.readyToWrestle,
@@ -3758,7 +3762,6 @@ G={
 				},
 				failFunc: function(cl) {
 					this.gain('skipped');
-					cl[1].gain('skipped');
 				},
 				pReq: ['h:2 v:0'],
 				req: ['able%0.5|bulky|the_gift', '- able']
@@ -3815,6 +3818,7 @@ G={
 					}
 					return text.replace('[S]', '');
 				},
+				req: ['any%0.6|any', 'any%0.5|able'],
 				pReq: ['h:6 v:1']
 			});
 			new G.move({
@@ -3828,9 +3832,14 @@ G={
 
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 					cl[1].gain('bruised');
-					if (Math.random() < Math.pow(chance, 4) || (cl[1].has('crippled') && Math.pow(chance, 3))) {
-						this.kill(cl[1], 'Counterproductive CPR');
-						return text.replace('[S]', ', causing [2:their] death!');
+					if (Math.random() < chance) { cl[1].gain('bruised'); }
+					if ((Math.random() < Math.pow(chance, 3) || (cl[1].has('crippled') && Math.random() < chance)) && cl[1].isDisabled(true)) {
+						this.kill(cl[1], choose(['counterproductive CPR', 'too many broken bones', 'mashed heart', 'internal bleeding', 'internal bleeding', 'pulped tissue', 'rampant hemorrhaging']));
+						return text.replace('[S]', ', killing [2:them]!');
+					}
+					if (Math.random() < Math.pow(chance, 2.5) || (cl[1].has('crippled') && Math.random() < Math.pow(chance, 3))) {
+						cl[1].gain('unconscious');
+						return text.replace('[S]', ', sending [2:them] into the world of dreams!');
 					}
 					if (Math.random() < Math.pow(chance, 2) || (cl[1].has('crippled') && Math.random() < Math.pow(chance, 2))) {
 						cl[1].gain('broken');
@@ -3841,8 +3850,8 @@ G={
 						return text.replace('[S]', ', greatly bruising [2:them]');
 					}
 				},
-				pReq: ['h:6 v:1'],
 				req: ['able%0.6|frenzied|sociopath|bulky%0.2 !peaceful|meek%0.5', '- fallen inCombat !out'],
+				pReq: ['h:6 v:1']
 			});
 			new G.move({
 				chance: 1,
@@ -3854,21 +3863,25 @@ G={
 					let chance = 0.5;
 					chance = cl[1].adjust(this.adjust('tryGrab'), 'dodge');
 					
-					if (Math.random() < Math.pow(chance, 2.5)) {
-						this.kill(cl[1], 'Suffocation');
+					if (Math.random() < Math.pow(chance, 2.5) && !cl[1].isDisabled(true)) {
+						this.kill(cl[1], 'suffocation');
 						return text.replace('[S]', ', suffocating [2:them] to death!');
+					}
+					if (Math.random() < Math.pow(chance, 1.5) && cl[1].isDisabled(true)) {
+						cl[1].gain('comatose');
+						return text.replace('[S]', ', which sends [2:them] into a coma');
 					}
 					if (Math.random() < Math.pow(chance, 1.5)) {
 						cl[1].gain('unconscious');
-						return text.replace('[S]', ', eventually knocking out [2], but not being able to quite kill [2:them]');
+						return text.replace('[S]', ', eventually knocking out [2:them], but not being able to quite kill [2:them]');
 					}
 					if (Math.random() < chance) {
 						cl[1].gain('dizzy');
-						return text.replace('[S]', ', making [2] very dizzy');
+						return text.replace('[S]', ', making [2:them] very dizzy');
 					}
 				},
-				pReq: ['h:6 v:1'],
-				req: ['able%0.2|frenzied%0.5|sociopath|bulky%0.2|medic%0.2 !peaceful|meek%0.5|clumsy%0.5', '- !able inCombat !out'],
+				req: ['any%0.2|frenzied%0.5|sociopath|bulky%0.2|medic%0.2 !peaceful|meek%0.5|clumsy%0.5 '+hardDisables, '- !able inCombat !out'],
+				pReq: ['h:6 v:1']
 			});
 			new G.move({
 				chance: 1,
@@ -3877,12 +3890,10 @@ G={
 				successFunc: function(cl, text) {
 					let landings = 0;
 					let count = Math.floor(Math.random() * 4) + 4 + (this.has('ninja')?4:0) + (this.has('frenzied')?8:0);
-					let chance = 0.25;
-					if (this.has('ninja')) { chance += 0.1; }
-					if (this.has('bulky')) { chance -= 0.15; }
-					if (this.has('clumsy')) { chance -= 0.15; }
+					let chance = 0.4;
 					
 					chance = this.adjust(chance, 'overall');
+					
 					for (let i = 0; i < count; i++) {
 						if (Math.random() < chance) { landings++; } //fUnNy
 					}
@@ -3934,7 +3945,7 @@ G={
 				if (this.has('vigilant')) { pow += 0.4; }
 				if (this.has('defensive')) { pow += 0.2; }
 				
-				if (this.has('unconscious')) { pow *= 0.99; }
+				if (this.isDisabled(true)) { pow *= 0.99; }
 				if (this.has('frenzied')) { pow *= 0.8; }
 				if (this.has('dazed')) { pow *= 0.85; }
 				if (this.has('dizzy')) { pow *= 0.9; }
@@ -4164,7 +4175,7 @@ G={
 				successFunc: function(cl) { 
 					cl[1].combat.moveToward(this, -8); 
 				},
-				req: ['pitchfork any|cowardly !able%0.75'+hardDisables, '- any'],
+				req: ['pitchfork any|cowardly !able%0.75 '+hardDisables, '- any'],
 				pReq: ['d:2/6']
 			});
 
@@ -4574,7 +4585,7 @@ G={
 				let pow = 1;
 
 				if (this.has('blind')) { pow += 0.3; }
-				if (this.has('unconscious')) { pow += 10; }
+				if (this.isDisabled(true)) { pow += 10; }
 				if (this.has('vulnerable')) { pow += 1; }
 				pow += 1.5 * this.isDisabled();
 				pow += 1 * this.isInjured();
@@ -4721,7 +4732,7 @@ G={
 				if (this.has('clumsy')) { pow += 0.2; }
 				if (this.has('meek')) { pow += 0.25; }
 				if (this.has('fortified')) { pow += 1; }
-				if (this.has('unconscious')) { pow += 10; }
+				if (this.isDisabled(true)) { pow += 10; }
 				pow += 1 * this.isDisabled(); 
 				pow += 0.5 * this.isInjured(); 
 				pow += 0.25 * this.isAiled(); 
@@ -5000,8 +5011,8 @@ G={
 				if (this.has('clumsy')) { pow += 0.15; }
 				if (this.has('shell-shocked')) { pow += 1; }
 				if (this.has('weak')) { pow += 1; }
-				if (this.isDisabled()) { pow += 0.15 * this.isDisabled(); }
-				if (this.isAiled()) { pow += 0.25 * this.isAiled(); }
+				pow += 0.15 * this.isDisabled(); 
+				pow += 0.25 * this.isAiled(); 
 
 				if (this.has('marksmen')) { pow *= 0.7; }
 				if (this.has('analytical')) { pow *= 0.85; }
