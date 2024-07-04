@@ -715,7 +715,7 @@ G={
 		new G.perk({name:`bow`,desc:`Its arrows can easily chop a head clean off from a distance if skillfully wielded.`,tier:1});
 		new G.perk({name:`flamethrower`,desc:`Careful! May set both foes and friends on fire.`,tier:2,init:{ammo:0}});
 		new G.perk({name:`rocket launcher`,desc:`A dangerous weapon; excels at blowing stuff up.`,tier:3,init:{loaded:1}});
-		new G.perk({name:`lasergun`,desc:`Ultra-concentrated energy shots that burn through practically anything.`,tier:3,init:{energy:2}});
+		new G.perk({name:`lasergun`,desc:`Ultra-concentrated energy shots that burn through practically anything.`,tier:3,init:{energy:2},onMove:function() { if (Math.random() < 0.3) { this.energy = Math.max(0, this.energy - 1); } }});
 		new G.perk({name:`magic wand`,desc:`Casts a variety of spells upon your friends and foes.`,tier:2,init:{charges:1}});
 		new G.perk({name:`ancient scepter`,desc:`Calls forth ancient hexes and curses on your adversaries.`,tier:3});
 		
@@ -5314,6 +5314,7 @@ G={
 					if (Math.random() < this.adjust(0.1, 'chargeWeapon')) { this.has('lasergun').energy = Math.max(this.has('lasergun').energy - 1, 0); return text.replace('[S]', 'there was a leak, which leaked all the new energy away plus a bit more'); }
 					if (Math.random() < this.adjust(0.025, 'chargeWeapon')) { this.lose('lasergun'); return text.replace('[S]', 'something went wrong and the laser gun broke down into millions of impossibly small pieces'); }
 					if (Math.random() < this.adjust(0.0125, 'chargeWeapon')) { this.kill(this, 'charging accident'); return text.replace('[S]', 'it ended up blowing up in [1:their] face'); }
+					return text.replace('[S]', '[1:they] messed up and it didn\'t charge anything');
 				},
 				req: ['lasergun any%0.5|able '+hardDisables],
 				reqFunc: function() {
