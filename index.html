@@ -3589,8 +3589,8 @@ G={
 					if (cl[1].isInjured()) { chance += 0.15; }
 					if (cl[1].isDisabled()) { chance += 0.15; }
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'overall');
-					if (chance > Math.random()) { cl[1].gain('dazed'); cl[1].gain('bruised'); return text.replace('[S]', ', stunning and greatly bruising [2]'); }
-					else if (chance / 4 > Math.random()) { this.kill(cl[1], 'fractured skull'); }
+					if (Math.pow(chance, 4) > Math.random()) { this.kill(cl[1], 'fractured skull'); return text.replace('[S]', ', caving [2:their] head in'); }
+					if (chance > Math.random()) { cl[1].gain('dazed'); cl[1].gain('bruised'); return text.replace('[S]', ', stunning and greatly bruising [2:them]'); }
 					return text.replace('[S]', '');
 				}
 			}
@@ -3599,25 +3599,23 @@ G={
 					if (cl[1].has('knight armor')) { return; }
 					
 					let chance = 0.3;
-					if (cl[1].has('bulky') || cl[1].has('survivalist') || cl[1].has('ninja')) { chance -= 0.2; }
-					if (cl[1].has('combat gear') || cl[1].has('kevlar vest')) { chance -= 0.15; }
-					if (this.has('bulky') || this.has('frenzied')) { chance += 0.1; }
-					if (cl[1].has('defensive')) { chance -= 0.1; }
-					if (cl[1].isInjured()) { chance += 0.15; }
-					if (cl[1].isDisabled()) { chance += 0.15; }
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'overall');
+
+					cl[1].gain('bruised');
 					if (chance > Math.random()) { cl[1].gain('dazed'); return text.replace('[S]', ', stunning [2]'); }
+					
 					return text.replace('[S]', '');
 				}
 			}
 			G.moveAssets.hardBodyHit = function() {
 				return function(cl, text) {
-					let chance = 0.25; 
+					let chance = 0.45; 
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
-					
+
+					cl[1].gain('bruised');
+					if (Math.pow(chance, 4) > Math.random()) { this.kill(cl[1], 'overcompressed heart'); } 
+					if (Math.pow(chance, 2.5) > Math.random()) { cl[1].gain('dazed'); cl[1].gain('fallen') return text.replace('[S]', ', stunning and knocking down [2]'); } 
 					if (chance > Math.random()) { cl[1].gain('bruised'); return text.replace('[S]', ', heavily bruising [2]'); } 
-					if (chance / 3 > Math.random()) { cl[1].gain('dazed'); return text.replace('[S]', ', stunning [2]'); } 
-					if (chance / 9 > Math.random()) { this.kill(cl[1], 'overcompressed heart'); } 
 					return text.replace('[S]', '');
 				}
 			}
@@ -3625,7 +3623,7 @@ G={
 				return function(cl, text) {
 					if (cl[1].has('knight armor')) { return; }
 					
-					let chance = 0.05;
+					let chance = 0.2;
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 					
 					if (chance > Math.random()) { cl[1].gain('bruised'); return text.replace('[S]', ', bruising [2]'); }
@@ -3776,7 +3774,7 @@ G={
 					return this.adjust(0.15);
 				},
 				failFunc: function(cl, text) {
-					if (Math.random() < this.has('frenzied')?0.1:0.3 && !this.has('fallen')) { this.gain('fallen'); return text.replace('[S]', ', bringing [1:themself] onto the ground in the process'); }
+					if (Math.random() < this.adjust(this.has('frenzied')?0.1:0.2, 'overall') && !this.has('fallen')) { this.gain('fallen'); return text.replace('[S]', ', bringing [1:themself] onto the ground in the process'); }
 					return text.replace('[S]', '');
 				},
 				req: ['any%0.5|bulky|cursed_knife|frenzied '+hardDisables, 'any'],
@@ -3830,11 +3828,11 @@ G={
 
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 					cl[1].gain('bruised');
-					if (Math.random() < chance / 3 || (cl[1].has('crippled') && Math.random() < chance / 3)) {
+					if (Math.random() < Math.pow(chance, 4) || (cl[1].has('crippled') && Math.pow(chance, 3)) {
 						this.kill(cl[1], 'Counterproductive CPR');
 						return text.replace('[S]', ', causing [2:their] death!');
 					}
-					if (Math.random() < chance / 2 || (cl[1].has('crippled') && Math.random() < chance / 2)) {
+					if (Math.random() < Math.pow(chance, 2) || (cl[1].has('crippled') && Math.random() < Math.pow(chance, 2))) {
 						cl[1].gain('broken');
 						return text.replace('[S]', ', breaking [2:their] [ribs|neck]');
 					}
@@ -3856,11 +3854,11 @@ G={
 					let chance = 0.5;
 					chance = cl[1].adjust(this.adjust('tryGrab'), 'dodge');
 					
-					if (Math.random() < chance / 2.5) {
+					if (Math.random() < Math.pow(chance, 2.5)) {
 						this.kill(cl[1], 'Suffocation');
 						return text.replace('[S]', ', suffocating [2:them] to death!');
 					}
-					if (Math.random() < chance / 1.5) {
+					if (Math.random() < Math.pow(chance, 1.5)) {
 						cl[1].gain('unconscious');
 						return text.replace('[S]', ', eventually knocking out [2], but not being able to quite kill [2:them]');
 					}
@@ -4104,7 +4102,7 @@ G={
 					
 					if (Math.random() < chance) {
 						if (cl[1].has('knight armor')) { cl[1].lose('knight armor'); return text.replace('[S]', ', breaking [2:their] knight armor in the process!'); }
-						if (Math.random() < chance / 2.5) { this.kill(cl[1], 'fractured skull'); return; }
+						if (Math.random() < Math.pow(chance, 4)) { this.kill(cl[1], 'fractured skull'); return; }
 						cl[1].gain('dazed'); return text.replace('[S]', ', [sending [2:them] into unconsciousness|knocking [2:them] out]');
 					}
 				},
@@ -4144,13 +4142,13 @@ G={
 					
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 
-					if (Math.random() < chance / 2.5 && cl[1].has('fallen')) {
+					if (Math.random() < Math.pow(chance, 3) && cl[1].has('fallen')) {
 						this.kill(cl[1], 'pitchforked');
-						return text.replace('[S]', 'piercing [2:their] vital organs');
+						return text.replace('[S]', ', piercing [2:their] vital organs');
 					}
-					if (Math.random() < chance / 2 && !cl[1].has('fallen')) {
+					if (Math.random() < Math.pow(chance, 2) && !cl[1].has('fallen')) {
 						cl[1].gain('fallen');
-						return text.replace('[S]', 'pushing [2:them] onto the ground.');
+						return text.replace('[S]', ', pushing [2:them] onto the ground.');
 					}
 					if (Math.random() < chance) {
 						cl[1].gain('cut up'); cl[1].gain('cut up');
@@ -4234,7 +4232,7 @@ G={
 					
 					if (Math.random() < chance) { cl[1].gain('bruised'); return text.replace('[S]', 'The pebbles managed to bruise [2:them]!'); }
 					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', 'The pebbles managed to knock over [2:them]!'); }
-					if (Math.random() < chance / (this.has('marksmen')?1:2)) { cl[1].gain('dazed'); return text.replace('[S]', 'The pebbles managed to hit [2:them] right on the head, stunning [2:them]!'); }
+					if (Math.random() < Math.pow(chance, (this.has('marksmen')?2:4))) { cl[1].gain('dazed'); return text.replace('[S]', 'The pebbles managed to hit [2:them] right on the head, stunning [2:them]!'); }
 				},
 				req: ['slingshot able|any%0.5 '+hardDisables, 'any'],
 				pReq: ['e:10/100']
@@ -4465,12 +4463,12 @@ G={
 			};
 			G.moveAssets.sliceBig = function() {
 				return function(cl, text) {
-					let chance = 0.25;
+					let chance = 0.3;
 					chance = cl[1].adjust(cl[1].adjust(this.adjust(this.adjust(chance, 'stabDamage'), 'overall'), 'stabDefense'), 'stabDefense');
 
 					cl[1].gain('cut up');
 					if (Math.random() < chance) { cl[1].gain('cut up'); }
-					if (Math.random() < chance / 4) { cl[1].gain('cut up'); }
+					if (Math.random() < Math.pow(chance, 4)) { cl[1].gain('cut up'); }
 					if (Math.random() < chance) { cl[1].gain('bleeding out'); return text.replace('[S]', ', with blood streaming down the wound'); }
 				}
 			};
@@ -4531,7 +4529,6 @@ G={
 					let item = cl[1].has('embedded').embeddedItem;
 					item.owner = this;
 					let name = item.perk.name;
-					console.log(item);
 					this.gain(item);
 					cl[1].gain('bleeding out');
 					cl[1].lose('embedded');
@@ -4661,17 +4658,17 @@ G={
 
 					if (Math.random() < chance) { 
 						cl[1].gain('shot');
-						if (Math.random() < chance / 2) {
+						if (Math.random() < Math.pow(chance, 4)) {
+							this.kill(cl[1], 'shot'); 
+							return text.replace('[S]', ', some hitting [2:their] [heart|head]');
+						}
+						if (Math.random() < Math.pow(chance, 2)) {
 							cl[1].gain('broken');
 							return text.replace('[S]', ', and breaking something within [2:them]');
 						}
-						if (Math.random() < chance / 2) {
+						if (Math.random() < Math.pow(chance, 2)) {
 							cl[1].gain('bleeding out');
 							return text.replace('[S]', ', blood erupting from the points of impact');
-						}
-						if (Math.random() < chance / 2.5) {
-							this.kill(cl[1], 'shot'); 
-							return text.replace('[S]', ', some hitting [2:their] [heart|head]');
 						}
 					} else {
 						if (cl[1].has('kevlar vest') && Math.random() < 0.5) { cl[1].lose('kevlar vest'); }
@@ -4757,11 +4754,11 @@ G={
 				target.combat.vertical += Math.random();
 
 				target.gain('singed');
-				if (Math.random() < chance / 2 && (target.isDisabled() > 1) && target.isInjured()) {
+				if (Math.random() < Math.pow(chance, 4) && (target.isDisabled() > 1) && target.isInjured()) {
 					this.kill(target, 'lethal blast');
 					return '[brutally |]kills [N]';
 				}
-				if (Math.random() < chance / 2 && (target.isInjured() || target.isAiled())) {
+				if (Math.random() < Math.pow(chance, 3) && (target.isInjured() || target.isAiled())) {
 					target.gain('unconscious'); target.gain('fallen'); target.gain('lacerated'); target.gain('cut up');
 					return 'knocks out [N]';
 				}
@@ -4769,7 +4766,7 @@ G={
 					target.gain('singed'); target.gain('singed'); target.gain('singed'); target.gain('singed'); target.gain('singed'); if (Math.random() < chance) { target.gain('fallen'); return 'burns and knocks over [N]'; }
 					return 'burns [N]';
 				}
-				if (Math.random() < chance && !target.has('shell-shocked') && !target.has('lacerated') && !target.has('crippled')) {
+				if (Math.random() < Math.pow(chance, 2) && !target.has('shell-shocked') && !target.has('lacerated') && !target.has('crippled')) {
 					target.gain('shell-shocked'); target.gain('fallen'); if (Math.random() < chance) { target.gain('cut up'); if (Math.random() < chance) { target.gain('bleeding out'); return 'causing [N] a bloodied mess'; } }
 					return 'critically traumatizes [N]';
 				}
@@ -4932,11 +4929,11 @@ G={
 						if (Math.random() < chance) { cl[1].gain('cut up'); }
 						return text.replace('[S]', ', which [embed into|sinks deep into|gets stuck in] [2:their] body');
 					}
-					if (Math.random() < chance / 1.5) {
+					if (Math.random() < Math.pow(chance, 1.5)) {
 						cl[1].gain('bleeding out'); cl[1].gain('cut up');
 						return text.replace('[S]', ', which caused blood to spurt out of every orifice on [2:their] body');
 					}
-					if (Math.random() < chance / 2) {
+					if (Math.random() < Math.pow(chance, 2) {
 						this.kill(cl[1], 'cupid\'s arrow');
 						return text.replace('[S]', ', which flies true to [2:their] heart!');
 					}
@@ -4967,10 +4964,10 @@ G={
 						if (Math.random() < chance) { cl[1].gain('cut up'); }
 						return text.replace('[S]', ', which [embed into|sinks deep into|gets stuck in] [2:their] body');
 					}
-					if (Math.random() < chance / 1.5) {
+					if (Math.random() < Math.pow(chance, 1.5)) {
 						cl[1].gain('fallen');
 					}
-					if (Math.random() < chance / 2) {
+					if (Math.random() < Math.pow(chance, 2)) {
 						this.kill(cl[1], 'shredded organs');
 						return text.replace('[S]', ', killing [2:them]!').replace('[arm|shoulder|chest|thigh]', '[eye|heart|lung|neck|mouth]');
 					}
@@ -5045,10 +5042,10 @@ G={
 					chance = cl[1].adjust(chance, 'spreadDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical);
 
 					this.has('shotgun').loaded = 0;
-					if (Math.random() < chance / 2.5 && (cl[1].isDisabled() || cl[1].isInjured())) {
+					if (Math.random() < Math.pow(chance, 4) && (cl[1].isDisabled() || cl[1].isInjured())) {
 						this.kill(cl[1], 'shotgun'); return text + '<br>[2] yelps in surprise as [2:their] brain collapses on itself.';
 					}
-					if (Math.random() < chance / 1.75) {
+					if (Math.random() < Math.pow(chance, 2.5)) {
 						cl[1].gain('unconscious'); cl[1].gain('shot'); cl[1].gain('lacerated'); return text.replace('[S]', ', knocking [2] out!');
 					}
 					if (Math.random() < chance && !cl[1].has('shot')) {
@@ -5119,10 +5116,10 @@ G={
 						cl[i].gain('singed');
 						let chance = cl[i].adjust(0.55 + (this.has('pyromania')?0.1:0), 'fireDefense');
 
-						if (Math.random() < chance / 2.5 && cl[i].isDisabled() && (cl[i].has('seared') || cl[i].has('burnt'))) { this.kill(cl[i], 'reduced to ashes'); afflictions.push('burns ['+(i + 1)+'] to a crisp'); continue; }
-						if (Math.random() < chance / 2) { cl[i].gain('fallen'); cl[i].gain('seared'); afflictions.push('blows ['+(i + 1)+'] to the ground and torches ['+(i + 1)+':them]'); continue; }
-						if (Math.random() < chance / 1.5 && this.has('pyromania')) { cl[i].gain('seared'); cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('shell-shocked'); afflictions.push('greatly traumatizes ['+(i + 1)+']'); continue; }
-						if (Math.random() < chance / 1.5) { cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('singed'); afflictions.push('heavily burns ['+(i + 1)+']'); continue; }
+						if (Math.random() < Math.pow(chance, 4.5) && cl[i].isDisabled() && (cl[i].has('seared') || cl[i].has('burnt'))) { this.kill(cl[i], 'reduced to ashes'); afflictions.push('burns ['+(i + 1)+'] to a crisp'); continue; }
+						if (Math.random() < Math.pow(chance, 2)) { cl[i].gain('fallen'); cl[i].gain('seared'); afflictions.push('blows ['+(i + 1)+'] to the ground and torches ['+(i + 1)+':them]'); continue; }
+						if (Math.random() < Math.pow(chance, 3) && this.has('pyromania')) { cl[i].gain('seared'); cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('shell-shocked'); afflictions.push('greatly traumatizes ['+(i + 1)+']'); continue; }
+						if (Math.random() < Math.pow(chance, 2)) { cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('singed'); afflictions.push('heavily burns ['+(i + 1)+']'); continue; }
 						if (Math.random() < chance) { cl[i].gain('singed'); afflictions.push('burns ['+(i + 1)+']'); continue; }
 
 						afflictions.push('hits ['+(i + 1)+']');
@@ -5333,7 +5330,7 @@ G={
 					chance = cl[1].adjust(chance, 'fireDefense');
 
 					cl[1].gain('singed'); cl[1].gain('singed');
-					if (Math.random() < Math.pow(chance, 5)) { this.kill(cl[1], 'lightly grilled'); return text.replace('[S]', ', which burns a white-hot hole in [2:them]'); }
+					if (Math.random() < Math.pow(chance, 7)) { this.kill(cl[1], 'lightly grilled'); return text.replace('[S]', ', which burns a white-hot hole in [2:them]'); }
 					if (Math.random() < chance) { cl[1].gain('singed'); cl[1].gain('seared'); cl[1].gain('burnt'); cl[1].gain('weak').duration += 2; cl[1].gain('fallen'); return text.replace('[S]', ', which [thoroughly |]burns[| through] [2:them], leaving [2:them] immobile and defenseless'); }
 					return text.replace('[S]', ', but [2:their] protective clothing protected them from the laser');
 				},
