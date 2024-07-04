@@ -3329,6 +3329,7 @@ G={
 					}
 					let char = choose(pool);
 					if (char) { char.joinCombat(this.combat.overseer); this.combat.overseer.addChar(char); return text.replaceAll('[S]', '<e>'+char.name+'</e>'); }
+					else { return text.replace('and [S] answers', 'but nothing happens'); }
 				},
 				failFunc: function(cl, text) {
 					let pool = [];
