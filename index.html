@@ -5355,6 +5355,137 @@ G={
 				},
 				pReq: ['d:6/60']
 			});
+
+			//wish ring (ahahhhhhhhh funny)
+			G.moveDefault.element = G.moveAssets.elements.alone;
+			new G.move({
+				chance: 2,
+				text: '[1] [stares|looks|fixates] on [1:their] wish ring, [not knowing what to do with it|being unsure what to do].',
+				req: ['wish_ring']
+			});
+			new G.move({
+				chance: 0.05,
+				text: '[1] wishes that [1:they] [were immortal|could survive anything|were invincible]...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... its magical engravings fade, turning it into just any ordinary ring. What has even happened? Who am I?',
+				failText: '[1] wishes that [1:they] [were immortal|could survive anything|were invincible]...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... overflowing with energy, [1:their] wish ring explodes into a rising mushroom of high-energy plasma!',
+				fail: 0.5,
+				successFunc: function() {
+					this.lose('wish ring');
+					this.gain('plot armor');
+					this.gain('sheep');
+				},
+				failFunc: function() {
+					this.lose('wish ring');
+					this.kill(this, 'bad wishes');
+				},
+				req: ['wish_ring !able any%0.1|naive !suicidal !frenzied !determined']
+			});
+			new G.move({
+				chance: 0.05,
+				text: '[1] wishes that everyone would just stop fighting.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then...',
+				successFunc: function() {
+					for (let i in this.combat.overseer.participants) {
+						if (this.combat.overseer.participants[i] == this) { continue; }
+						this.combat.overseer.addChar(this.combat.overseer.participants[i]);
+						this.combat.overseer.participants[i].fleeCombat(true);
+					}
+				},
+				req: ['wish_ring able%0.1|*able']
+			});
+			new G.move({
+				chance: 0.02,
+				text: '[1], in a surge of impulsive thoughts, wished that they were a duck.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... quack!',
+				successFunc: function() {
+					this.gain('duck');
+					this.fleeCombat(true);
+				},
+				req: ['wish_ring']
+			});
+			new G.move({
+				chance: 0.05,
+				text: '[1] wishes that there were more people fighting on [1:their] side.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... [ALL-1] has joined the fight!',
+				successFunc: function() {
+					let cl = deepArrCopy(this.team.chars);
+					for (let i in cl) {
+						if (cl[i] == this) { cl.splice(i, 1); }
+						if (cl[i].isOut() || (cl[i].combat && cl[i].combat.overseer == this.combat.overseer)) { cl.splice(i, 1); }
+					}
+					let list = [];
+					for (let i = 0; i < Math.min(3 + Math.round(Math.random() * 2), cl.length); i++) {
+						let chosen = choose(cl);
+						cl.splice(cl.indexOf(chosen), 1);
+						list.push(chosen);
+					}
+					for (let i in list) {
+						this.combat.overseer.addChar(list[i]);
+						list[i].fleeCombat(true);
+						list[i].joinCombat(this.combat.overseer);
+					}
+				},
+				req: ['wish_ring any%0.2|able'],
+				reqFunc: function() {
+					let teamCount = 0;
+					let opponentCount = 0;
+					for (let i in this.combat.overseer.participants) {
+						if (this.combat.overseer.participants[i].team == this.team) { teamCount++; }
+						else { opponentCount++; }
+					}
+					if (teamCount <= opponentCount) { return false; }
+					
+					let count = 0;
+					for (let i in this.team.chars) {
+						if (!this.team.chars[i].isOut() && !(cl[i].combat && cl[i].combat.overseer == this.combat.overseer)) { count++; }
+					}
+					if (count > 1) { return true; }
+					return false;
+				}
+			});
+			new G.move({
+				chance: 0.04,
+				text: '[1] wishes that there were less people against [1:them].<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... [ALL-1] disappears in a puff of smoke!',
+				element: new G.element({
+					interact: 5,
+					interactMin: 0
+				}),
+				successFunc: function(cl) {
+					for (let i = 1; i < cl.length; i++) {
+						cl[i].fleeCombat(true);
+					}
+				},
+				req: ['wish_ring any%0.5|able', 'delete%0.75 != any', 'delete%0.75 != any', 'delete%0.75 != any', 'delete%0.75 != any', 'delete%0.75 != any'],
+				reqFunc: function() {
+					if (this.combat.overseer.participants.length <= 2) { return false; }
+					
+					let teamCount = 0;
+					let opponentCount = 0;
+					for (let i in this.combat.overseer.participants) {
+						if (this.combat.overseer.participants[i].team == this.team) { teamCount++; } else { opponentCount++; }
+					}
+					return (teamCount < oponentCount);
+				}
+			});
+			new G.move({
+				chance: 0.04,
+				text: '[1] wishes that [2] [never existed|would disappear].<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... no one seemed to remember [2] at all.',
+				element: new G.element(),
+				successFunc: function(cl) {
+					this.kill(cl[1], 'ceased to exist'); cl[1].gain('nihil');
+				},
+				req: ['wish_ring any%0.5|sociopath|devious%0.5', 'any%0.5|annoying']
+			});
+			new G.move({
+				chance: 0.03,
+				text: '[1] wishes that this whole thing would just come to a conclusion already...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... <e>[S]</e> is the only one left standing.',
+				successFunc: function(cl, text) {
+					let chosen = choose(this.combat.overseer.participants);
+					for (let i in this.combat.overseer.participants) {
+						this.combat.overseer.addChar(this.combat.overseer.participants[i]);
+						if (this.combat.overseer.participants == chosen) { continue; }
+						this.kill(this.combat.overseer.participants[i], 'ceased to exist');
+					}
+					return text.replace('[S]', chosen.name);
+				},
+				req: ['wish_ring bruised singed cut_up fallen !able seared|crippled|lacerated any%0.5|shell-shocked|hallucinating|vulnerable|weak !determined|heroic|plot_armor|leader|ironskin|combat_gear|knight_armor|frenzied']
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
@@ -5376,9 +5507,7 @@ G={
 			G.char.prototype.joinCombat = function(overseer) {
 				if (this.combat) { return false; }
 				this.combat = new G.combatTracker(overseer, this);
-				console.log(this.combat.horizontal);
 				this.combat.horizontal = (Math.pow(Math.random(), 0.33) * 60) * ((Math.random() < 0.5)?1:-1);
-				console.log(this.combat.horizontal);
 			}
 			G.char.prototype.fleeCombat = function(silent) {
 				this.lose('fleed');
