@@ -5497,7 +5497,7 @@ G={
 						if (this.combat.overseer.participants[i].team == this.team) { teamCount++; }
 						else { opponentCount++; }
 					}
-					if (teamCount <= opponentCount) { return false; }
+					if (teamCount >= opponentCount) { return false; }
 					
 					let count = 0;
 					for (let i in this.team.chars) {
