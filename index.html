@@ -5397,7 +5397,7 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			}
 			new G.move({
-				chance: 0.2,
+				chance: 0.5,
 				text: '[1] wishes that [1:they] [were immortal|could survive anything|were invincible]...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... its magical engravings fade, turning it into just any ordinary ring as fluffy white furs begin growing out of [2:their] body.',
 				failText: '[1] wishes that [1:they] [were immortal|could survive anything|were invincible]...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... overflowing with energy, [1:their] wish ring explodes into a rising mushroom of high-energy plasma!',
 				fail: 0.5,
@@ -5421,7 +5421,7 @@ G={
 				return text.replace('[S]', 'however, still nothing happened.');
 			}
 			new G.move({
-				chance: 0.2,
+				chance: 0.5,
 				text: '[1] wishes to see [2] fighting with [1:them], one more time.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... it\'s a miracle! [2] came back to life, right besides [1:them]!',
 				failText: '[1] wishes to see [2] fighting with [1:them], one more time.<br>[1:g|His|Her|Their] wish ring shimmers for a second, [S]',
 				successFunc: function() {
@@ -5437,7 +5437,7 @@ G={
 				req: ['wish_ring']
 			});
 			new G.move({
-				chance: 0.2,
+				chance: 0.5,
 				text: '[1] wishes that everyone would just stop fighting.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then...',
 				failText: '[1] wishes that everyone would just stop fighting.<br>[1:g|His|Her|Their] wish ring shimmers for a second, [S]',
 				successFunc: function() {
@@ -5450,7 +5450,7 @@ G={
 				req: ['wish_ring able%0.1|*able '+hardDisables]
 			});
 			new G.move({
-				chance: 0.1,
+				chance: 0.25,
 				text: '[1], in a surge of impulsive thoughts, wished that they were a duck.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... quack!',
 				fail: function() { return 0; },
 				successFunc: function() {
@@ -5460,7 +5460,7 @@ G={
 				req: ['wish_ring']
 			});
 			new G.move({
-				chance: 0.2,
+				chance: 0.5,
 				text: '[1] wishes that [there were more people fighting on [1:their] side|[1:they] weren\'t so outnumbered].<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... [ALL-1] has joined the fight!',
 				failText: '[1] wishes that [there were more people fighting on [1:their] side|[1:they] weren\'t so outnumbered].<br>[1:g|His|Her|Their] wish ring shimmers for a second, [S]',
 				successFunc: function() {
@@ -5500,7 +5500,7 @@ G={
 				}
 			});
 			new G.move({
-				chance: 0.2,
+				chance: 0.5,
 				text: '[1] wishes that [there were less people against [1:them]|[1:they] weren\'t so outnumbered].<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... [ALL-1] disappears in a puff of smoke!',
 				failText: '[1] wishes that [there were less people against [1:them]|[1:they] weren\'t so outnumbered].<br>[1:g|His|Her|Their] wish ring shimmers for a second, [S]',
 				element: new G.element({
@@ -5525,7 +5525,7 @@ G={
 				}
 			});
 			new G.move({
-				chance: 0.2,
+				chance: 0.5,
 				text: '[1] wishes that [2] [never existed|would disappear].<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... no one seemed to remember [2] at all.',
 				failText: '[1] wishes that [2] [never existed|would disappear].<br>[1:g|His|Her|Their] wish ring shimmers for a second, [S]',
 				element: new G.element(),
@@ -5535,7 +5535,7 @@ G={
 				req: ['wish_ring any%0.5|sociopath|devious%0.5 '+hardDisables, 'any%0.5|annoying']
 			});
 			new G.move({
-				chance: 0.2,
+				chance: 0.5,
 				text: '[1] wishes that this whole thing would just come to a conclusion already...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... <e>[S]</e> is the only one left standing.',
 				fail: function() { return 0; },
 				successFunc: function(cl, text) {
