@@ -767,6 +767,7 @@ G={
 		new G.perk({name:`mint essence`,desc:`Can be consumed to gain immunity to all curses, but is rather difficult to swallow.`,tier:2});
 		new G.perk({name:`vanilla ice cream`,desc:`Can be consumed.`,tier:1});
 		new G.perk({name:`cookie dough`,desc:`Can be consumed, or be baked into a proper batch of cookies. Premature consumption may lead to sickness.`,tier:0});
+		new G.perk({name:`pancreas pellet`,desc:`A highly magical pellet that cures literally everything at once.`,tier:3);
 
 		// Additional items - CS
 		new G.perk({name:`snake charmer\'s flute`,desc:``,tier:2});
@@ -1674,6 +1675,8 @@ G={
        							> matches everyone
 	       					'delete' 
 	      						> removes the character from the output; must be put at the front as an independent term (use percent sign to make it probabilistic)
+			 				'hidden'
+								> does not output the character, but a matching character must still exist for it to consider the output valid, and it counts toward + and -; must be put at the front and is mutually exclusive with "delete"; does not support percent signs
 			   				put '%N' after any perk to signify a chance for that to be true, where N is the chance
 					*/
 					let bigReq = null;
@@ -1723,7 +1726,8 @@ G={
 						} else {
 							pool = forcePool;
 						}
-						
+
+						let hidden = false;
 						req = req.split(' '); //req now describes all statements separated by AND
 						let skip = false;
 						for (let ii in req) {
@@ -1731,7 +1735,11 @@ G={
 								if (req[ii] == 'delete') { skip = true; continue; }
 								let chance = parseFloat(req[ii].split('%')[1]);
 								if (Math.random() < chance) { skip = true; continue; }
-								req.splice(ii, 1);
+								req[ii] = req[ii].slice(req[ii].indexOf(' ') + 1, req[ii].length);
+							}
+							if (req[ii].indexOf('hidden') == 0) {
+								hidden = true;
+								req[ii] = req[ii].slice(req[ii].indexOf(' ') + 1, req[ii].length);
 							}
 							req[ii] = req[ii].split('|'); //req is now a nested array, with layer one being AND and layer two being OR
 						}
@@ -1760,7 +1768,7 @@ G={
 							
 							if (fitAND)
 							{
-								selected.push(it);
+								if (!hidden) { selected.push(it); }
 								pool.splice(pool.indexOf(it), 1);
 								prevTeam=it.team;
 								found=it;
@@ -5536,7 +5544,7 @@ G={
 				req: ['wish_ring any%0.5|sociopath|devious%0.5 '+hardDisables, 'any%0.5|annoying']
 			});
 			new G.move({
-				chance: 0.5,
+				chance: 1,
 				text: '[1] wishes that this whole thing would just come to a conclusion already...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... <e>[S]</e> is the only one left standing.',
 				fail: function() { return 0; },
 				successFunc: function(cl, text) {
@@ -5548,7 +5556,22 @@ G={
 					}
 					return text.replace('[S]', chosen.name);
 				},
-				req: ['wish_ring bruised singed seared cut_up lacerated fallen any%0.5|shot|broken !able burnt|crippled|bleeding_out any%0.2|shell-shocked|hallucinating|vulnerable|weak !determined|heroic|plot_armor|leader|ironskin|combat_gear|knight_armor|frenzied|high_morale '+hardDisables]
+				req: ['wish_ring !able bruised singed seared cut_up lacerated fallen shot|broken burnt|crippled|bleeding_out any%0.25|shell-shocked|hallucinating|vulnerable|weak !determined|heroic|plot_armor|leader|ironskin|combat_gear|knight_armor|frenzied|high_morale '+hardDisables]
+			});
+			new G.move({
+				chance: 0.5,
+				text: '[1] wishes for no one to suffer anymore.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... to [1:their] shock, everyone\'s wounds and scars all healed at once!',
+				failText: '[1] wishes for no one to suffer anymore.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... [S]',
+				successFunc: function() {
+					for (let i in this.combat.overseer.participants) {
+						for (let ii in this.combat.overseer.participants[i].perks) {
+							let innerPerk = this.combat.overseer.participants[i].perks[ii].perk;
+							if (!innerPerk.out && (innerPerk.disable || innerPerk.injury || innerPerk.ailment)) { this.combat.overseer.participants[i].lose(innerPerk); }
+						}
+						if (this.combat.overseer.participants[i] != this) { this.combat.overseer.addChar(this.combat.overseer.participants[i]); }
+					}
+				},
+				req: ['wish_ring any%0.5|*able', 'hidden !able|injured|ailed', 'hidden !able|injured|ailed']
 			});
 			G.moveDefault.element = new G.element();
 			G.moveDefault.fail = 0;
