@@ -1528,7 +1528,7 @@ G={
 					else if (!op && val==cond) return true;
 					else return false;
 				}
-				G.actReqKeywords = ['any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', '=', 'every', 'ailed', 'injured', 'inCombat'];
+				G.actReqKeywords = ['any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', '=', 'every', 'ailed', 'injured', 'inCombat', 'delete', 'hidden'];
 				G.getAliveCharsN = function() {
 					let amount = 0;
 					for (let i in G.chars) {
@@ -1576,6 +1576,7 @@ G={
 						if (item == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
 						if (item == 'inCombat') { return cNegate(actualTrue, !this.combat); }
 						if (item == 'every') { return actualTrue; }
+						if (item == 'delete' || item == 'hidden') { return actualTrue; }
 						throw 'Special keyword not found!';
 					}
 					if (item.includes(':')) {
@@ -1727,19 +1728,17 @@ G={
 							pool = forcePool;
 						}
 
-						let hidden = false;
 						req = req.split(' '); //req now describes all statements separated by AND
+						let hidden = false;
 						let skip = false;
 						for (let ii in req) {
 							if (req[ii].indexOf('delete') == 0) {
 								if (req[ii] == 'delete') { skip = true; continue; }
 								let chance = parseFloat(req[ii].split('%')[1]);
 								if (Math.random() < chance) { skip = true; continue; }
-								req[ii] = req[ii].slice(req[ii].indexOf(' ') + 1, req[ii].length);
 							}
 							if (req[ii].indexOf('hidden') == 0) {
 								hidden = true;
-								req[ii] = req[ii].slice(req[ii].indexOf(' ') + 1, req[ii].length);
 							}
 							req[ii] = req[ii].split('|'); //req is now a nested array, with layer one being AND and layer two being OR
 						}
