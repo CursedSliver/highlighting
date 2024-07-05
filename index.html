@@ -5423,7 +5423,7 @@ G={
 			G.moveDefault.failFunc = function(cl, text) {
 				let chance = 1 - this.adjust(0.95, 'wish');
 				
-				if (Math.random() < chance) { this.lose('wish ring'); return text.replace('[S]', 'and then - the [magical|intricate] engravings on it suddenly fades away, leaving [2:them] with a completely normal ring.'); }
+				if (Math.random() < chance) { this.lose('wish ring'); return text.replace('[S]', 'and then - the [magical|intricate] engravings on it suddenly fades away, leaving [1:them] with a completely normal ring.'); }
 				if (Math.random() < Math.pow(chance, 2)) { this.lose('wish ring'); this.kill(this, 'bad wishes'); return text.replace('[S]', 'and another second, and another, getting brighter - until it explodes into an expanding fireball right on [2:their] hand!'); }
 				return text.replace('[S]', 'however, still nothing happened.');
 			}
