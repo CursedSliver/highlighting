@@ -5565,7 +5565,7 @@ G={
 					for (let i in this.combat.overseer.participants) {
 						for (let ii in this.combat.overseer.participants[i].perks) {
 							let innerPerk = this.combat.overseer.participants[i].perks[ii].perk;
-							if (!innerPerk.out && (innerPerk.disable || innerPerk.injury || innerPerk.ailment)) { this.combat.overseer.participants[i].lose(innerPerk); }
+							if (!innerPerk.out && (innerPerk.disable || innerPerk.injury || innerPerk.ailment)) { this.combat.overseer.participants[i].lose(this.combat.overseer.participants[i].perks[ii]); }
 						}
 						if (this.combat.overseer.participants[i] != this) { this.combat.overseer.addChar(this.combat.overseer.participants[i]); }
 					}
