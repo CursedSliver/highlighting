@@ -5420,13 +5420,14 @@ G={
 				req: ['wish_ring !able any%0.1|naive !suicidal !frenzied !determined '+hardDisables]
 			});
 			G.moveDefault.fail = function() { return this.adjust(0.5, 'wish'); }
-			G.moveDefault.failFunc = function(cl, text) {
+			G.moveAssets.wishRingFailFunc = function(cl, text) {
 				let chance = 1 - this.adjust(0.95, 'wish');
 				
 				if (Math.random() < chance) { this.lose('wish ring'); return text.replace('[S]', 'and then - the [magical|intricate] engravings on it suddenly fades away, leaving [1:them] with a completely normal ring.'); }
 				if (Math.random() < Math.pow(chance, 2)) { this.lose('wish ring'); this.kill(this, 'bad wishes'); return text.replace('[S]', 'and another second, and another, getting brighter - until it explodes into an expanding fireball right on [2:their] hand!'); }
 				return text.replace('[S]', 'however, still nothing happened.');
 			}
+			G.moveDefault.failFunc = G.moveAssets.wishRingFailFunc;
 			new G.move({
 				chance: 0.5,
 				text: '[1] wishes to see [2] fighting with [1:them], one more time.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... it\'s a miracle! [2] came back to life, right besides [1:them]!',
@@ -5440,6 +5441,15 @@ G={
 					char.revive();
 					this.combat.overseer.addChar(char); 
 					char.joinCombat(this.combat.overseer);
+				},
+				failFunc: function(cl, text) {
+					let pool = [];
+					for (let i in this.team.chars) {
+						if (this.team.chars[i].isOut()) { pool.push(this.team.chars[i]); }
+					}
+					let char = choose(pool);
+					this.combat.overseer.addChar(char); 
+					return G.moveAssets.wishRingFailFunc(cl, text);
 				},
 				req: ['wish_ring'],
 				reqFunc: function() {
