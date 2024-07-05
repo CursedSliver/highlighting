@@ -776,6 +776,7 @@ G={
 		new G.perk({name:`topaz with a hole`,desc:``,tier:2});
 		new G.perk({name:`topaz on a stick`,desc:``,tier:3});
 		new G.perk({name:`angel in a bottle`,desc:``,tier:3});
+		new G.perk({name:`nuclear bomb`,desc:`A nuke.`,tier:9});
 		
 		//creator
 		G.setupData=0;
@@ -1391,6 +1392,11 @@ G={
 				}
 				G.char.prototype.isDead = function() {
 					return this.has('dead');
+				}
+				G.char.prototype.revive = function() {
+					for (let i in this.perks) {
+						if (this.perks[i].perk.out || this.perks[i].perk.disable || this.perks[i].perk.injury || this.perks[i].perk.ailment) { this.lose(this.perks[i], true); }
+					}
 				}
 				G.char.prototype.adjust = function(chance, type) {
 					if (!type) { type = 'overall'; }
@@ -3053,6 +3059,7 @@ G={
 			G.char.prototype.targetCount = function(perpentrator) {
 				if (!this.combat) { return 1; }
 				let count = 1;
+				if (this.has('annoying')) { count += 1; }
 				if (this.has('nerd')) { count += 0.6; }
 				if (this.has('glasses')) { count += 0.5; }
 				if (this.has('meek')) { count += 0.4; }
@@ -5359,13 +5366,31 @@ G={
 			//wish ring (ahahhhhhhhh funny)
 			G.moveDefault.element = G.moveAssets.elements.alone;
 			new G.move({
-				chance: 2,
+				chance: 10,
 				text: '[1] [stares|looks|fixates] on [1:their] wish ring, [not knowing what to do with it|being unsure what to do].',
-				req: ['wish_ring']
+				req: ['wish_ring able%0.025|naive%0.25|meek%0.25 able']
 			});
 			new G.move({
+				chance: 1,
+				text: '[1] just had a [brilliant|awesome|devious|innocent] wish, but [1:their] wish ring is hesitant on answering it...',
+				req: ['wish_ring !naive|meek']
+			});
+			G.adjustFuncs.wish = function(chance) {
+				let pow = 1;
+				if (this.has('plot armor')) { pow += 9; }
+				if (this.has('frenzied')) { pow += 2; }
+				
+				if (this.has('the gift')) { pow *= 0.75; }
+				if (this.has('goth')) { pow *= 0.9; }
+				pow *= Math.pow(0.85, this.isInjured());
+				pow *= Math.pow(0.9, this.isAiled());
+				pow *= Math.pow(0.8, this.isDisabled());
+
+				return 1 - Math.pow(1 - chance, pow);
+			}
+			new G.move({
 				chance: 0.05,
-				text: '[1] wishes that [1:they] [were immortal|could survive anything|were invincible]...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... its magical engravings fade, turning it into just any ordinary ring. What has even happened? Who am I?',
+				text: '[1] wishes that [1:they] [were immortal|could survive anything|were invincible]...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... its magical engravings fade, turning it into just any ordinary ring as fluffy white furs begin growing out of [2:their] body.',
 				failText: '[1] wishes that [1:they] [were immortal|could survive anything|were invincible]...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... overflowing with energy, [1:their] wish ring explodes into a rising mushroom of high-energy plasma!',
 				fail: 0.5,
 				successFunc: function() {
@@ -5377,11 +5402,36 @@ G={
 					this.lose('wish ring');
 					this.kill(this, 'bad wishes');
 				},
-				req: ['wish_ring !able any%0.1|naive !suicidal !frenzied !determined']
+				req: ['wish_ring !able any%0.1|naive !suicidal !frenzied !determined '+hardDisables]
+			});
+			G.moveDefault.fail = function() { return this.adjust(0.5, 'wish'); }
+			G.moveDefault.failFunc = function(cl, text) {
+				let chance = 1 - this.adjust(0.95, 'wish');
+				
+				if (Math.random() < chance) { this.lose('wish ring'); return text.replace('[S]', 'and then - the [magical|intricate] engravings on it suddenly fades away, leaving [2:them] with a completely normal ring.'); }
+				if (Math.random() < Math.pow(chance, 2)) { this.lose('wish ring'); this.kill(this, 'bad wishes'); return text.replace('[S]', 'and another second, and another, getting brighter - until it explodes into an expanding fireball right on [2:their] hand!'); }
+				return text.replace('[S]', 'however, still nothing happened.');
+			}
+			new G.move({
+				chance: 0.05,
+				text: '[1] wishes to see [2] fighting with [1:them], one more time.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... it\'s a miracle! [2] came back to life, right besides [1:them]!',
+				failText: '[1] wishes to see [2] fighting with [1:them], one more time.<br>[1:g|His|Her|Their] wish ring shimmers for a second, [S]',
+				successFunc: function() {
+					let pool = [];
+					for (let i in this.team.chars) {
+						if (this.team.chars[i].isOut()) { pool.push(this.team.chars[i]); }
+					}
+					let char = choose(pool);
+					this.combat.overseer.addChar(char); 
+					char.revive();
+					char.joinCombat(this.combat.overseer);
+				},
+				req: ['wish_ring']
 			});
 			new G.move({
 				chance: 0.05,
 				text: '[1] wishes that everyone would just stop fighting.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then...',
+				failText: '[1] wishes that everyone would just stop fighting.<br>[1:g|His|Her|Their] wish ring shimmers for a second, [S]',
 				successFunc: function() {
 					for (let i in this.combat.overseer.participants) {
 						if (this.combat.overseer.participants[i] == this) { continue; }
@@ -5389,11 +5439,12 @@ G={
 						this.combat.overseer.participants[i].fleeCombat(true);
 					}
 				},
-				req: ['wish_ring able%0.1|*able']
+				req: ['wish_ring able%0.1|*able '+hardDisables]
 			});
 			new G.move({
 				chance: 0.02,
 				text: '[1], in a surge of impulsive thoughts, wished that they were a duck.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... quack!',
+				fail: function() { return 0; },
 				successFunc: function() {
 					this.gain('duck');
 					this.fleeCombat(true);
@@ -5402,7 +5453,8 @@ G={
 			});
 			new G.move({
 				chance: 0.05,
-				text: '[1] wishes that there were more people fighting on [1:their] side.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... [ALL-1] has joined the fight!',
+				text: '[1] wishes that [there were more people fighting on [1:their] side|[1:they] weren\'t so outnumbered].<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... [ALL-1] has joined the fight!',
+				failText: '[1] wishes that [there were more people fighting on [1:their] side|[1:they] weren\'t so outnumbered].<br>[1:g|His|Her|Their] wish ring shimmers for a second, [S]',
 				successFunc: function() {
 					let cl = deepArrCopy(this.team.chars);
 					for (let i in cl) {
@@ -5421,7 +5473,7 @@ G={
 						list[i].joinCombat(this.combat.overseer);
 					}
 				},
-				req: ['wish_ring any%0.2|able'],
+				req: ['wish_ring any%0.2|able '+hardDisables],
 				reqFunc: function() {
 					let teamCount = 0;
 					let opponentCount = 0;
@@ -5433,7 +5485,7 @@ G={
 					
 					let count = 0;
 					for (let i in this.team.chars) {
-						if (!this.team.chars[i].isOut() && !(cl[i].combat && cl[i].combat.overseer == this.combat.overseer)) { count++; }
+						if (!this.team.chars[i].isOut() && !(this.team.chars[i].combat && this.team.chars[i].combat.overseer == this.combat.overseer)) { count++; }
 					}
 					if (count > 1) { return true; }
 					return false;
@@ -5441,7 +5493,8 @@ G={
 			});
 			new G.move({
 				chance: 0.04,
-				text: '[1] wishes that there were less people against [1:them].<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... [ALL-1] disappears in a puff of smoke!',
+				text: '[1] wishes that [there were less people against [1:them]|[1:they] weren\'t so outnumbered].<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... [ALL-1] disappears in a puff of smoke!',
+				failText: '[1] wishes that [there were less people against [1:them]|[1:they] weren\'t so outnumbered].<br>[1:g|His|Her|Their] wish ring shimmers for a second, [S]',
 				element: new G.element({
 					interact: 5,
 					interactMin: 0
@@ -5451,7 +5504,7 @@ G={
 						cl[i].fleeCombat(true);
 					}
 				},
-				req: ['wish_ring any%0.5|able', 'delete%0.75 != any', 'delete%0.75 != any', 'delete%0.75 != any', 'delete%0.75 != any', 'delete%0.75 != any'],
+				req: ['wish_ring any%0.5|able '+hardDisables, 'delete%0.75 != any', 'delete%0.75 != any', 'delete%0.75 != any', 'delete%0.75 != any', 'delete%0.75 != any'],
 				reqFunc: function() {
 					if (this.combat.overseer.participants.length <= 2) { return false; }
 					
@@ -5466,15 +5519,17 @@ G={
 			new G.move({
 				chance: 0.04,
 				text: '[1] wishes that [2] [never existed|would disappear].<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... no one seemed to remember [2] at all.',
+				failText: '[1] wishes that [2] [never existed|would disappear].<br>[1:g|His|Her|Their] wish ring shimmers for a second, [S]',
 				element: new G.element(),
 				successFunc: function(cl) {
 					this.kill(cl[1], 'ceased to exist'); cl[1].gain('nihil');
 				},
-				req: ['wish_ring any%0.5|sociopath|devious%0.5', 'any%0.5|annoying']
+				req: ['wish_ring any%0.5|sociopath|devious%0.5 '+hardDisables, 'any%0.5|annoying']
 			});
 			new G.move({
-				chance: 0.03,
+				chance: 0.04,
 				text: '[1] wishes that this whole thing would just come to a conclusion already...<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... <e>[S]</e> is the only one left standing.',
+				fail: function() { return 0; },
 				successFunc: function(cl, text) {
 					let chosen = choose(this.combat.overseer.participants);
 					for (let i in this.combat.overseer.participants) {
@@ -5484,8 +5539,11 @@ G={
 					}
 					return text.replace('[S]', chosen.name);
 				},
-				req: ['wish_ring bruised singed cut_up fallen !able seared|crippled|lacerated any%0.5|shell-shocked|hallucinating|vulnerable|weak !determined|heroic|plot_armor|leader|ironskin|combat_gear|knight_armor|frenzied']
+				req: ['wish_ring bruised singed seared cut_up lacerated fallen any%0.5|shot|broken !able burnt|crippled|bleeding_out any%0.2|shell-shocked|hallucinating|vulnerable|weak !determined|heroic|plot_armor|leader|ironskin|combat_gear|knight_armor|frenzied|high_morale '+hardDisables]
 			});
+			G.moveDefault.element = new G.element();
+			G.moveDefault.fail = 0;
+			G.moveDefault.failFunc = function() { };
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
