@@ -660,6 +660,7 @@ G={
 		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true,hard:true});
 		new G.perk({name:`ignorable`,desc:`No one really takes notice of them.`});
 		//summon perks
+		new G.perk({name:`grieving`,desc:`grieving about the loss of a good friend.`,init:{power:1},onMove:function() { this.power--; if (this.power <= 0) { this.owner.lose(this); } }});
 		G.glob.identificator = true;
 		new G.perk({name:`turtle`,desc:`A cute turtle to do its owner\'s bidding.`});
 		new G.perk({name:`wolf`,desc:`A fierce wolf to help its owner defeat the enemies.`});
@@ -1301,6 +1302,7 @@ G={
 					char.combat = new G.combatTracker(overseer);
 					overseer.addExtra(char);
 				}
+				return char;
 			}
 			G.charsBN = {}; //Do not use for code, just convenient for testing
 				G.char.prototype.has=function(perk)
@@ -1361,8 +1363,11 @@ G={
 				{
 					if (!this.has('dead'))
 					{
-						G.deaths++;
-						G.deadThisRound.push(this);
+						if (this.real) {
+							G.deaths++;
+							G.deadThisRound.push(this);
+						}
+						if (this.onDeath) { this.onDeath.call(this); }
 						this.gain('dead');
 						if (reason) this.deathReason=reason;
 						if (this.combat) {
@@ -5683,6 +5688,19 @@ G={
 				},
 				req: ['wizard_robe any%0.5|cowardly !levitating|invisible|fallen '+hardDisables]
 			});
+
+			new G.move({
+				chance: 1,
+				text: '[1] releases [1:their] pet turtle!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					let turtle = G.newPhantomChar(G.perksBN['turtle'], this.combat.overseer, this);
+					turtle.onDeath = function() { this.has('turtle').creator.gain('grieving').power = 50; }
+					turtle.itemRef = this.has('pet turtle');
+					this.lose('pet turtle');
+				},
+				req: ['pet_turtle !frenzied']
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
@@ -5711,7 +5729,10 @@ G={
 				if (!this.combat) { return false; }
 				if (!silent) { this.combat.overseer.injectBack('<br><e>'+this.name+'</e> has fleed from the fight!'); }
 				for (let i = this.perks.length - 1; i >= 0; i--) {
-					if (this.perks[i].perk.combat) { this.lose(this.perks[i], true); }
+					if (this.perks[i].perk.combat) { 
+						if (this.perks[i].itemRef) { this.gain(this.perks[i].itemRef); }
+						this.lose(this.perks[i], true); 
+					}
 				}
 				this.combat.overseer.removeParticipant(this);
 				this.combat = null;
