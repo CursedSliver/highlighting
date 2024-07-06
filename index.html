@@ -3759,7 +3759,7 @@ G={
 			new G.move({
 				text: '[1] makes a powerful punch at [2]\'s [chest|neck][S].',
 				failText: '[1] throws [1:their] fist at [2]\'s [check|neck], but [2] dodged out of the way before it can hit.',
-				fail: 0.35,
+				fail: function() { cl[1].adjust(this.adjust(0.35, 'overall'), 'dodge') },
 				func: G.moveAssets.readyForPunch,
 				successFunc: G.moveAssets.mediumBodyHit(),
 				pReq: ['h:3 v:0.5'],
@@ -3968,7 +3968,7 @@ G={
 				if (this.has('vigilant')) { pow += 0.4; }
 				if (this.has('defensive')) { pow += 0.2; }
 				
-				if (this.isDisabled(true)) { pow *= 0.99; }
+				if (this.isDisabled(true)) { pow *= 0.01; }
 				if (this.has('frenzied')) { pow *= 0.8; }
 				if (this.has('dazed')) { pow *= 0.85; }
 				if (this.has('dizzy')) { pow *= 0.9; }
