@@ -3599,10 +3599,10 @@ G={
 			});
 			G.moveDefault.chance = 1;
 			new G.move({
-				chance: 2.5,
-				text: 'Something about [1]\'s bullet wounds changes, and [suddenly|abruptly], [1:they] feels an immeasurable wave of pain wash over them.',
+				chance: 1.5,
+				text: 'Something about [1]\'s bullet wounds changes, and [suddenly|abruptly], [1:they] feels an immeasurable wave of pain wash over [1:them].',
 				successFunc: function() { this.gain('crippled'); },
-				req: ['shot any'],
+				req: ['shot any%0.5|meek !survivalist%0.5'],
 				reqFunc: function(cl) {
 					if (Math.random() < (1 - 1 / (this.has('shot').count + 1))) {
 						return true;
