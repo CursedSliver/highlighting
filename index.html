@@ -627,6 +627,7 @@ G={
 			G.glob.injury = false;
 			G.glob.combat = false; //whether this applies to combat only; any perks marked with this will be removed after fleeing from combat
 			G.glob.hard = false; //for perks marked with disable; indicates that the perk is "hard disable", meaning that most disabled actions wont apply but out actions wont apply either (such as unconscious, shell-shocked). For combat, each hard disabled counts as 5 disabled
+			G.glob.identificator = false; //if something has a perk marked with this, it will not longer be sanitized for realness
 		new G.perk({name:`frenzied`,desc:`Experiencing a fit of violent rage and, when met with trouble, an incredible surge of adrenaline.`,disable:false});
 		new G.perk({name:`shell-shocked`,desc:`Has seen too much. May not be of much use for a while.`,hard:true});
 		new G.perk({name:`dazed`,desc:`Not quite in full control of their faculties. May wander off unpredictably.`});
@@ -648,6 +649,7 @@ G={
 		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true});
 		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},cannotLose:true,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { this.count--; if (this.count <= 0) { this.count += 1000; this.owner.lose('skipped', true); } }});
 		new G.perk({name:`in stasis`,desc:`Can no longer make turns!`});
+		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,init:{embeddedItem:null},setItem:function(itemPerk) { itemPerk.owner = this.owner; this.embeddedItem = itemPerk; }});
 		new G.perk({name:`marked`,desc:`All eyes on them!`,init:{duration:1,maxDuration:1},setDuration:function(dur){this.duration = Math.max(this.duration, dur); this.maxDuration = Math.max(this.maxDuration, dur); },onMove:function() { this.duration--; if (this.duration <= 0) { this.owner.lose(this); } }});
 		new G.perk({name:`high morale`,desc:`Confidence at an all-time high!`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`ironskin`,desc:`Skin as hard as steel!`,init:{duration:5},onMove:function() { this.duration--; }});
@@ -656,6 +658,17 @@ G={
 		new G.perk({name:`hallucinating`,desc:`Enchanted in a trance.`,init:{duration:5},onMove:function() { this.duration--; },disable:true,hard:true});
 		new G.perk({name:`invisible`,desc:`Vanished into thin air!`,init:{duration:2},onMove:function() { this.duration--; }});
 		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true,hard:true});
+		new G.perk({name:`ignorable`,desc:`No one really takes notice of them.`});
+		//summon perks
+		G.glob.identificator = true;
+		new G.perk({name:`turtle`,desc:`A cute turtle to do its owner\'s bidding.`});
+		new G.perk({name:`wolf`,desc:`A fierce wolf to help its owner defeat the enemies.`});
+		new G.perk({name:`hawk`,desc:`A vigilant hawk to watch over the world with its owner.`});
+		new G.perk({name:`tiger`,desc:`A hungry tiger to tear its owner\'s enemies to shreds.`});
+		new G.perk({name:`phantasmal dragon`,desc:`A nice ethereal dragon to brutally and painfully atomize your enemies into a quadrillion fragments.`});
+		new G.perk({name:`eye of the void`,desc:`????`});
+		new G.perk({name:`heavenly hypercane`,desc:`Lets fate befall upon the unlucky one.`});
+		G.glob.identificator = false;
 
 		delete G.glob.onGain;
 		G.glob.disable = true;
@@ -672,7 +685,6 @@ G={
 		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:false,ailment:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('seared'); this.count = Math.max(this.count - 3, 1); } }});
 		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('burnt'); this.count = Math.max(this.count - 3, 1); } } });
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`,ailment:true});
-		new G.perk({name:`embedded`,desc:`Warning: DO NOT remove sharp object embedded in vital arteries.`,disable:false,init:{embeddedItem:null},setItem:function(itemPerk) { itemPerk.owner = this.owner; this.embeddedItem = itemPerk; }});
 		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true,injury:false}); // Removed Disabled
 		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true,injury:false});
 		new G.perk({name:`missing leg`,desc:`Missing a whole leg!`});
@@ -1265,7 +1277,7 @@ G={
 					}
 					G.teams.splice(G.teams.indexOf(this),1);
 				}
-			G.char=function(o)
+			G.char=function(o, notReal)
 			{
 				this.type='char';
 				this.perks=[];
@@ -1274,10 +1286,21 @@ G={
 				this.deathReason='';
 				this.killer=[];
 				this.combat=null;
-				for (var i in o){this[i]=o[i];}
+				if (notReal) { this.real = false; } else { this.real = true; }
+				for (let i in o){this[i]=o[i];}
 				this.id = G.chars.length;
-				G.chars.push(this);
-				G.charsBN[this.name] = this;
+				if (!notReal) { 
+					G.chars.push(this);
+					G.charsBN[this.name] = this;
+				}
+			}
+			G.newPhantomChar = function(idPerk, overseer, creator) {
+				let char = new G.char({}, true);
+				char.perks.push(new G.perkToken(idPerk, char, {creator:creator||null}));
+				if (overseer) {
+					char.combat = new G.combatTracker(overseer);
+					overseer.addExtra(char);
+				}
 			}
 			G.charsBN = {}; //Do not use for code, just convenient for testing
 				G.char.prototype.has=function(perk)
@@ -1532,7 +1555,7 @@ G={
 					else if (!op && val==cond) return true;
 					else return false;
 				}
-				G.actReqKeywords = ['any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', '=', 'every', 'ailed', 'injured', 'inCombat', 'delete', 'hidden'];
+				G.actReqKeywords = ['any', 'able', 'out', 'inTeam', 'noTeam', '-', '+', '=', 'every', 'ailed', 'injured', 'inCombat', 'delete', 'hidden', 'real'];
 				G.getAliveCharsN = function() {
 					let amount = 0;
 					for (let i in G.chars) {
@@ -1554,7 +1577,7 @@ G={
 					return this.chars.length - this.getAliveCharsN();
 				}
 				//refactored TW's code to be much more sensible - CS
-				let conditionTester = function(str, prevTeam, firstTeam, negate) {
+				let conditionTester = function(str, prevTeam, firstTeam) {
 					//individual expressions, without AND or OR
 					if (str == '') { return true; }
 					if (!str) { return false; } 
@@ -1562,15 +1585,16 @@ G={
 					let item = str.split('%')[0];
 					let actualTrue = true;
 					let actualFalse = false;
-					if (negate) { actualTrue = !actualTrue; actualFalse = !actualFalse; }
 					if (item[0] == '!') { item = item.slice(1, item.length); }
 					if (item[0] == '*') { actualTrue = !actualTrue; actualFalse = !actualFalse; item = item.slice(1, item.length); }
 					if (chance) { if (!(Math.random() < chance)) { return actualFalse; } }
 					if (item == 'team') { return cNegate(actualTrue, this.type == 'team'); }
 					else if (G.actReqKeywords.includes(item) && this.type == 'char') {
-						if (item == 'any') { return cNegate(actualTrue, this.isOut()); } 
+						if (item == 'inCombat') { return cNegate(actualTrue, !this.combat); }
 						if (item == 'able') { return cNegate(actualTrue, this.isDisabled()); }
 						if (item == 'out') { return cNegate(actualTrue, !this.isOut()); }
+						if (item == 'real') { return cNegate(actualTrue, !this.real); }
+						if (item == 'any') { return cNegate(actualTrue, this.isOut()); } 
 						if (item == 'inTeam') { return cNegate(actualTrue, !this.team); }
 						if (item == 'noTeam') { return cNegate(actualTrue, this.team); }
 						if (item == '-') { return cNegate(actualTrue, (this.team === prevTeam && !(prevTeam == 0 || this.team == 0))); }
@@ -1578,7 +1602,6 @@ G={
 						if (item == '=') { return cNegate(actualTrue, !(this.team === firstTeam && !(firstTeam == 0 || this.team == 0))); }
 						if (item == 'ailed') { return cNegate(actualTrue, !this.isAiled()); }
 						if (item == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
-						if (item == 'inCombat') { return cNegate(actualTrue, !this.combat); }
 						if (item == 'every') { return actualTrue; }
 						if (item == 'delete' || item == 'hidden') { return actualTrue; }
 						throw 'Special keyword not found!';
@@ -1677,11 +1700,13 @@ G={
 							'any'
 								> can be abled or disabled (still doesn't accept out)
 							'every'
-       							> matches everyone
+       							> matches everyone 
 	       					'delete' 
 	      						> removes the character from the output; must be put at the front as an independent term (use percent sign to make it probabilistic)
 			 				'hidden'
 								> does not output the character, but a matching character must still exist for it to consider the output valid, and it counts toward + and -; must be put at the front and is mutually exclusive with "delete"; does not support percent signs
+							'real'
+	   							> matches real (characters initialized at the beginning of the game) characters only; put a "real" anywhere to make the fit check check all characters
 			   				put '%N' after any perk to signify a chance for that to be true, where N is the chance
 					*/
 					let bigReq = null;
@@ -1754,7 +1779,7 @@ G={
 						for (let ii = 0; ii < pool.length; ii++) {
 							//ii is iteration over all chars and teams to try match ("it")
 							let it=pool[ii];
-							if (selected.includes(it)) { continue; }
+							if (selected.includes(it) || (!it.real && real) || (it.real && !real)) { continue; }
 							let fitAND = true;
 							for (let iii in req) {
 								let fitOR = false;
@@ -1788,12 +1813,15 @@ G={
 				for (let i in req) {
 					let hasDisable = false;
 					let hasOut = false;
+					let hasReal = false;
 					if (req[i].includes('able') || req[i].includes('any')) { hasDisable = true; }
 					if (req[i].includes('out')) { hasOut = true; }
+					if (req[i].includes('real')) { hasReal = true; }
 					for (let ii in G.perks) {
 						if (G.perks[ii].disable && req[i].includes(G.perks[ii].name.toLowerCase().replaceAll(' ', '_'))) { hasDisable = true; }
 						if (G.perks[ii].out && req[i].includes(G.perks[ii].name.toLowerCase().replaceAll(' ', '_'))) { hasOut = true; }
 					}
+					if (!hasReal) { req[i] = 'real '+req[i]; }
 					if (!hasDisable) { req[i] = 'able '+req[i]; }
 					if (!hasOut) { req[i] = '!out '+req[i]; }
 					if (!req[i].includes('inCombat') && !fitForCombat) { req[i] = '!inCombat '+req[i]; }
@@ -2943,6 +2971,7 @@ G={
 			G.ongoingCombats = [];
 			G.combatOverseer = function() {
 				this.participants = [];
+				this.extras = [];
 				this.processed = false;
 				this.outStr = '';
 				this.out = []; //each item is a box object
@@ -2959,6 +2988,9 @@ G={
 			}
 			G.combatOverseer.prototype.addParticipant = function(participant) {
 				this.participants.push(participant);
+			}
+			G.combatOverseer.prototype.addExtra = function(char) {
+				this.extras.push(char);
 			}
 			G.combatOverseer.prototype.removeParticipant = function(participant) {
 				if (this.participants.indexOf(participant) != -1) { this.participants.splice(this.participants.indexOf(participant), 1); }
@@ -3068,6 +3100,7 @@ G={
 			} //vertical is here too, but each vertical distance above adds and each vertical distance below removes
 			G.getHeightAt = function(horizontal) {
 				//"this" is the overseer
+				//not implemented (planning on a perlin noise here)
 				return 0;
 			}
 			G.lastCharList = null; //debug
@@ -3094,6 +3127,9 @@ G={
 				
 				if (this.has('frenzied')) { count *= 0.75; }
 				if (this.has('invisible')) { count *= 0.01; }
+				if (this.has('ignorable')) { count *= 0.25; }
+
+				return count;
 			}
 			G.last = null; //convenience; last refers to the last move created
 			G.char.prototype.makeMove = function() {
@@ -5884,18 +5920,19 @@ G={
 						overseer.processed = true;
 						let count = 0;
 						overseer.participants = shuffle(overseer.participants);
-						for (let i in overseer.participants) {
-							for (let ii in overseer.participants) {
+						let participants = overseer.participants.concat(shuffle(overseer.extras));
+						for (let i in participants) {
+							for (let ii in participants) {
 								if (i == ii) { continue; }
-								overseer.participants[i].combat.moveToward(overseer.participants[ii], Math.pow(Math.abs(overseer.participants[i].combat.horizontal - overseer.participants[ii].combat.horizontal) + 1, 0.35) - 1);
+								participants[i].combat.moveToward(participants[ii], Math.pow(Math.abs(participants[i].combat.horizontal - participants[ii].combat.horizontal) + 1, 0.35) - 1);
 							}
 						}
 						for (let i = 0; i < 20; i++) {
-							for (let i in overseer.participants) {
-								if (overseer.participants[i].makeMove()) { overseer.participants[i].fleeCombat(); }
+							for (let i in participants) {
+								if (participants[i].makeMove()) { participants[i].fleeCombat(); }
 							}
-							for (let i in overseer.participants) { if (isNaN(overseer.participants[i].combat.horizontal)) { throw 'NaN has appeared!'; } }
-							if (overseer.participants.length <= 1 || Math.random() > 1 / (count + 1)) { break; }
+							for (let i in participants) { if (isNaN(participants[i].combat.horizontal)) { throw 'NaN has appeared!'; } }
+							if (participants.length <= 1 || Math.random() > 1 / (count + 1)) { break; }
 							count++;
 						}
 						str += G.parseBoxes(overseer.out);
