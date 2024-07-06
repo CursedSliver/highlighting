@@ -5733,6 +5733,7 @@ G={
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.gain('defensive');
+					this.gain('ignorable');
 				},
 				req: ['turtle !defensive']
 			});
@@ -5742,6 +5743,7 @@ G={
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.lose('defensive');
+					this.lose('ignorable');
 				},
 				req: ['turtle defensive']
 			});
