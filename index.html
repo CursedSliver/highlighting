@@ -3158,6 +3158,9 @@ G={
 					if (overseer.participants[i] == this) { continue; }
 					boxCharList.push(overseer.participants[i]);
 				}
+				for (let i in overseer.extras) {
+					boxCharList.push(overseer.extras[i]);
+				}
 				let availableMoves = [];
 				for (let i in G.moves) {
 					const m = G.moves[i];
