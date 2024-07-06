@@ -2210,7 +2210,7 @@ G={
 
             // Random Item Orb -TW
             // - Melee
-			new G.act(0.025,['random_orb !big_stick'],`[BLUE][1] can't wait to get a cool item from [1:their] orb.<br>It begins to shine, and turns into a really big stick.`,p=>{p[1].gain('big stick');p[1].lose('random_orb');});
+			new G.act(0.025,['random_orb !big_stick'],`[BLUE][1] can't wait to get a cool item from [1:their] orb.<br>It begins to shine, and turns into a really big stick.`,p=>{p[1].gain('big stick');p[1].lose('random orb');});
 			new G.act(0.025,['random_orb !pitchfork'],`[BLUE][1] almost loses [1:their] random item orb, but when they find it, it turns into a pitchfolk.<br>[1] supposes they might be able to pitch it at something.`,p=>{p[1].gain('pitchfork');p[1].lose('random orb');});
 			new G.act(0.025,['random_orb !sword'],`[BLUE][1] pretends to draw one of the items appearing on the surface of [1:their] orb.<br>To [1:their] surprise, they draw a sword out from the orb as it fades away.`,p=>{p[1].gain('sword');p[1].lose('random orb');});
 			new G.act(0.025,['random_orb !axe'],`[BLUE][1] shakes their random item orb. It turns into an axe, upping [1:their] chances of survival somewhat.`,p=>{p[1].gain('axe');p[1].lose('random orb');});
