@@ -5446,7 +5446,7 @@ G={
 				failFunc: function(cl, text) {
 					let pool = [];
 					for (let i in this.team.chars) {
-						if (this.team.chars[i].isOut()) { pool.push(this.team.chars[i]); }
+						if (this.team.chars[i].isOut() && !this.team.chars[i].has('nihil')) { pool.push(this.team.chars[i]); }
 					}
 					let char = choose(pool);
 					this.combat.overseer.addChar(char); 
