@@ -5439,6 +5439,7 @@ G={
 					}
 					let char = choose(pool);
 					char.revive();
+					console.log(char);
 					this.combat.overseer.addChar(char); 
 					char.joinCombat(this.combat.overseer);
 				},
@@ -5579,7 +5580,7 @@ G={
 				failText: '[1] wishes for no one to suffer anymore.<br>[1:g|His|Her|Their] wish ring shimmers for a second, and then... [S]',
 				successFunc: function() {
 					for (let i in this.combat.overseer.participants) {
-						for (let ii in this.combat.overseer.participants[i].perks) {
+						for (let ii = this.combat.overseer.participants[i].perks.length - 1; ii >= 0; ii--) {
 							let innerPerk = this.combat.overseer.participants[i].perks[ii].perk;
 							if (!innerPerk.out && (innerPerk.disable || innerPerk.injury || innerPerk.ailment)) { this.combat.overseer.participants[i].lose(this.combat.overseer.participants[i].perks[ii]); }
 						}
