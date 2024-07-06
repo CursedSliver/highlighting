@@ -1306,6 +1306,7 @@ G={
 				if (overseer) {
 					char.combat = new G.combatTracker(overseer);
 					overseer.addExtra(char);
+					if (creator) { char.combat.horizontal = creator.combat.horizontal; char.combat.vertical = creator.combat.vertical; }
 				}
 				return char;
 			}
@@ -5983,7 +5984,8 @@ G={
 						overseer.processed = true;
 						let count = 0;
 						overseer.participants = shuffle(overseer.participants);
-						let participants = overseer.participants.concat(shuffle(overseer.extras));
+						overseer.extras = shuffle(overseer.extras);
+						let participants = overseer.participants.concat(overseer.extras);
 						for (let i in participants) {
 							for (let ii in participants) {
 								if (i == ii) { continue; }
@@ -5991,6 +5993,7 @@ G={
 							}
 						}
 						for (let i = 0; i < 20; i++) {
+							participants = overseer.participants.concat(overseer.extras);
 							for (let i in participants) {
 								if (participants[i].makeMove()) { participants[i].fleeCombat(); }
 							}
