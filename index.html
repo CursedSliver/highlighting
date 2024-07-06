@@ -3674,7 +3674,7 @@ G={
 				text: '[Suddenly|Abruptly], [1] phases back into reality as [1:their] invisibility runs out! All eyes are on [1:them] now...',
 				successFunc: function() {
 					this.lose('invisible');
-					this.gain('marked').setDuration(1);
+					this.gain('marked').perk.setDuration.call(this.has('marked'), 1);
 				},
 				req: ['invisible'],
 				reqFunc: function() { return (this.has('invisible').duration <= 0); }
