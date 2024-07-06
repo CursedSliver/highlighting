@@ -1395,6 +1395,7 @@ G={
 					return this.has('dead');
 				}
 				G.char.prototype.revive = function() {
+					console.log(this.name + ' has been revived!');
 					for (let i in this.perks) {
 						if (this.perks[i].perk.out || this.perks[i].perk.disable || this.perks[i].perk.injury || this.perks[i].perk.ailment) { this.lose(this.perks[i], true); }
 					}
