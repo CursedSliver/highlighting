@@ -1779,7 +1779,7 @@ G={
 						for (let ii = 0; ii < pool.length; ii++) {
 							//ii is iteration over all chars and teams to try match ("it")
 							let it=pool[ii];
-							if (selected.includes(it) || (!it.real && real) || (it.real && !real)) { continue; }
+							if (selected.includes(it)) { continue; }
 							let fitAND = true;
 							for (let iii in req) {
 								let fitOR = false;
