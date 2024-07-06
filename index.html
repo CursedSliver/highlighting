@@ -1822,10 +1822,10 @@ G={
 				}
 			G.sanitizeInaction = function(req, fitForCombat) {
 				if (!req || req.length == 0) { return [(fitForCombat?'':'!inCombat ')+'!out able']; }
-				for (let i in req) {
+				for (let i = 0; i < req.length; i++) {
 					let hasDisable = false;
 					let hasOut = false;
-					let hasReal = false;
+					let hasReal = !!i; //skips sanitizing reals past the me check
 					if (req[i].includes('able') || req[i].includes('any')) { hasDisable = true; }
 					if (req[i].includes('out')) { hasOut = true; }
 					if (req[i].includes('real')) { hasReal = true; }
