@@ -4830,7 +4830,7 @@ G={
 					target.gain('singed'); target.gain('singed'); target.gain('singed'); target.gain('singed'); target.gain('singed'); if (Math.random() < chance) { target.gain('fallen'); return 'burns and knocks over [N]'; }
 					return 'burns [N]';
 				}
-				if (Math.random() < Math.pow(chance, 2) && !target.has('shell-shocked') && !target.has('lacerated') && !target.has('crippled')) {
+				if (Math.random() < Math.pow(chance, 4) && !target.has('shell-shocked') && !target.has('lacerated') && !target.has('crippled')) {
 					target.gain('shell-shocked'); target.gain('fallen'); if (Math.random() < chance) { target.gain('cut up'); if (Math.random() < chance) { target.gain('bleeding out'); return 'causing [N] a bloodied mess'; } }
 					return 'critically traumatizes [N]';
 				}
@@ -5182,7 +5182,7 @@ G={
 
 						if (Math.random() < Math.pow(chance, 4.5) && cl[i].isDisabled() && (cl[i].has('seared') || cl[i].has('burnt'))) { this.kill(cl[i], 'reduced to ashes'); afflictions.push('burns ['+(i + 1)+'] to a crisp'); continue; }
 						if (Math.random() < Math.pow(chance, 2)) { cl[i].gain('fallen'); cl[i].gain('seared'); afflictions.push('blows ['+(i + 1)+'] to the ground and torches ['+(i + 1)+':them]'); continue; }
-						if (Math.random() < Math.pow(chance, 3) && this.has('pyromania')) { cl[i].gain('seared'); cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('shell-shocked'); afflictions.push('greatly traumatizes ['+(i + 1)+']'); continue; }
+						if (Math.random() < Math.pow(chance, 4) && this.has('pyromania')) { cl[i].gain('seared'); cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('shell-shocked'); afflictions.push('greatly traumatizes ['+(i + 1)+']'); continue; }
 						if (Math.random() < Math.pow(chance, 2)) { cl[i].gain('singed'); cl[i].gain('singed'); cl[i].gain('singed'); afflictions.push('heavily burns ['+(i + 1)+']'); continue; }
 						if (Math.random() < chance) { cl[i].gain('singed'); afflictions.push('burns ['+(i + 1)+']'); continue; }
 
