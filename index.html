@@ -4990,14 +4990,14 @@ G={
 					let chance = 0.75;
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 
-					this.lose('shuriken');
-					if (cl[1].has('ironskin')) { return text.replace('[S]', 'but it did nothing'); }
+					if (cl[1].has('ironskin')) { this.lose('shuriken'); return text.replace('[S]', 'but it did nothing'); }
 					if (Math.random() < chance) {
-						this.has('shuriken').owner = cl[1];
 						cl[1].gain('embedded').perk.setItem.call(cl[1].has('embedded'), this.has('shuriken'));
+						this.lose('shuriken');
 						if (Math.random() < chance) { cl[1].gain('cut up'); }
 						return text.replace('[S]', ', which [embed into|sinks deep into|gets stuck in] [2:their] body');
 					}
+					this.lose('shuriken');
 					if (Math.random() < Math.pow(chance, 1.5)) {
 						cl[1].gain('fallen');
 					}
