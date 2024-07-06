@@ -1829,6 +1829,7 @@ G={
 					for (let ii in G.perks) {
 						if (G.perks[ii].disable && req[i].includes(G.perks[ii].name.toLowerCase().replaceAll(' ', '_'))) { hasDisable = true; }
 						if (G.perks[ii].out && req[i].includes(G.perks[ii].name.toLowerCase().replaceAll(' ', '_'))) { hasOut = true; }
+						if (G.perks[ii].identificator && req[i].includes(G.perks[ii].name.toLowerCase().replaceAll(' ', '_'))) { hasReal = true; }
 					}
 					if (!hasReal) { req[i] = 'real '+req[i]; }
 					if (!hasDisable) { req[i] = 'able '+req[i]; }
