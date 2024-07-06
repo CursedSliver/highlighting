@@ -5711,10 +5711,37 @@ G={
 				req: ['pet_turtle !frenzied']
 			});
 			new G.move({
-				chance: 1,
+				chance: 0.1,
 				text: '[1] idly sits on the ground, staring at the horizon.',
 				element: G.moveAssets.elements.alone,
-				req: ['turtle']
+				req: ['turtle !defensive']
+			});
+			new G.move({
+				chance: 0.25,
+				text: '[1] slowly [walks|crawls] over to [2] with its stubby legs.',
+				successFunc: function(cl) {
+					this.combat.moveToward(cl[1], 35);
+				},
+				req: ['turtle !defensive', '+|- any'],
+				pReq: ['h:60 v:2']
+			});
+			new G.move({
+				chance: 0.1,
+				text: '[1] retracts its head into its shell.',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.gain('defensive');
+				},
+				req: ['turtle !defensive']
+			});
+			new G.move({
+				chance: 0.33,
+				text: '[1]\'s head comes out of its shell.',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.lose('defensive');
+				},
+				req: ['turtle defensive']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
