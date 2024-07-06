@@ -5450,7 +5450,7 @@ G={
 					}
 					let char = choose(pool);
 					this.combat.overseer.addChar(char); 
-					return G.moveAssets.wishRingFailFunc(cl, text);
+					return G.moveAssets.wishRingFailFunc.call(this, cl, text);
 				},
 				req: ['wish_ring'],
 				reqFunc: function() {
