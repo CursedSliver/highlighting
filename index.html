@@ -5735,6 +5735,10 @@ G={
 				successFunc: function() {
 					this.gain('defensive');
 					this.gain('ignorable');
+					this.gain('unconscious');
+					this.gain('comatose');
+					this.gain('hallucinating');
+					this.gain('shell-shocked');
 				},
 				req: ['turtle !defensive']
 			});
@@ -5745,6 +5749,10 @@ G={
 				successFunc: function() {
 					this.lose('defensive');
 					this.lose('ignorable');
+					this.lose('unconscious');
+					this.lose('comatose');
+					this.lose('hallucinating');
+					this.lose('shell-shocked');
 				},
 				req: ['turtle defensive']
 			});
