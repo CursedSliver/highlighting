@@ -2992,7 +2992,7 @@ G={
 				this.outStr = '';
 			}
 			G.combatOverseer.prototype.addParticipant = function(participant) {
-				this.participants.push(participant);
+				if (participant) { this.participants.push(participant); }
 			}
 			G.combatOverseer.prototype.addExtra = function(char) {
 				this.extras.push(char);
