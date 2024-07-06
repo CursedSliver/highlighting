@@ -653,6 +653,8 @@ G={
 		new G.perk({name:`weak`,desc:`Muscles no longer work properly.`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`vulnerable`,desc:`No matter what you wear, it still hurts...`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`hallucinating`,desc:`Enchanted in a trance.`,init:{duration:5},onMove:function() { this.duration--; },disable:true,hard:true});
+		new G.perk({name:`invisible`,desc:`Vanished into thin air!`,init:{duration:2},onMove:function() { this.duration--; }});
+		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true,hard:true});
 
 		delete G.glob.onGain;
 		G.glob.disable = true;
@@ -1350,12 +1352,12 @@ G={
 					return false;
 				}
 				G.char.prototype.cureAilments = function() {
-					for (let i in this.perks) {
+					for (let i = this.perks.length - 1; i >= 0; i--) {
 						if (this.perks[i].perk.ailment) { this.lose(i); }
 					}
 				}
 				G.char.prototype.healInjuries = function() {
-					for (let i in this.perks) {
+					for (let i = this.perks.length - 1; i >= 0; i--) {
 						if (this.perks[i].perk.injury) { this.lose(i); }
 					}
 				}
@@ -3063,6 +3065,10 @@ G={
 				}
 				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult;
 			} //vertical is here too, but each vertical distance above adds and each vertical distance below removes
+			G.getHeightAt = function(horizontal) {
+				//"this" is the overseer
+				return 0;
+			}
 			G.lastCharList = null; //debug
 			G.char.prototype.targetCount = function(perpentrator) {
 				if (!this.combat) { return 1; }
@@ -3082,7 +3088,8 @@ G={
 					if (this.perks[i].perk.tier == 1) { count += 0.15; }
 				}
 				
-				if (this.has('frenzied')) { count -= 0.25; }
+				if (this.has('frenzied')) { count *= 0.75; }
+				if (this.has('invisible')) { count *= 0.01; }
 			}
 			G.last = null; //convenience; last refers to the last move created
 			G.char.prototype.makeMove = function() {
@@ -3091,7 +3098,8 @@ G={
 				//returns text for display (in one box)
 				var str = '';
 				if (!this.combat) { return; }
-				for (let i in this.perks) {
+				this.combat.vertical = G.getHeightAt.call(this.combat.overseer, this.combat.horizontal); 
+				for (let i = this.perks.length - 1; i >= 0; i--) {
 					if (typeof this.perks[i].mt == 'number') { this.perks[i].mt++; }
 					if (this.perks[i].perk.onMove) { this.perks[i].perk.onMove.call(this.perks[i]); }
 				}
@@ -5593,6 +5601,31 @@ G={
 			G.moveDefault.element = new G.element();
 			G.moveDefault.fail = 0;
 			G.moveDefault.failFunc = function() { };
+
+			new G.move({
+				chance: 0.5, 
+				text: '[1] dances with [1:their] wizard robe, carpeting the ground around [1:them] with magical glitter.',
+				element: G.moveAssets.elements.alone,
+				req: ['wizard_robe any !fallen '+hardDisables]
+			});
+			new G.move({
+				chance: 0.5,
+				text: 'With a [shake|swirl] of [1:their] wizard robe, [1] vanishes into thin air!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.gain('invisible');
+				},
+				req: ['wizard_robe any%0.5|ninja !levitating|invisible|fallen '+hardDisables]
+			});
+			new G.move({
+				chance: 0.5,
+				text: 'With a [shake|swirl] of [1:their] wizard robe, [1] [suddenly|abruptly] lifts off the ground with a [powerful|magical] updraft, hovering above everyone else!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.gain('levitating');
+				},
+				req: ['wizard_robe any%0.5|cowardly !levitating|invisible|fallen '+hardDisables]
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
@@ -5620,7 +5653,7 @@ G={
 				this.lose('fleed');
 				if (!this.combat) { return false; }
 				if (!silent) { this.combat.overseer.injectBack('<br><e>'+this.name+'</e> has fleed from the fight!'); }
-				for (let i in this.perks) {
+				for (let i = this.perks.length - 1; i >= 0; i--) {
 					if (this.perks[i].perk.combat) { this.lose(this.perks[i], true); }
 				}
 				this.combat.overseer.removeParticipant(this);
