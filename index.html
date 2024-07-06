@@ -1298,6 +1298,10 @@ G={
 			G.newPhantomChar = function(idPerk, overseer, creator) {
 				let char = new G.char({}, true);
 				char.perks.push(new G.perkToken(idPerk, char, {creator:creator||null}));
+				if (creator) {
+					char.name = creator.name + '\'s ' + idPerk.name;
+					char.team = creator.team;
+				}
 				if (overseer) {
 					char.combat = new G.combatTracker(overseer);
 					overseer.addExtra(char);
@@ -3208,7 +3212,7 @@ G={
 						availableMoves.push([m, targets]);
 					}
 				}
-				if (availableMoves.length == 0) { console.log(this.name+' no longer knows what to do!'); return this.has('fleed'); }
+				if (availableMoves.length == 0) { if (this.real) { console.log(this.name+' no longer knows what to do!'); } return this.has('fleed'); }
 				
 				let m = choose(availableMoves);
 				boxCharList = m[1];
@@ -5703,6 +5707,12 @@ G={
 					this.lose('pet turtle');
 				},
 				req: ['pet_turtle !frenzied']
+			});
+			new G.move({
+				chance: 1,
+				text: '[1] idly sits on the ground, staring at the horizon.',
+				element: G.moveAssets.elements.alone,
+				req: ['turtle']
 			});
 			
 			G.char.prototype.initiateCombat = function() {
