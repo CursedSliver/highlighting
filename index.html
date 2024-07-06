@@ -648,6 +648,7 @@ G={
 		new G.perk({name:`fortified`,desc:`In a very defensive stance, but can\'t really do much else.`,disable:true});
 		new G.perk({name:`skipped`,desc:`Turn skipped!`,init:{count:1},cannotLose:true,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },onLose:function() { this.count--; if (this.count <= 0) { this.count += 1000; this.owner.lose('skipped', true); } }});
 		new G.perk({name:`in stasis`,desc:`Can no longer make turns!`});
+		new G.perk({name:`marked`,desc:`All eyes on them!`,init:{duration:1,maxDuration:1},setDuration:function(dur){this.duration = Math.max(this.duration, dur); this.maxDuration = Math.max(this.maxDuration, dur); },onMove:function() { this.duration--; if (this.duration <= 0) { this.owner.lose(this); } }});
 		new G.perk({name:`high morale`,desc:`Confidence at an all-time high!`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`ironskin`,desc:`Skin as hard as steel!`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`weak`,desc:`Muscles no longer work properly.`,init:{duration:5},onMove:function() { this.duration--; }});
@@ -3087,6 +3088,9 @@ G={
 					if (this.perks[i].perk.tier == 2) { count += 0.3; }
 					if (this.perks[i].perk.tier == 1) { count += 0.15; }
 				}
+				if (this.has('marked')) {
+					count += 20 * Math.pow(this.has('marked').duration / this.has('marked').maxDuration, 0.5);
+				}
 				
 				if (this.has('frenzied')) { count *= 0.75; }
 				if (this.has('invisible')) { count *= 0.01; }
@@ -3564,7 +3568,7 @@ G={
 				req: ['unconscious'],
 				successFunc: function() { this.lose('unconscious'); }
 			});
-			G.moveDefault.chance = 5;
+			G.moveDefault.chance = 10;
 			new G.move({
 				text: 'Much to [1]\'s disappointment, [1:their] skin\'s incredible durability fades as the spell loses its power...',
 				successFunc: function() {
@@ -3604,6 +3608,23 @@ G={
 				},
 				req: ['hallucinating'],
 				reqFunc: function() { return (this.has('hallucinating').duration <= 0); }
+			});
+			new G.move({
+				text: '[1] slowly descends back onto the ground as [1:their] levitating powers run dry...',
+				successFunc: function() {
+					this.lose('levitating');
+				},
+				req: ['levitating'],
+				reqFunc: function() { return (this.has('levitating').duration <= 0); }
+			});
+			new G.move({
+				text: '[Suddenly|Abruptly], [1] phases back into reality as [1:their] invisibility runs out! All eyes are on [1:them] now...',
+				successFunc: function() {
+					this.lose('invisible');
+					this.gain('marked').setDuration(1);
+				},
+				req: ['invisible'],
+				reqFunc: function() { return (this.has('invisible').duration <= 0); }
 			});
 			G.moveDefault.chance = 1;
 			new G.move({
