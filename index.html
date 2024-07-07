@@ -1315,13 +1315,15 @@ G={
 			}
 			G.charsBN = {}; //Do not use for code, just convenient for testing
 				G.char.prototype.has=function(perk) {
-					if (typeof perk==='string')
-					{
+					if (typeof perk==='string') {
 						if (!G.perksBN[perk]) {console.log('No perk named','"'+perk+'"');return false;}
 						perk=G.perksBN[perk];
 					}
-					for (var i in this.perks)
-					{
+					if (perk instanceof G.perkToken) {
+						if (this.perks.includes(perk)) { return this.perks[this.perks.indexOf(perk)]; }
+						return false;
+					}
+					for (let i in this.perks) {
 						if (this.perks[i].perk.name==perk.name) return this.perks[i];
 					}
 					return false;
