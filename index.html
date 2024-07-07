@@ -5894,6 +5894,17 @@ G={
 				req: ['wolf', 'any'],
 				pReq: ['e:10/100']
 			});
+			new G.move({
+				chance: 0.5,
+				text: '[1] howls at the sky, calling in another wolf to fight alongside [1:them]!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					let wolf = G.newPhantomChar(G.perksBN['wolf'], this.combat.overseer, this.has('wolf').creator);
+					wolf.gain(choose(['haste', 'bulky', 'cowardly', 'meek']));
+					this.lose('pet wolf');
+				},
+				req: ['wolf any']
+			})
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
