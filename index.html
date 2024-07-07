@@ -654,6 +654,7 @@ G={
 		new G.perk({name:`marked`,desc:`All eyes on them!`,init:{duration:1,maxDuration:1},setDuration:function(dur){this.duration = Math.max(this.duration, dur); this.maxDuration = Math.max(this.maxDuration, dur); },onMove:function() { this.duration--; if (this.duration <= 0) { this.owner.lose(this); } }});
 		new G.perk({name:`high morale`,desc:`Confidence at an all-time high!`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`ironskin`,desc:`Skin as hard as steel!`,init:{duration:5},onMove:function() { this.duration--; }});
+		new G.perk({name:`invigorated`,desc:`Stronger than ever!`,init:{power:1},onGain: function(alreadyHasPerk) { if (alreadyHasPerk) { this.power++; } }});
 		new G.perk({name:`weak`,desc:`Muscles no longer work properly.`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`vulnerable`,desc:`No matter what you wear, it still hurts...`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`hallucinating`,desc:`Enchanted in a trance.`,init:{duration:5},onMove:function() { this.duration--; },disable:true,hard:true});
@@ -3754,10 +3755,11 @@ G={
 			G.adjustFuncs.strength = function(chance) {
 				let pow = 1;
 				//since this is for successFuncs, more pow = more good
-				if (this.has('bulky')) { pow += 1.25; }
-				if (this.has('frenzied')) { pow += 1.4; }
-				if (this.has('determined')) { pow += 1.25; }
-				if (this.has('heroic')) { pow += 1.1; }
+				if (this.has('bulky')) { pow += 0.4; }
+				if (this.has('frenzied')) { pow += 0.6; }
+				if (this.has('determined')) { pow += 0.35; }
+				if (this.has('heroic')) { pow += 0.15; }
+				if (this.has('invigorated')) { pow += 0.3 * this.has('invigorated').power; }
 
 				if (this.has('weak')) { pow *= 0.5; }
 				if (this.has('terrified')) { pow *= 0.6; }
@@ -4167,6 +4169,7 @@ G={
 				//bulky is generally equal
 				if (this.has('frenzied')) { pow *= 0.65; }
 				if (this.has('determined')) { pow *= 0.85; }
+				if (this.has('invigorated')) { pow *= Math.pow(0.85, this.has('invigorated').power); }
 	
 				return 1 - Math.pow(1 - chance, pow);
 			};
@@ -4188,9 +4191,10 @@ G={
 				if (this.has('marksmen')) { pow *= 0.85; }
 				if (this.has('ninja')) { pow *= 0.7; }
 				if (this.has('haste')) { pow *= 0.75; }
-				if (this.has('bulky')) { pow *= 0.55;}
+				if (this.has('bulky')) { pow *= 0.55; }
 				if (this.has('frenzied')) { pow *= 0.65; }
 				if (this.has('heroic')) { pow *= 0.75; }
+				if (this.has('invigorated')) { pow *= Math.pow(0.8, this.has('invigorated').power); }
 	
 				return 1 - Math.pow(1 - chance, pow);
 			};
@@ -4448,6 +4452,7 @@ G={
 				if (this.has('ninja')) { pow += 0.4; }
 				if (this.has('frenzied')) { pow += 0.5; }
 				if (this.has('determined')) { pow += 0.1; }
+				if (this.has('invigorated')) { pow += 0.15 * this.has('invigorated').power; }
 
 				if (this.has('clumsy')) { pow *= 0.75; }
 				if (this.has('peaceful')) { pow *= 0.9; }
@@ -4825,6 +4830,7 @@ G={
 				if (this.has('vigilant')) { pow *= 0.9; }
 				if (this.has('determined')) { pow *= 0.9; }
 				if (this.has('frenzied')) { pow *= 0.75; }
+				if (this.has('invigorated')) { pow *= Math.pow(0.95, this.has('invigorated').power); }
 
 				return 1 - Math.pow(1 - chance, pow);
 			};
@@ -5883,7 +5889,7 @@ G={
 				},
 				successFunc: function(cl, text) {
 					let chance = 0.3;
-					chance = cl[1].adjust(chance, 'defenseGen');
+					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 
 					if (Math.random() < 1 - Math.pow(chance, 0.5)) { return text + ' However, due to [2:their] defensive clothing, it had no effect!'; }
 					cl[1].gain('wolves\' mark');
@@ -5949,7 +5955,7 @@ G={
 				chance: 1,
 				text: '[1] slashes at [2] with [1:their] sharp claws[S]!',
 				successFunc: function(cl, text) {
-					let chance = cl[1].adjust(0.5, 'defenseGen');
+					let chance = cl[1].adjust(this.adjust(0.5, 'strength'), 'defenseGen');
 
 					if (Math.random() < chance) { cl[1].gain('cut up'); }
 					if (Math.random() < chance) { cl[1].gain('cut up'); }
@@ -5963,11 +5969,12 @@ G={
 				chance: 1,
 				text: '[1] locks [1:their] jaw onto [2]\'s neck[S]!',
 				successFunc: function(cl, text) {
-					let chance = cl[1].adjust(0.5, 'defenseGen');
+					let chance = cl[1].adjust(this.adjust(0.5, 'strength'), 'defenseGen');
 
 					cl[1].gain('cut up'); 
-					if (Math.random() < chance) { cl[1].gain('bleeding out'); return text.replace('[S]', ', which [snaps|severs] [2:their] vital arteries, causing [2:them] to start bleeding out'); }
-					if (Math.random() < Math.pow(chance, 3)) { this.has('tiger').creator.kill(cl[1], 'tiger; severed neck'); return text.replace('[S]', 'killing [2:them]'); }
+					if (Math.random() < chance) { cl[1].gain('bleeding out'); this.gain('invigorated'); return text.replace('[S]', ', which [snaps|severs] [2:their] vital arteries, causing [2:them] to start bleeding out') + '<br>[1] is becoming stronger, empowered by this success!'; }
+					if (Math.random() < Math.pow(chance, 3)) { this.has('tiger').creator.kill(cl[1], 'tiger; severed neck'); this.gain('invigorated'); return text.replace('[S]', 'killing [2:them]') + '<br>[1] is becoming stronger, empowered by this success!'; }
+					return text + ' However, nothing really happened as [1:they] couldn\'t quite break through [2:their] defensive armor!';
 				},
 				req: ['tiger', 'any fallen'],
 				pReq: ['h:1.5 v:0.5']
