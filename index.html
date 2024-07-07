@@ -5882,7 +5882,7 @@ G={
 					if (Math.random() < Math.pow(chance, 2) && !cl[1].has('fallen')) { cl[1].gain('fallen'); return text.replace('[S]', ', pinning [2:them] onto the ground'); }
 					if (Math.random() < Math.pow(chance, 4) && cl[1].has('fallen')) { cl[1].gain('cut up'); cl[1].gain('bleeding out'); return text.replace('[S]', ', opening up a great wound where blood begins to spill out everywhere'); }
 				},
-				req: ['wolf'],
+				req: ['wolf', 'any'],
 				pReq: ['e:10']
 			});
 			new G.move({
@@ -5891,7 +5891,7 @@ G={
 				successFunc: function(cl) {
 					this.combat.moveToward(cl[1], 20);
 				},
-				req: ['wolf'],
+				req: ['wolf', 'any'],
 				pReq: ['e:10/100']
 			});
 			
