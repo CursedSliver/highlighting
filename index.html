@@ -5835,7 +5835,7 @@ G={
 			});
 			new G.move({
 				chance: 2,
-				text: '[1] gives [S] that [1:they] had stolen to [1:their] owner.',
+				text: '[1] gives the [S] that [1:they] had stolen to [1:their] owner.',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.has('hawk').creator.gain(this.has('carrying').items[0]);
