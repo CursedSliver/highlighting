@@ -5804,7 +5804,7 @@ G={
 					if (Math.random() < Math.pow(chance, 1.5)) { cl[1].gain('fallen'); return text + '<br>While panicking, [2] fell onto the ground!'; }
 					if (Math.random() < Math.pow(chance, 3)) { cl[1].gain('bruised'); cl[1].gain('crippled'); return text + '<br>Somehow, [1:they] managed to lift [2] off the ground, and drop [2:them] off from a great distance! [2] hits the ground, severely injured.'; }
 				},
-				req: ['hawk !carrying levitating'],
+				req: ['hawk !carrying levitating', 'any'],
 				pReq: ['d:100']
 			});
 			new G.move({
@@ -5828,7 +5828,7 @@ G={
 					this.gain('marked').perk.setDuration.call(this.has('marked'), 100);
 					return text.replace('managed to [steal|snatch] '+item.perk.name+' from [2:their] [body|hands]');
 				},
-				req: ['hawk !carrying levitating'],
+				req: ['hawk !carrying levitating', 'any'],
 				pReq: ['d:50']
 			});
 			new G.move({
