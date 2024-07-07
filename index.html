@@ -1309,7 +1309,7 @@ G={
 				if (overseer) {
 					char.combat = new G.combatTracker(overseer);
 					overseer.addExtra(char);
-					if (creator) { char.combat.horizontal = creator.combat.horizontal; char.combat.vertical = creator.combat.vertical; }
+					if (creator && creator.combat) { char.combat.horizontal = creator.combat.horizontal; char.combat.vertical = creator.combat.vertical; }
 				}
 				return char;
 			}
@@ -5878,7 +5878,7 @@ G={
 					chance = cl[1].adjust(chance, 'defenseGen');
 
 					if (Math.random() < 1 - Math.pow(chance, 0.5)) { return text + ' However, due to [2:their] defensive clothing, it had no effect!'; }
-					if (Math.random() < chance) { cl[1].gain('cut-up'); }
+					if (Math.random() < chance) { cl[1].gain('cut up'); }
 					if (Math.random() < Math.pow(chance, 2) && !cl[1].has('fallen')) { cl[1].gain('fallen'); return text.replace('[S]', ', pinning [2:them] onto the ground'); }
 					if (Math.random() < Math.pow(chance, 4) && cl[1].has('fallen')) { cl[1].gain('cut up'); cl[1].gain('bleeding out'); return text.replace('[S]', ', opening up a great wound where blood begins to spill out everywhere'); }
 				},
