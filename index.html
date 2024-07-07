@@ -1248,8 +1248,9 @@ G={
 			});
 		}
 		
-		G.started=false;
-		G.start=function()
+		G.started = false;
+		G.simulating = false;
+		G.start = function()
 		{
 			G.started=true;
 			G.setupData=G.exportSetup(-1);
@@ -6110,6 +6111,8 @@ G={
 			G.round=0;
 			G.nextRound=function()
 			{
+				if (G.simulating) { return; }
+				G.simulating = true;
 				let actions=[];
 				G.deadThisRound=[];
 				
@@ -6307,7 +6310,8 @@ G={
 				}
 				else l('deadThisRound').style.display='none';
 				
-				let end=false;
+				let end = false;
+				G.simulating = false;
 				
 				if (alive>0)
 				{
