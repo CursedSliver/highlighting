@@ -1314,8 +1314,7 @@ G={
 				return char;
 			}
 			G.charsBN = {}; //Do not use for code, just convenient for testing
-				G.char.prototype.has=function(perk)
-				{
+				G.char.prototype.has=function(perk) {
 					if (typeof perk==='string')
 					{
 						if (!G.perksBN[perk]) {console.log('No perk named','"'+perk+'"');return false;}
@@ -1327,8 +1326,7 @@ G={
 					}
 					return false;
 				}
-				G.char.prototype.gain=function(perk)
-				{
+				G.char.prototype.gain=function(perk) {
 					let alreadyHasPerk = false;
 					let token = null;
 					if (this.has(perk)) { 
@@ -1350,8 +1348,7 @@ G={
 					if (token.perk.onGain) { token.perk.onGain.call(token, alreadyHasPerk); }
 					return token;
 				}
-				G.char.prototype.lose=function(perk, force)
-				{
+				G.char.prototype.lose=function(perk, force) {
 					let token = null;
 					if (perk instanceof G.perkToken) { token = perk; } else { token = this.has(perk); }
 					if (token) { 
@@ -1359,17 +1356,10 @@ G={
 						if (!token.perk.cannotLose || force) { return this.perks.splice(this.perks.indexOf(token), 1); }
 					}
 				}
-				G.char.prototype.give=function(other,perk)
-				{
-					if (typeof perk==='string')
-					{
-						if (!G.perksBN[perk]) {console.log('No perk named','"'+perk+'"');return false;}
-						perk=G.perksBN[perk];
-					}
+				G.char.prototype.give=function(other,perk) {
 					if (this.has(perk)) {this.has(perk).owner = other; other.gain(this.has(perk)); this.lose(perk);}
 				}
-				G.char.prototype.die=function(reason)
-				{
+				G.char.prototype.die=function(reason) {
 					if (!this.has('dead'))
 					{
 						if (this.real) {
