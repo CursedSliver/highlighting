@@ -5849,6 +5849,7 @@ G={
 				},
 				req: ['hawk carrying levitating'],
 				reqFunc: function() {
+					if (!this.has('hawk').creator.combat || this.has('hawk').creator.combat.overseer != this.combat.overseer) { return false; }
 					return (Math.abs(this.combat.horizontal - this.has('hawk').creator.combat.horizontal) <= 5);
 				}
 			});
