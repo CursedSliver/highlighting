@@ -5795,12 +5795,12 @@ G={
 					if (Math.random() < Math.pow(chance, 1.5) && !cl[1].has('fallen')) { cl[1].gain('fallen'); return text + '<br>While panicking, [2] fell onto the ground!'; }
 					if (Math.random() < Math.pow(chance, cl[1].has('fallen')?2:3)) { cl[1].gain('bruised'); cl[1].gain('crippled'); return text + '<br>Somehow, [1:they] managed to lift [2] off the ground, and drop [2:them] off from a great distance! [2] hits the ground, severely injured.'; }
 				},
-				req: ['hawk !carrying levitating', 'any'],
+				req: ['hawk !carrying levitating', 'any !hawk'],
 				pReq: ['d:100']
 			});
 			new G.move({
 				chance: 0.5,
-				text: '[1] swoops down upon [2], and [S]!',
+				text: '[1] swoops down upon [2], [S]!',
 				failText: '[1] swoops down upon [2] in an attempt to steal something, but [2:they] managed to fend [1:them] off.',
 				fail: function(cl) { return cl[1].adjust(0.4, 'dodge'); },
 				func: function(cl) {
@@ -5813,13 +5813,14 @@ G={
 							pool.push(cl[1].perks[i]);
 						}
 					}
+					if (pool.length == 0) { console.log('no items to steal!'); return text.replace('[S]', 'but [2] didn\'t have anything for [1:them] to steal'); }
 					let item = choose(pool);
 					cl[1].give(this, item);
 					this.gain('carrying').perk.addItem.call(this.has('carrying'), item);
 					this.gain('marked').perk.setDuration.call(this.has('marked'), 100);
-					return text.replace('managed to [steal|snatch] '+item.perk.name+' from [2:their] [body|hands]');
+					return text.replace('and managed to [steal|snatch] '+item.perk.name+' from [2:their] [body|hands]');
 				},
-				req: ['hawk !carrying levitating', 'any'],
+				req: ['hawk !carrying levitating', 'any real'],
 				pReq: ['d:50']
 			});
 			new G.move({
