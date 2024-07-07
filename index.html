@@ -5837,11 +5837,13 @@ G={
 				chance: 2,
 				text: '[1] gives the [S] that [1:they] had stolen to [1:their] owner.',
 				element: G.moveAssets.elements.alone,
-				successFunc: function() {
+				successFunc: function(cl, text) {
+					let item = this.has('carrying').items[0];
 					this.has('hawk').creator.gain(this.has('carrying').items[0]);
 					this.combat.overseer.addChar(this.has('hawk').creator);
 					this.lose('carrying');
 					this.lose('marked');
+					return text.replace('[S]', item.perk.name);
 				},
 				req: ['hawk carrying levitating'],
 				reqFunc: function() {
