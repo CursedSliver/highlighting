@@ -660,6 +660,7 @@ G={
 		new G.perk({name:`invisible`,desc:`Vanished into thin air!`,init:{duration:2},onMove:function() { this.duration--; }});
 		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true,hard:true});
 		new G.perk({name:`ignorable`,desc:`No one really takes notice of them.`});
+		new G.perk({name:`carrying`,desc:`Carrying something heavy.`,init:{items:[]},addItem:function(item){ this.items.push(item); },onMove:function() { this.owner.combat.vertical = Math.max(this.owner.combat.overseer.getHeightAt(this.owner.combat.horizontal), this.owner.combat.vertical - 2.5); }});
 		//summon perks
 		new G.perk({name:`grieving`,desc:`grieving about the loss of a good friend.`,init:{power:1},onMove:function() { this.power--; if (this.power <= 0) { this.owner.lose(this); } }});
 		G.glob.identificator = true;
@@ -1345,7 +1346,7 @@ G={
 							token = new G.perkToken(perk, this);
 						}
 					}
-					if (!alreadyHasPerk) { this.perks.push(token); }
+					if (!alreadyHasPerk || token.perk.type == 'item') { this.perks.push(token); }
 					if (token.perk.onGain) { token.perk.onGain.call(token, alreadyHasPerk); }
 					return token;
 				}
@@ -5711,13 +5712,13 @@ G={
 					turtle.itemRef = this.has('pet turtle');
 					this.lose('pet turtle');
 				},
-				req: ['pet_turtle !frenzied']
+				req: ['pet_turtle !frenzied !determined%0.5']
 			});
 			new G.move({
 				chance: 0.1,
 				text: '[1] idly sits on the ground, staring at the horizon.',
 				element: G.moveAssets.elements.alone,
-				req: ['turtle !defensive']
+				req: ['turtle any !defensive']
 			});
 			new G.move({
 				chance: 0.25,
@@ -5725,7 +5726,7 @@ G={
 				successFunc: function(cl) {
 					this.combat.moveToward(cl[1], 35);
 				},
-				req: ['turtle !defensive', '+|- any'],
+				req: ['turtle any !defensive', '+|- any'],
 				pReq: ['h:60 v:2']
 			});
 			new G.move({
@@ -5740,7 +5741,7 @@ G={
 					this.gain('hallucinating');
 					this.gain('shell-shocked');
 				},
-				req: ['turtle !defensive']
+				req: ['turtle any !defensive']
 			});
 			new G.move({
 				chance: 0.33,
@@ -5754,7 +5755,106 @@ G={
 					this.lose('hallucinating');
 					this.lose('shell-shocked');
 				},
-				req: ['turtle defensive']
+				req: ['turtle any defensive']
+			});
+
+			new G.move({
+				chance: 1,
+				text: '[1] lets loose [1:their] pet hawk!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					let hawk = G.newPhantomChar(G.perksBN['hawk'], this.combat.overseer, this);
+					hawk.onDeath = function() { this.has('hawk').creator.gain('grieving').power = 2; }
+					hawk.itemRef = this.has('pet hawk');
+					this.lose('pet hawk');
+				},
+				req: ['pet_hawk !frenzied !determined%0.5']
+			});
+			new G.move({
+				chance: 1,
+				text: '[1] takes flight!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.gain('levitating').duration = 100;
+				},
+				req: ['hawk able%0.5|carrying !levitating']
+			});
+			new G.move({
+				chance: 0.5,
+				text: '[1] descends from the sky, wanting to rest for a bit.',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.lose('levitating');
+					this.gain('skipped');
+				},
+				req: ['hawk any%0.3|*able|injured|ailed|carrying%0.5 levitating']
+			});
+			new G.move({
+				chance: 0.25,
+				text: '[1] swoops down upon [2] with sharp [talons|beak]!',
+				func: function(cl) {
+					this.combat.moveToward(cl[1], 50);
+				},
+				successFunc: function(cl, text) {
+					let chance = 0.5;
+					chance = cl[1].adjust(chance, 'defenseGen');
+					
+					cl[1].gain('cut up');
+					if (Math.random() < chance) { cl[1].gain('bruised'); }
+					if (Math.random() < Math.pow(chance, 1.5)) { cl[1].gain('fallen'); return text + '<br>While panicking, [2] fell onto the ground!'; }
+					if (Math.random() < Math.pow(chance, 3)) { cl[1].gain('bruised'); cl[1].gain('crippled'); return text + '<br>Somehow, [1:they] managed to lift [2] off the ground, and drop [2:them] off from a great distance! [2] hits the ground, severely injured.'; }
+				},
+				req: ['hawk !carrying levitating'],
+				pReq: ['d:100']
+			});
+			new G.move({
+				chance: 0.25,
+				text: '[1] swoops down upon [2], and [S]!',
+				failText: '[1] swoops down upon [2] in an attempt to steal something, but [2:they] managed to fend [1:them] off.',
+				fail: function(cl) { return cl[1].adjust(0.4, 'dodge'); },
+				func: function(cl) {
+					this.combat.moveToward(cl[1], 50);
+				},
+				successFunc: function(cl, text) {
+					let pool = [];
+					for (let i in cl[1].perks) {
+						if (cl[1].perks[i].perk.type == 'item') { 
+							pool.push(cl[1].perks[i]);
+						}
+					}
+					let item = choose(pool);
+					cl[1].give(this, item);
+					this.gain('carrying').perk.addItem.call(this.has('carrying'), item);
+					this.gain('marked').perk.setDuration.call(this.has('marked'), 100);
+					return text.replace('managed to [steal|snatch] '+item.perk.name+' from [2:their] [body|hands]');
+				},
+				req: ['hawk !carrying levitating'],
+				pReq: ['d:100']
+			});
+			new G.move({
+				chance: 1,
+				text: '[1] flies back to [1:their] owner.',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.combat.overseer.addChar(this.has('hawk').creator);
+					this.combat.moveToward(this.has('hawk').creator, (this.has('carrying')?25:50));
+				},
+				req: ['hawk any%0.15|carrying levitating']
+			});
+			new G.move({
+				chance: 1,
+				text: '[1] gives [S] that [1:they] had stolen to [1:their] owner.',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.has('hawk').creator.gain(this.has('carrying').items[0]);
+					this.combat.overseer.addChar(this.has('hawk').creator);
+					this.lose('carrying');
+					this.lose('marked');
+				},
+				req: ['hawk carrying levitating'],
+				reqFunc: function() {
+					return (Math.abs(this.combat.horizontal - this.has('hawk').creator.combat.horizontal) <= 5);
+				}
 			});
 			
 			G.char.prototype.initiateCombat = function() {
