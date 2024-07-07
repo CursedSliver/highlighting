@@ -5706,6 +5706,7 @@ G={
 				successFunc: function() {
 					let turtle = G.newPhantomChar(G.perksBN['turtle'], this.combat.overseer, this);
 					turtle.onDeath = function() { this.has('turtle').creator.gain('grieving').power = 50; }
+					turtle.gain('vulnerable');
 					turtle.itemRef = this.has('pet turtle');
 					this.lose('pet turtle');
 				},
@@ -5868,6 +5869,7 @@ G={
 					wolf.onDeath = function() { this.has('wolf').creator.gain('grieving').power = 2; }
 					wolf.itemRef = this.has('pet wolf');
 					wolf.gain(choose(['haste', 'bulky', 'cowardly', 'meek']));
+					wolf.gain('vulnerable');
 					wolf.cloneID = 0;
 					this.lose('pet wolf');
 				},
@@ -5875,7 +5877,7 @@ G={
 			});		
 			new G.move({
 				chance: 1,
-				text: '[1] lurches and bites [2] with [1:their] sharp teeth[S]!',
+				text: '[1] [lurches|pounces] and [bites|attacks] [2] with [1:their] sharp teeth[S]!',
 				func: function(cl) {
 					this.combat.moveInFrontOf(cl[1], 1);
 				},
@@ -5898,29 +5900,79 @@ G={
 				successFunc: function(cl) {
 					this.combat.moveToward(cl[1], 20);
 				},
-				req: ['wolf', '- any'],
+				req: ['wolf', 'any'],
 				pReq: ['e:10/100']
 			});
 			new G.move({
 				chance: function() {
-					let base = 1;
+					let base = 1.25;
 					let count = 0;
 					for (let i in this.combat.overseer.extras) {
 						if (this.combat.overseer.extras[i].has('wolf') && (this.combat.overseer.extras[i].team == this.team || this.combat.overseer.extras[i].team == 0)) { count++; }
 					}
-					return base /= Math.max(Math.pow(count, 2), 1);
+					return base /= Math.max(Math.pow(count, 1.75), 1);
 				},
 				text: '[1] howls at the sky, calling in another wolf to fight alongside [1:them]!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					let wolf = G.newPhantomChar(G.perksBN['wolf'], this.combat.overseer, this.has('wolf').creator);
 					wolf.gain(choose(['haste', 'bulky', 'cowardly', 'meek']));
+					wolf.gain('vulnerable');
 					wolf.cloneID = this.cloneID + 1;
 					wolf.name += ' #' + wolf.cloneID;
 					this.lose('pet wolf');
 				},
 				req: ['wolf any']
 			});
+
+			new G.move({
+				chance: 1,
+				text: '[1] unshackles [1:their] pet tiger!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					let tiger = G.newPhantomChar(G.perksBN['tiger'], this.combat.overseer, this);
+					tiger.onDeath = function() { this.has('tiger').creator.gain('grieving').power = 2; }
+					tiger.itemRef = this.has('pet tiger');
+					this.lose('pet tiger');
+				},
+				req: ['pet_tiger !frenzied !determined%0.5']
+			});	
+			new G.move({
+				chance: 1,
+				text: '[1] [sprints|runs|charges] toward [2].',
+				successFunc: function(cl) {
+					this.combat.moveToward(cl[1], 60);
+				},
+				req: ['tiger', 'any%0.5|*able']
+			});
+			new G.move({
+				chance: 1,
+				text: '[1] slashes at [2] with [1:their] sharp claws[S]!',
+				successFunc: function(cl, text) {
+					let chance = cl[1].adjust(0.5, 'defenseGen');
+
+					if (Math.random() < chance) { cl[1].gain('cut up'); }
+					if (Math.random() < chance) { cl[1].gain('cut up'); }
+					if (Math.random() < chance) { cl[1].gain('cut up'); }
+					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', ', which brings [2:them] to the ground'); }
+				},
+				req: ['tiger', 'able|any%0.25 !fallen'],
+				pReq: ['h:1.5 v:0.5']
+			});
+			new G.move({
+				chance: 1,
+				text: '[1] locks [1:their] jaw onto [2]\'s neck[S]!',
+				successFunc: function(cl, text) {
+					let chance = cl[1].adjust(0.5, 'defenseGen');
+
+					cl[1].gain('cut up'); 
+					if (Math.random() < chance) { cl[1].gain('bleeding out'); return text.replace('[S]', ', which [snaps|severs] [2:their] vital arteries, causing [2:them] to start bleeding out'); }
+					if (Math.random() < Math.pow(chance, 3)) { this.has('tiger').creator.kill(cl[1], 'tiger; severed neck'); return text.replace('[S]', 'killing [2:them]'); }
+				},
+				req: ['tiger', 'any fallen'],
+				pReq: ['h:1.5 v:0.5']
+			});
+			
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
