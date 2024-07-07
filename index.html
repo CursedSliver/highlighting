@@ -5818,7 +5818,7 @@ G={
 					cl[1].give(this, item);
 					this.gain('carrying').perk.addItem.call(this.has('carrying'), item);
 					this.gain('marked').perk.setDuration.call(this.has('marked'), 100);
-					return text.replace('[S]', 'and managed to [steal|snatch] '+item.perk.name+' from [2:their] [body|hands]');
+					return text.replace('[S]', 'and managed to [steal|snatch] a '+item.perk.name+' from [2:their] [body|hands]');
 				},
 				req: ['hawk !carrying levitating', 'any real'],
 				pReq: ['d:50']
