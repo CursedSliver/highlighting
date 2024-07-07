@@ -3103,7 +3103,7 @@ G={
 				}
 				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult;
 			} //vertical is here too, but each vertical distance above adds and each vertical distance below removes
-			G.getHeightAt = function(horizontal) {
+			G.combatOverseer.prototype.getHeightAt = function(horizontal) {
 				//"this" is the overseer
 				//not implemented (planning on a perlin noise here)
 				return 0;
@@ -3143,7 +3143,7 @@ G={
 				//returns text for display (in one box)
 				var str = '';
 				if (!this.combat) { return; }
-				this.combat.vertical = G.getHeightAt.call(this.combat.overseer, this.combat.horizontal); 
+				this.combat.vertical = this.combat.overseer.getHeightAt(this.combat.horizontal); 
 				for (let i = this.perks.length - 1; i >= 0; i--) {
 					if (typeof this.perks[i].mt == 'number') { this.perks[i].mt++; }
 					if (this.perks[i].perk.onMove) { this.perks[i].perk.onMove.call(this.perks[i]); }
