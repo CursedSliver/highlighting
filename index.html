@@ -5780,17 +5780,17 @@ G={
 				req: ['hawk able%0.5|carrying !levitating']
 			});
 			new G.move({
-				chance: 0.5,
+				chance: 1,
 				text: '[1] descends from the sky, wanting to rest for a bit.',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.lose('levitating');
 					this.gain('skipped');
 				},
-				req: ['hawk any%0.3|*able|injured|ailed|carrying%0.5 levitating']
+				req: ['hawk any%0.3|injured|ailed|carrying%0.5 levitating '+hardDisables]
 			});
 			new G.move({
-				chance: 0.25,
+				chance: 0.5,
 				text: '[1] swoops down upon [2] with sharp [talons|beak]!',
 				func: function(cl) {
 					this.combat.moveToward(cl[1], 50);
@@ -5808,7 +5808,7 @@ G={
 				pReq: ['d:100']
 			});
 			new G.move({
-				chance: 0.25,
+				chance: 0.5,
 				text: '[1] swoops down upon [2], and [S]!',
 				failText: '[1] swoops down upon [2] in an attempt to steal something, but [2:they] managed to fend [1:them] off.',
 				fail: function(cl) { return cl[1].adjust(0.4, 'dodge'); },
@@ -5832,17 +5832,17 @@ G={
 				pReq: ['d:50']
 			});
 			new G.move({
-				chance: 1,
+				chance: 2,
 				text: '[1] flies back to [1:their] owner.',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.combat.overseer.addChar(this.has('hawk').creator);
 					this.combat.moveToward(this.has('hawk').creator, (this.has('carrying')?25:50));
 				},
-				req: ['hawk any%0.15|carrying levitating']
+				req: ['hawk any%0.15|carrying levitating '+hardDisables]
 			});
 			new G.move({
-				chance: 1,
+				chance: 2,
 				text: '[1] gives [S] that [1:they] had stolen to [1:their] owner.',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
