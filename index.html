@@ -3530,7 +3530,7 @@ G={
 				req: ['dazed '+hardDisables]
 			});
 			new G.move({
-				chance: 1,
+				chance: 2.5,
 				text: '[1] manages to [fairly quickly |]get up again.',
 				failText: '[1] tries to get up, but [[1:they] stumbled while doing so and fell again|[1:they] couldn\'t quite do it|was too shaken to stand properly and fell again]!',
 				fail: function() {
@@ -5895,7 +5895,7 @@ G={
 				for (let i in G.chars){G.chars[i].acted=false;}
 				for (let i in G.ongoingCombats) { if (G.ongoingCombats[i].processed) { G.ongoingCombats[i].processed = false; G.ongoingCombats[i].roundCount++; G.ongoingCombats[i].clearOut(); G.ongoingCombats[i].addBox('Continuing the fight from last round, with [ALL]...', deepArrCopy(G.ongoingCombats[i].participants), true); } }
 				for (let i = 0; i < randomFloor(Math.log2(G.chars.length + 1)); i++) {
-					if (Math.random() < 0.35 / (G.ongoingCombats.length + 1)) {
+					if (Math.random() < 0.2 / (G.ongoingCombats.length * 2 + 1)) {
 						//chooses someone able to initiate combat with someone else
 						var pool = [];
 						for (let i in G.chars) {
