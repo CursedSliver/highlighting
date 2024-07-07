@@ -5871,7 +5871,7 @@ G={
 				chance: 1,
 				text: '[1] lurches and bites [2] with [1:their] sharp teeth[S]!',
 				func: function(cl) {
-					this.moveInFrontOf(cl[1], 1);
+					this.combat.moveInFrontOf(cl[1], 1);
 				},
 				successFunc: function(cl, text) {
 					let chance = 0.3;
@@ -5895,7 +5895,14 @@ G={
 				pReq: ['e:10/100']
 			});
 			new G.move({
-				chance: 0.5,
+				chance: function() {
+					let base = 1;
+					let count = 0;
+					for (let i in this.combat.overseer.extras) {
+						if (this.combat.overseer.extras[i].has('wolf') && (this.combat.overseer.extras[i].team == this.team || this.combat.overseer.extras[i].team == 0)) { count++; }
+					}
+					return base /= Math.max(Math.pow(count, 2), 1);
+				},
 				text: '[1] howls at the sky, calling in another wolf to fight alongside [1:them]!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
@@ -5904,7 +5911,7 @@ G={
 					this.lose('pet wolf');
 				},
 				req: ['wolf any']
-			})
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
