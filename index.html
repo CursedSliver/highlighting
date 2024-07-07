@@ -5853,6 +5853,47 @@ G={
 					return (Math.abs(this.combat.horizontal - this.has('hawk').creator.combat.horizontal) <= 5);
 				}
 			});
+
+			new G.move({
+				chance: 1,
+				text: '[1] unleashes [1:their] pet wolf!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					let wolf = G.newPhantomChar(G.perksBN['wolf'], this.combat.overseer, this);
+					wolf.onDeath = function() { this.has('wolf').creator.gain('grieving').power = 2; }
+					wolf.itemRef = this.has('pet wolf');
+					wolf.gain(choose(['haste', 'bulky', 'cowardly', 'meek']));
+					this.lose('pet wolf');
+				},
+				req: ['pet_wolf !frenzied !determined%0.5']
+			});		
+			new G.move({
+				chance: 1,
+				text: '[1] lurches and bites [2] with [1:their] sharp teeth[S]!',
+				func: function(cl) {
+					this.moveInFrontOf(cl[1], 1);
+				},
+				successFunc: function(cl, text) {
+					let chance = 0.3;
+					chance = cl[1].adjust(chance, 'defenseGen');
+
+					if (Math.random() < 1 - Math.pow(chance, 0.5)) { return text + ' However, due to [2:their] defensive clothing, it had no effect!'; }
+					if (Math.random() < chance) { cl[1].gain('cut-up'); }
+					if (Math.random() < Math.pow(chance, 2) && !cl[1].has('fallen')) { cl[1].gain('fallen'); return text.replace('[S]', ', pinning [2:them] onto the ground'); }
+					if (Math.random() < Math.pow(chance, 4) && cl[1].has('fallen')) { cl[1].gain('cut up'); cl[1].gain('bleeding out'); return text.replace('[S]', ', opening up a great wound where blood begins to spill out everywhere'); }
+				},
+				req: ['wolf'],
+				pReq: ['e:10']
+			});
+			new G.move({
+				chance: 0.75,
+				text: '[1] runs toward [2].',
+				successFunc: function(cl) {
+					this.combat.moveToward(cl[1], 20);
+				},
+				req: ['wolf'],
+				pReq: ['e:10/100']
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
