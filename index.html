@@ -662,7 +662,8 @@ G={
 		new G.perk({name:`ignorable`,desc:`No one really takes notice of them.`});
 		new G.perk({name:`carrying`,desc:`Carrying something heavy.`,init:{items:[]},addItem:function(item){ this.items.push(item); },onMove:function() { this.owner.combat.vertical = Math.max(this.owner.combat.overseer.getHeightAt(this.owner.combat.horizontal), this.owner.combat.vertical - 2.5); }});
 		//summon perks
-		new G.perk({name:`grieving`,desc:`grieving about the loss of a good friend.`,init:{power:1},onMove:function() { this.power--; if (this.power <= 0) { this.owner.lose(this); } }});
+		new G.perk({name:`grieving`,desc:`Grieving about the loss of a good friend.`,init:{power:1},onMove:function() { this.power--; if (this.power <= 0) { this.owner.lose(this); } }});
+		new G.perk({name:`wolves' mark`,desc:`Attracting the attention of nearby wolves.`,init:{duration:2},onMove:function() { this.duration--; if (this.duration <= 0) { this.owner.lose(this); } }});
 		G.glob.identificator = true;
 		new G.perk({name:`turtle`,desc:`A cute turtle to do its owner\'s bidding.`});
 		new G.perk({name:`wolf`,desc:`A fierce wolf to help its owner defeat the enemies.`});
@@ -3006,6 +3007,9 @@ G={
 					if (G.ongoingCombats.indexOf(this) != -1) { G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1); }
 				}
 			}
+			G.combatOverseer.prototype.removeExtra = function(char) {
+				if (this.extras.indexOf(char) != -1) { this.extras.splice(this.extras.indexOf(char), 1); }
+			}
 			G.combatOverseer.prototype.addBox = function(str, chars, noCharBoxes) {
 				this.out.push(new G.box(chars, str, 'green', noCharBoxes));
 				if (this.moveCount == 1) { this.injectFront('[1] and [2] meets and, [in a bid for glory|for their survival|seeing each other as a threat], [starts fighting|starts a vicious battle|begins a bloody fight]!<br>'); }
@@ -3131,6 +3135,7 @@ G={
 				if (this.has('marked')) {
 					count += 20 * Math.pow(this.has('marked').duration / this.has('marked').maxDuration, 0.5);
 				}
+				if (perpentrator.has('wolf') && this.has('wolves\' mark')) { count += 20; }
 				
 				if (this.has('frenzied')) { count *= 0.75; }
 				if (this.has('invisible')) { count *= 0.01; }
@@ -5878,11 +5883,12 @@ G={
 					chance = cl[1].adjust(chance, 'defenseGen');
 
 					if (Math.random() < 1 - Math.pow(chance, 0.5)) { return text + ' However, due to [2:their] defensive clothing, it had no effect!'; }
+					cl[1].gain('wolves\' mark');
 					if (Math.random() < chance) { cl[1].gain('cut up'); }
 					if (Math.random() < Math.pow(chance, 2) && !cl[1].has('fallen')) { cl[1].gain('fallen'); return text.replace('[S]', ', pinning [2:them] onto the ground'); }
 					if (Math.random() < Math.pow(chance, 4) && cl[1].has('fallen')) { cl[1].gain('cut up'); cl[1].gain('bleeding out'); return text.replace('[S]', ', opening up a great wound where blood begins to spill out everywhere'); }
 				},
-				req: ['wolf', 'any'],
+				req: ['wolf', '- any'],
 				pReq: ['e:10']
 			});
 			new G.move({
@@ -5891,7 +5897,7 @@ G={
 				successFunc: function(cl) {
 					this.combat.moveToward(cl[1], 20);
 				},
-				req: ['wolf', 'any'],
+				req: ['wolf', '- any'],
 				pReq: ['e:10/100']
 			});
 			new G.move({
@@ -5945,7 +5951,7 @@ G={
 						this.lose(this.perks[i], true); 
 					}
 				}
-				this.combat.overseer.removeParticipant(this);
+				if (this.real) { this.combat.overseer.removeParticipant(this); } else { this.combat.overseer.removeExtra(this); }
 				this.combat = null;
 			}
 			
