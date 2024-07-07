@@ -5792,8 +5792,8 @@ G={
 					
 					cl[1].gain('cut up');
 					if (Math.random() < chance) { cl[1].gain('bruised'); }
-					if (Math.random() < Math.pow(chance, 1.5)) { cl[1].gain('fallen'); return text + '<br>While panicking, [2] fell onto the ground!'; }
-					if (Math.random() < Math.pow(chance, 3)) { cl[1].gain('bruised'); cl[1].gain('crippled'); return text + '<br>Somehow, [1:they] managed to lift [2] off the ground, and drop [2:them] off from a great distance! [2] hits the ground, severely injured.'; }
+					if (Math.random() < Math.pow(chance, 1.5) && !cl[1].has('fallen')) { cl[1].gain('fallen'); return text + '<br>While panicking, [2] fell onto the ground!'; }
+					if (Math.random() < Math.pow(chance, cl[1].has('fallen')?2:3)) { cl[1].gain('bruised'); cl[1].gain('crippled'); return text + '<br>Somehow, [1:they] managed to lift [2] off the ground, and drop [2:them] off from a great distance! [2] hits the ground, severely injured.'; }
 				},
 				req: ['hawk !carrying levitating', 'any'],
 				pReq: ['d:100']
