@@ -5868,6 +5868,7 @@ G={
 					wolf.onDeath = function() { this.has('wolf').creator.gain('grieving').power = 2; }
 					wolf.itemRef = this.has('pet wolf');
 					wolf.gain(choose(['haste', 'bulky', 'cowardly', 'meek']));
+					wolf.cloneID = 0;
 					this.lose('pet wolf');
 				},
 				req: ['pet_wolf !frenzied !determined%0.5']
@@ -5914,6 +5915,8 @@ G={
 				successFunc: function() {
 					let wolf = G.newPhantomChar(G.perksBN['wolf'], this.combat.overseer, this.has('wolf').creator);
 					wolf.gain(choose(['haste', 'bulky', 'cowardly', 'meek']));
+					wolf.cloneID = this.cloneID + 1;
+					wolf.name += ' #' + wolf.cloneID;
 					this.lose('pet wolf');
 				},
 				req: ['wolf any']
