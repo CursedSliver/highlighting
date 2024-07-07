@@ -5951,7 +5951,7 @@ G={
 						this.lose(this.perks[i], true); 
 					}
 				}
-				if (this.real) { this.combat.overseer.removeParticipant(this); } else { this.combat.overseer.removeExtra(this); }
+				if (this.real) { this.combat.overseer.removeParticipant(this); } else { /*this.combat.overseer.removeExtra(this);*/ } //no removing extras only mark as nihil
 				this.combat = null;
 			}
 			
@@ -6163,7 +6163,7 @@ G={
 						for (let i in participants) {
 							for (let ii in participants) {
 								if (i == ii) { continue; }
-								participants[i].combat.moveToward(participants[ii], Math.pow(Math.abs(participants[i].combat.horizontal - participants[ii].combat.horizontal) + 1, 0.35) - 1);
+								if (!participants[i].isOut()) { participants[i].combat.moveToward(participants[ii], Math.pow(Math.abs(participants[i].combat.horizontal - participants[ii].combat.horizontal) + 1, 0.35) - 1); }
 							}
 						}
 						for (let i = 0; i < 20; i++) {
