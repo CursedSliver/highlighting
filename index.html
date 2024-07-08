@@ -3002,6 +3002,7 @@ G={
 				this.moveCount = 0;
 				this.roundCount = 0;
 				this.nonInteractiveMoveCount = 0;
+				this.queuedInjects = []; //each item is an array, first one is between ['front', 'back'], second is index, third is content
 				
 				G.ongoingCombats.push(this);
 			}
@@ -3032,6 +3033,13 @@ G={
 			G.combatOverseer.prototype.recordMove = function() {
 				this.moveCount++;
 			}
+			G.combatOverseer.processInjects = function() {
+				for (let i of this.queuedInjects) {
+					if (i[0] == 'front') { this.out[i[1]].text = i[2] + this.out[i[1]].text; continue; }
+					if (i[0] == 'back') { this.out[i[1]].text += i[2]; continue; }
+				}
+				return this.out;
+			}
 			G.parseBoxes = function(arr) {
 				var str = '';
 				for (let i in arr) {
@@ -3057,14 +3065,12 @@ G={
 			G.combatOverseer.prototype.injectFront = function(content, boxIndex) {
 				if (!this.out.length) { return false; }
 				boxIndex = boxIndex||(this.out.length - 1);
-				this.out[boxIndex].text = content + this.out[boxIndex].text;
-				return true; 
+				this.queuedInjects.push(['front', boxIndex, content]);
 			}
 			G.combatOverseer.prototype.injectBack = function(content, boxIndex) {
 				if (!this.out.length) { return false; }
 				boxIndex = boxIndex||(this.out.length - 1);
-				this.out[boxIndex].text += content;
-				return this.out[boxIndex].text; 
+				this.queuedInjects.push(['back', boxIndex, content]);
 			}
 			G.combatOverseer.prototype.injectSkull = function(name, boxIndex) {
 				if (!this.out.length) { return false; }
@@ -6326,7 +6332,7 @@ G={
 							if (participants.length <= 1 || Math.random() > 1 / (count + 1)) { break; }
 							count++;
 						}
-						str += G.parseBoxes(overseer.out);
+						str += G.parseBoxes(overseer.processInjects());
 					}
 					if (me.type == 'char' && me.has('act again') && !me.combat) { me.lose('act again'); i--; }
 				}
