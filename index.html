@@ -3136,12 +3136,17 @@ G={
 				this.interrupter = interrupter;
 				this.move = move;
 			}
-			G.char.prototype.interrupt = function(interrupter, move) {
+			G.char.prototype.interrupt = function(interruptedChar, move) {
 				if (!this.combat) { return false; }
 				if (!move) { move = this.combat.overseer.lastMove; }
-				let obj = new G.interruptUnit(interrupter, move);
+				let obj = new G.interruptUnit(interruptedChar, move);
 				this.combat.interrupts.push(obj);
 				this.combat.lastInterrupt = obj;
+				for (let i of interruptedChar.perks) {
+					if (i.perk.onInterrupt) {
+						i.perk.onInterrupt.call(i.perk);
+					}
+				}
 			}
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
