@@ -3143,6 +3143,41 @@ G={
 				this.combat.interrupts.push(obj);
 				this.combat.lastInterrupt = obj;
 			}
+			G.char.prototype.initiateCombat = function() {
+				var charList = [];
+				for (let i in G.teams) {
+					if (G.teams[i] == this.team) { continue; }
+					charList = charList.concat(G.teams[i].chars);
+				}
+				for (let i = 0; i < charList.length; i++) {
+					if (charList[i].combat || charList[i].isDisabled() || charList[i].isOut()) { charList.splice(i, 1); i--; }
+				}
+				var opponent = null;
+				if (charList.length > 0) { opponent = choose(charList); } else { return false; } 
+
+				var overseer = new G.combatOverseer();
+				this.combat = new G.combatTracker(overseer, this);
+				opponent.combat = new G.combatTracker(overseer, opponent);
+				opponent.combat.horizontal = (Math.random() - 0.5) * 80;
+			}
+			G.char.prototype.joinCombat = function(overseer) {
+				if (this.combat) { return false; }
+				this.combat = new G.combatTracker(overseer, this);
+				this.combat.horizontal = (Math.pow(Math.random(), 0.33) * 60) * ((Math.random() < 0.5)?1:-1);
+			}
+			G.char.prototype.fleeCombat = function(silent) {
+				this.lose('fleed');
+				if (!this.combat) { return false; }
+				if (!silent) { this.combat.overseer.injectBack('<br><e>'+this.name+'</e> has fleed from the fight!'); }
+				for (let i = this.perks.length - 1; i >= 0; i--) {
+					if (this.perks[i].perk.combat) { 
+						if (this.perks[i].itemRef) { this.gain(this.perks[i].itemRef); }
+						this.lose(this.perks[i], true); 
+					}
+				}
+				if (this.real) { this.combat.overseer.removeParticipant(this); } else { /*this.combat.overseer.removeExtra(this);*/ } //no removing extras only mark as nihil
+				this.combat = null;
+			}
 			G.char.prototype.targetCount = function(perpentrator) {
 				if (!this.combat) { return 1; }
 				let count = 1;
@@ -6054,42 +6089,6 @@ G={
 				element: G.moveAssets.elements.alone,
 				req: ['ancient_scepter !frenzied']
 			});
-			
-			G.char.prototype.initiateCombat = function() {
-				var charList = [];
-				for (let i in G.teams) {
-					if (G.teams[i] == this.team) { continue; }
-					charList = charList.concat(G.teams[i].chars);
-				}
-				for (let i = 0; i < charList.length; i++) {
-					if (charList[i].combat || charList[i].isDisabled() || charList[i].isOut()) { charList.splice(i, 1); i--; }
-				}
-				var opponent = null;
-				if (charList.length > 0) { opponent = choose(charList); } else { return false; } 
-
-				var overseer = new G.combatOverseer();
-				this.combat = new G.combatTracker(overseer, this);
-				opponent.combat = new G.combatTracker(overseer, opponent);
-				opponent.combat.horizontal = (Math.random() - 0.5) * 80;
-			}
-			G.char.prototype.joinCombat = function(overseer) {
-				if (this.combat) { return false; }
-				this.combat = new G.combatTracker(overseer, this);
-				this.combat.horizontal = (Math.pow(Math.random(), 0.33) * 60) * ((Math.random() < 0.5)?1:-1);
-			}
-			G.char.prototype.fleeCombat = function(silent) {
-				this.lose('fleed');
-				if (!this.combat) { return false; }
-				if (!silent) { this.combat.overseer.injectBack('<br><e>'+this.name+'</e> has fleed from the fight!'); }
-				for (let i = this.perks.length - 1; i >= 0; i--) {
-					if (this.perks[i].perk.combat) { 
-						if (this.perks[i].itemRef) { this.gain(this.perks[i].itemRef); }
-						this.lose(this.perks[i], true); 
-					}
-				}
-				if (this.real) { this.combat.overseer.removeParticipant(this); } else { /*this.combat.overseer.removeExtra(this);*/ } //no removing extras only mark as nihil
-				this.combat = null;
-			}
 			
 			G.parse = function(text,actors)
 			{
