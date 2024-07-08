@@ -674,7 +674,7 @@ G={
 		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true});
 		new G.perk({name:`ignorable`,desc:`No one really takes notice of them.`});
 		new G.perk({name:`carrying`,desc:`Carrying something heavy.`,init:{items:[]},addItem:function(item){ this.items.push(item); },onMove:function() { this.owner.combat.vertical = Math.max(this.owner.combat.overseer.getHeightAt(this.owner.combat.horizontal), this.owner.combat.vertical - 2.5); }});
-		new G.perk({name:`ancient charging`,desc:`Your Ancient scepter is charging up!`,onMove:function() { this.owner.has('ancient scepter').charges++; },onInterrupt:function() { this.owner.lose('ancient charging'); this.owner.combat.overseer.injectBack('<br><e>'+this.owner.name+'</e>\'s focus on the ancient scepter has been disrupted!'); },aggro:10})
+		new G.perk({name:`ancient charging`,desc:`Your Ancient scepter is charging up!`,onMove:function() { this.owner.has('ancient scepter').charges++; },onInterrupt:function() { this.owner.lose(this); this.owner.combat.overseer.injectBack('<br><e>'+this.owner.name+'</e>\'s focus on the ancient scepter has been disrupted!'); },aggro:10})
 		//summon perks
 		new G.perk({name:`grieving`,desc:`Grieving about the loss of a good friend.`,init:{power:1},onMove:function() { this.power--; if (this.power <= 0) { this.owner.lose(this); } }});
 		new G.perk({name:`wolves' mark`,desc:`Attracting the attention of nearby wolves.`,init:{duration:2},onMove:function() { this.duration--; if (this.duration <= 0) { this.owner.lose(this); } }});
@@ -3144,7 +3144,7 @@ G={
 				this.combat.lastInterrupt = obj;
 				for (let i of interruptedChar.perks) {
 					if (i.perk.onInterrupt) {
-						i.perk.onInterrupt.call(i.perk);
+						i.perk.onInterrupt.call(i);
 					}
 				}
 			}
