@@ -3033,7 +3033,7 @@ G={
 			G.combatOverseer.prototype.recordMove = function() {
 				this.moveCount++;
 			}
-			G.combatOverseer.processInjects = function() {
+			G.combatOverseer.prototype.processInjects = function() {
 				for (let i of this.queuedInjects) {
 					if (i[0] == 'front') { this.out[i[1]].text = i[2] + this.out[i[1]].text; continue; }
 					if (i[0] == 'back') { this.out[i[1]].text += i[2]; continue; }
