@@ -575,7 +575,19 @@ G={
 			if (this.combat) { this.mt = 0; }
 			if (this.perk.init) { for (let i in this.perk.init) { this[i] = this.perk.init[i]; } }
 		}
-		
+
+		/*
+  		DOCUMENTATION:
+    		"name": the name of the perk
+      		"desc": description
+		"init": object, all properties in the object will be copied over to the token on creation
+  		"onGain": function, called on gain and a bool for already having perk or not will be passed in
+    		"onLose": function, called on lose
+      		"update": function, called every round
+		"onMove": function, called at the start of every move selection
+  		"onInterrupt": function, called when interrupted in combat
+    		"aggro": number, adds the number to the count for target selection (tier does the same thing but more complicated and actually represents something else)
+  		*/
 		G.glob={type:'trait',def:true};
 		new G.perk({name:`no perk`,desc:`No perk selected.`});
 		new G.perk({name:`leader`,desc:`Capable of bringing people together to accomplish great deeds.`});
@@ -662,6 +674,7 @@ G={
 		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true});
 		new G.perk({name:`ignorable`,desc:`No one really takes notice of them.`});
 		new G.perk({name:`carrying`,desc:`Carrying something heavy.`,init:{items:[]},addItem:function(item){ this.items.push(item); },onMove:function() { this.owner.combat.vertical = Math.max(this.owner.combat.overseer.getHeightAt(this.owner.combat.horizontal), this.owner.combat.vertical - 2.5); }});
+		new G.perk({name:`ancient charging`,desc:`Your Ancient scepter is charging up!`,onMove:function() { this.owner.has('ancient scepter').charges++; },onInterrupt:function() { this.owner.lose('ancient charging'); this.owner.combat.overseer.injectBack('<br><e>'+this.owner.name+'</e>\'s focus on the ancient scepter has been disrupted!'); },aggro:10})
 		//summon perks
 		new G.perk({name:`grieving`,desc:`Grieving about the loss of a good friend.`,init:{power:1},onMove:function() { this.power--; if (this.power <= 0) { this.owner.lose(this); } }});
 		new G.perk({name:`wolves' mark`,desc:`Attracting the attention of nearby wolves.`,init:{duration:2},onMove:function() { this.duration--; if (this.duration <= 0) { this.owner.lose(this); } }});
@@ -738,7 +751,7 @@ G={
 		new G.perk({name:`rocket launcher`,desc:`A dangerous weapon; excels at blowing stuff up.`,tier:3,init:{loaded:1}});
 		new G.perk({name:`lasergun`,desc:`Ultra-concentrated energy shots that burn through practically anything.`,tier:3,init:{energy:2},onMove:function() { if (Math.random() < 0.1) { this.energy = Math.max(0, this.energy - 1); } }});
 		new G.perk({name:`magic wand`,desc:`Casts a variety of spells upon your friends and foes.`,tier:2,init:{charges:1}});
-		new G.perk({name:`ancient scepter`,desc:`Calls forth ancient hexes and curses on your adversaries.`,tier:3});
+		new G.perk({name:`ancient scepter`,desc:`Calls forth ancient beings, hexes, and curses on your adversaries.`,tier:3,init:{charges:1}});
 		
 		new G.perk({name:`pet wolf`,desc:`A ravenous pet wolf to devour your opponents.`,tier:2});
 		new G.perk({name:`pet tiger`,desc:`A fierce pet tiger to tear your opponents to shreds.`,tier:3});
@@ -3146,6 +3159,7 @@ G={
 					if (this.perks[i].perk.tier == 3) { count += 0.45; }
 					if (this.perks[i].perk.tier == 2) { count += 0.3; }
 					if (this.perks[i].perk.tier == 1) { count += 0.15; }
+					if (typeof this.perks[i].perk.aggro == 'number') { count += this.perks[i].perk.aggro; }
 				}
 				if (this.has('marked')) {
 					count += 20 * Math.pow(this.has('marked').duration / this.has('marked').maxDuration, 0.5);
@@ -6034,7 +6048,12 @@ G={
 			});
 
 			//ancient scepter (summons and funny spells)
-			
+			new G.move({
+				chance: 0.5,
+				text: '[1] [stares|glances at|touches|holds] the blue orb on [1:their] ancient scepter, [impressed|curious|intrigued].',
+				element: G.moveAssets.elements.alone,
+				req: ['ancient_scepter !frenzied']
+			});
 			
 			G.char.prototype.initiateCombat = function() {
 				var charList = [];
