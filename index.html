@@ -3064,7 +3064,7 @@ G={
 				if (!this.out.length) { return false; }
 				boxIndex = boxIndex||(this.out.length - 1);
 				this.out[boxIndex].text += content;
-				return true; 
+				return this.out[boxIndex].text; 
 			}
 			G.combatOverseer.prototype.injectSkull = function(name, boxIndex) {
 				if (!this.out.length) { return false; }
