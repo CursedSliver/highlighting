@@ -6089,6 +6089,15 @@ G={
 				element: G.moveAssets.elements.alone,
 				req: ['ancient_scepter !frenzied']
 			});
+			new G.move({
+				chance: 1,
+				text: '[1] [focuses hard|concentrates] on [1:their] ancient scepter to [charge|infuse|channel] it with magic!<br>This might take a while...',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.gain('ancient charging');
+				},
+				req: ['ancient_scepter any%0.5|able '+hardDisables]
+			});
 			
 			G.parse = function(text,actors)
 			{
