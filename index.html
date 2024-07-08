@@ -3201,7 +3201,7 @@ G={
 				}
 				if (perpentrator.has('wolf') && this.has('wolves\' mark')) { count += 20; }
 				
-				if (perpentrator.combat.lastInterrupt.interrupter == this) { count *= 1.5; count += 0.5; }
+				if (perpentrator.combat.lastInterrupt && perpentrator.combat.lastInterrupt.interrupter == this) { count *= 1.5; count += 0.5; }
 				
 				if (this.has('frenzied')) { count *= 0.75; }
 				if (this.has('invisible')) { count *= 0.01; }
