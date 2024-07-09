@@ -6258,7 +6258,7 @@ G={
 			};
 			new G.move({
 				chance: function() {
-					return Math.min((this.has('phantasmal dragon').mt ** 4) * 0.001, 10);
+					return Math.min((this.has('phantasmal dragon').mt ** 4) * 0.0005, 10);
 				},
 				text: 'Suddenly, [1] lets out a last scream as its body disintegrates into a storm of grayish-white orbs of light!',
 				element: G.moveAssets.elements.alone,
@@ -6267,7 +6267,7 @@ G={
 			});
 			new G.move({
 				chance: function() {
-					return Math.min((this.has('phantasmal dragon').mt ** 2) * 0.01, 10);
+					return Math.min((this.has('phantasmal dragon').mt ** 2) * 0.005, 10);
 				},
 				text: 'Suddenly, [1] lets out a last scream as its body disintegrates into a storm of grayish-white orbs of light.<br>As it disintegrates, [2] drops out of [1:their] mouth and starts a hundreds-meter fall onto the ground!',
 				element: G.moveAssets.elements.alone,
