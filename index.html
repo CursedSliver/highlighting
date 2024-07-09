@@ -4719,8 +4719,8 @@ G={
 				failText: '[1] tries to stab [2] with [1:their] sword, but the sword just went past [2:them] without touching.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 3 + 2); },
-				successFunc: G.moveAssets.stabHeavy('sword !immaterial'),
-				req: ['sword', 'any'],
+				successFunc: G.moveAssets.stabHeavy('sword'),
+				req: ['sword', 'any !immaterial'],
 				pReq: ['e:15']
 			});
 			new G.move({
