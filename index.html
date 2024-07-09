@@ -650,6 +650,7 @@ G={
 		new G.perk({name:`has killed`,desc:`Caused someone's death.`,init:{count:1},disable:false,ailment:false,onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } }});
 		new G.perk({name:`revived`,desc:`Will be revived soon.`,ailment:false});
 		new G.perk({name:`set trap`,desc:`Laid down some traps that others may get caught in...`,disable:false,ailment:false});
+		new G.perk({name:`mint enhanced`,desc:`Has successfully swallowed a mint essence, gaining immunity to all magical attacks.`,disable:false,ailment:false});
 
 		//combat stuff
 		G.glob.combat = true;
@@ -674,6 +675,7 @@ G={
 		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true});
 		new G.perk({name:`ignorable`,desc:`No one really takes notice of them.`});
 		new G.perk({name:`carrying`,desc:`Carrying something heavy.`,init:{items:[]},addItem:function(item){ this.items.push(item); },onMove:function() { this.owner.combat.vertical = Math.max(this.owner.combat.overseer.getHeightAt(this.owner.combat.horizontal), this.owner.combat.vertical - 2.5); }});
+		new G.perk({name:`flying`,desc:`Burrowing through the air!`,init:{heightMult:1},onMove:function() { this.owner.combat.vertical += (15 + 10 * Math.random()) * this.heightMult; }});
 		new G.perk({name:`ancient charging`,desc:`Your Ancient scepter is charging up!`,onMove:function() { this.owner.has('ancient scepter').charges++; },onInterrupt:function() { this.owner.lose(this); console.log(this.owner.combat.overseer.injectBack('<br><e>'+this.owner.name+'</e>\'s focus on the ancient scepter has been disrupted!')); },aggro:10})
 		//summon perks
 		new G.perk({name:`grieving`,desc:`Grieving about the loss of a good friend.`,init:{power:1},onMove:function() { this.power--; if (this.power <= 0) { this.owner.lose(this); } }});
@@ -693,8 +695,8 @@ G={
 		G.glob.injury = true;
 		G.glob.ailment = false;
 		G.glob.combat = false;
-		new G.perk({name:`wet`,desc:`Is dripping with water.`,disable:false,injury:false})
-		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false}); // Removed Disabled
+		new G.perk({name:`wet`,desc:`Is dripping with water.`,disable:false,injury:false});
+		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false});
 		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 4 && Math.random() < 0.75) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
 		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`});
 		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.4) { this.owner.gain('lacerated'); } }, update:function() { if (Math.random() < 0.1) { this.count--; if (this.count == 0) { this.owner.lose('cut up'); }}}});
@@ -6091,9 +6093,10 @@ G={
 					return text + ' However, nothing really happened as [1:they] couldn\'t quite break through [2:their] defensive armor!';
 				},
 				req: ['tiger', 'any fallen'],
+				
 				pReq: ['h:1.5 v:0.5']
 			});
-
+			
 			//ancient scepter (summons and funny spells)
 			new G.move({
 				chance: 0.5,
@@ -6102,13 +6105,44 @@ G={
 				req: ['ancient_scepter !frenzied']
 			});
 			new G.move({
-				chance: 1,
+				chance: 2,
 				text: '[1] [focuses hard|concentrates] on [1:their] ancient scepter to [charge|infuse|channel] it with magic!<br>This might take a while...',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.gain('ancient charging');
 				},
-				req: ['ancient_scepter any%0.5|able '+hardDisables]
+				req: ['ancient_scepter any%0.5|able%0.5|wizard_robe%0.5 '+hardDisables],
+				reqFunc: function() {
+					return (this.has('ancient scepter').charges < this.has('wizard robe')?4:2);
+				}
+			});
+			new G.move({
+				chance: 1,
+				text: '[1] holds [1:their] ancient scepter up into the air, chanting something unintellgible as the magical orb begins to glow brightly!<br>Suddenly, a grayish-white portal emerges in a flash of light as a serpentine figure flies out of it, roaring! <br>Looking closely, it\'s a ghastly wyvern, entirely composed of sharp looking, semi-translucent armor with a pair of glowing white eyes...',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.has('ancient scepter').charges -= 2;
+					let dragon = G.newPhantomChar(G.perksBN['phantasmal dragon'], this.combat.overseer, this);
+					dragon.gain('flying');
+					dragon.gain('ironskin');
+					dragon.gain('combat gear');
+					dragon.gain('bulky');
+					dragon.gain('mint enhanced');
+				},
+				req: ['ancient_scepter'],
+				reqFunc: function() {
+					return (this.has('ancient scepter').charges >= 2);
+				}
+			});	
+			new G.move({
+				chance: 1,
+				text: '[1] dives toward [2] and picks [2:them] up effortlessly with [1:their] large jaws, then quickly flies back up, carrying [2:them] with [1:them]!',
+				failText: '[1] dives toward [2], but [2:they] managed to avoid [1:them].',
+				fail: function(cl) { return cl[1].adjust(0.1, 'dodge'); },
+				successFunc: function() {
+					
+				},
+				req: ['phantasmal_dragon !carrying']
 			});
 			
 			G.parse = function(text,actors)
