@@ -6580,7 +6580,7 @@ G={
 						for (let i in participants) {
 							for (let ii in participants) {
 								if (i == ii) { continue; }
-								if (!participants[i].isOut() && participants[i].combat) { participants[i].combat.moveToward(participants[ii], Math.pow(Math.abs(participants[i].combat.horizontal - participants[ii].combat.horizontal) + 1, 0.35) - 1); }
+								if (!participants[i].isOut() && participants[i].combat && participants[ii].combat) { participants[i].combat.moveToward(participants[ii], Math.pow(Math.abs(participants[i].combat.horizontal - participants[ii].combat.horizontal) + 1, 0.35) - 1); }
 							}
 						}
 						for (let i = 0; i < 20; i++) {
