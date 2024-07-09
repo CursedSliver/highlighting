@@ -757,7 +757,7 @@ G={
 		new G.perk({name:`rocket launcher`,desc:`A dangerous weapon; excels at blowing stuff up.`,tier:3,init:{loaded:1}});
 		new G.perk({name:`lasergun`,desc:`Ultra-concentrated energy shots that burn through practically anything.`,tier:3,init:{energy:2},onMove:function() { if (Math.random() < 0.1) { this.energy = Math.max(0, this.energy - 1); } }});
 		new G.perk({name:`magic wand`,desc:`Casts a variety of spells upon your friends and foes.`,tier:2,init:{charges:1}});
-		new G.perk({name:`ancient scepter`,desc:`Calls forth ancient beings, hexes, and curses on your adversaries.`,tier:3,init:{charges:1}});
+		new G.perk({name:`ancient scepter`,desc:`Calls forth ancient beings, hexes, and curses on your adversaries.`,tier:3,init:{charges:0}});
 		
 		new G.perk({name:`pet wolf`,desc:`A ravenous pet wolf to devour your opponents.`,tier:2});
 		new G.perk({name:`pet tiger`,desc:`A fierce pet tiger to tear your opponents to shreds.`,tier:3});
