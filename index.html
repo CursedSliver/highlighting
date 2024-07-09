@@ -672,6 +672,7 @@ G={
 		new G.perk({name:`vulnerable`,desc:`No matter what you wear, it still hurts...`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`hallucinating`,desc:`Enchanted in a trance.`,init:{duration:5},onMove:function() { this.duration--; },disable:true,hard:true});
 		new G.perk({name:`invulnerable`,desc:`Completely invincible.`});
+		new G.perk({name:`infallible`,desc:`Will never be slow.`});
 		new G.perk({name:`immaterial`,desc:`Does not possess a directly interactable physical form.`});
 		new G.perk({name:`invisible`,desc:`Vanished into thin air!`,init:{duration:2},onMove:function() { this.duration--; }});
 		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true});
@@ -684,6 +685,7 @@ G={
 		//summon perks
 		new G.perk({name:`grieving`,desc:`Grieving about the loss of a good friend.`,init:{power:1},onMove:function() { this.power--; if (this.power <= 0) { this.owner.lose(this); } }});
 		new G.perk({name:`wolves' mark`,desc:`Attracting the attention of nearby wolves.`,init:{duration:2},onMove:function() { this.duration--; if (this.duration <= 0) { this.owner.lose(this); } }});
+		new G.perk({name:`mark of the void`,desc:`You feel an evil presence watching you...`,init:{duration:3},onMove:function() { this.duration--; if (this.duration <= 0) { this.owner.lose(this); } }})
 		G.glob.identificator = true;
 		new G.perk({name:`turtle`,desc:`A cute turtle to do its owner\'s bidding.`});
 		new G.perk({name:`wolf`,desc:`A fierce wolf to help its owner defeat the enemies.`});
@@ -3254,7 +3256,7 @@ G={
 					if (typeof this.perks[i].mt == 'number') { this.perks[i].mt++; }
 					if (this.perks[i].perk.onMove) { this.perks[i].perk.onMove.call(this.perks[i]); }
 				}
-				if (!this.has('frenzied') && !this.has('haste') && ((Math.random() < 0.05) || Math.random() < 1 - Math.pow(1 - (this.has('haste')?0.075:0.15), this.isDisabled()) || Math.random() < 1 - Math.pow(1 - (this.has('haste')?0.05:0.1), this.isInjured()) || Math.random() < 1 - Math.pow(1 - (this.has('haste')?0.025:0.05), this.isAiled()))) { return this.has('fleed'); } //everyone can just be slow sometimes
+				if (!this.has('frenzied') && !this.has('haste') && !this.has('infallible') && ((Math.random() < 0.05) || Math.random() < 1 - Math.pow(1 - (this.has('haste')?0.075:0.15), this.isDisabled()) || Math.random() < 1 - Math.pow(1 - (this.has('haste')?0.05:0.1), this.isInjured()) || Math.random() < 1 - Math.pow(1 - (this.has('haste')?0.025:0.05), this.isAiled()))) { return this.has('fleed'); } //everyone can just be slow sometimes
 				if (this.has('skipped')) { this.lose('skipped'); return this.has('fleed'); }
 				if (this.has('in stasis')) { return this.has('fleed'); }
 				let overseer = this.combat.overseer;
@@ -6136,7 +6138,7 @@ G={
 				}
 			});
 			new G.move({
-				chance: 1,
+				chance: 0.5,
 				text: '[1] holds [1:their] ancient scepter up into the air, chanting something unintellgible as the magical orb begins to glow brightly!<br>Suddenly, a grayish-white portal emerges in a flash of light as a serpentine figure flies out of it, roaring! <br>Looking closely, it\'s a ghastly wyvern, entirely composed of sharp looking, semi-translucent armor with a pair of glowing white eyes...',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
@@ -6281,6 +6283,83 @@ G={
 					return text + '<br>Somehow, [2] miraculously survived the fall! Despite this, [2:they] are still very much knocked out from the fall.';
 				},
 				req: ['phantasmal_dragon every carrying']
+			});
+
+			new G.move({
+				chance: 0.5,
+				text: '[1] holds [1:their] ancient scepter up into the air, chanting something unintellgible as the magical orb begins to glow brightly!<br>Suddenly, vast swaths of inky void emanates out of the orb, coagulating into a sphere as a distinct point of light begin forming from within! Looking closer, the whole thing resembles an... eye?',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.has('ancient scepter').charges -= 2;
+					let eye = G.newPhantomChar(G.perksBN['eye of the void'], this.combat.overseer, this);
+					eye.gain('immaterial');
+					eye.gain('levitating');
+					eye.gain('infallible');
+					eye.gain('skipped').count = 2;
+				},
+				req: ['ancient_scepter'],
+				reqFunc: function() {
+					for (let i in this.combat.overseer.extras) {
+						if (this.combat.overseer.extras[i].has('eye of the void') && this.combat.overseer.extras[i].has('eye of the void').creator == this) { return false; }
+					}
+					return (this.has('ancient scepter').charges >= 2);
+				}
+			});	
+			new G.move({
+				chance: 1,
+				text: 'Suddenly, [1]\'s pupil enlarges as it fixates its sight onto [2]! [2] can feel the danger desperately telling [2:their] body to get as far away as possible...',
+				successFunc: function(cl) {
+					cl[1].gain('mark of the void');
+					cl[1].gain('terrified');
+					this.gain('skipped');
+				},
+				req: ['eye_of_the_void every', 'any !mark_of_the_void'],
+				pReq: ['d:35']
+			});
+			new G.move({
+				chance: 20,
+				text: 'With an inverse shockwave imploding air into [1:their] center, [1]\'s pupil begins glowing with a fiery red as bright-red flames in the form of a concentrated high-velocity beam arrives at [2]\'s body![S]',
+				successFunc: function(cl, text) {
+					cl[1].lose('mark of the void');
+					cl[1].lose('terrified');
+					this.gain('skipped');
+					this.combat.overseer.injectColor('red');
+
+					let chance = 0.5;
+					chance = cl[1].adjust(chance, 'fireDefense');
+					if (Math.random() < chance) { this.has('eye of the void').creator.kill(cl[1], 'cooked to well done'); };
+					for (let i = 0; i < 20; i++) { if (Math.random() < chance) { cl[1].gain('singed'); } }
+					if (Math.random() < chance) { cl[1].gain('fallen'); }
+					if (Math.random() < Math.pow(chance, 2)) { cl[1].gain('shell-shocked'); }
+					return text.replace('[S]', '<br>Miraculously, [2:they] survived this attack, but is left with third-degree burns all over [2:their] body...');
+				},
+				req: ['eye_of_the_void every', 'any mark_of_the_void'],
+				pReq: ['d:60']
+			});
+			new G.move({
+				chance: function() {
+					let add = 0;
+					let mult = 1;
+					if (this.has('cowardly')) { add += 2.5; }
+					if (this.has('vigilant')) { add += 2.5; }
+					if (this.has('terrified')) { add += 5; }
+					add += this.isInjured() * 0.5;
+
+					mult *= Math.pow(0.8, this.isAiled());
+					if (this.has('blind')) { mult *= 0.1; }
+
+					return add * mult;
+				},
+				text: 'Sensing imminent death, [1] runs away from [2]!',
+				successFunc: function(cl) { this.combat.moveToward(cl[1], -1 * (Math.random() * 20 + 20)); },
+				req: ['able mark_of_the_void', 'eye_of_the_void']
+			});
+			new G.move({
+				chance: G.moveAssets.summonExpiration('eye of the void', 0.01, 3),
+				text: 'Abruptly, [1] starts rapidly shrinking, soon reduced to all but a pitch-black point in the air and letting off an enormous amount of black smoke. Soon after that, the black point disappeared as well.',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() { this.kill(this, 'expired'); this.gain('nihil'); },
+				req: ['eye_of_the_void']
 			});
 			
 			G.parse = function(text,actors)
