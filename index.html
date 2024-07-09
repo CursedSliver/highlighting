@@ -6260,7 +6260,7 @@ G={
 				},
 				text: 'Suddenly, [1] lets out a last scream as its body disintegrates into a storm of grayish-white orbs of light!',
 				element: G.moveAssets.elements.alone,
-				successFunc: function() { this.kill(this, 'expired'); this.gain('nihil'); },
+				successFunc: function() { this.kill(this, 'expired'); this.combat.overseer.injectColor('green'); this.gain('nihil'); },
 				req: ['phantasmal_dragon every !carrying']
 			});
 			new G.move({
@@ -6275,6 +6275,7 @@ G={
 					char.lose('coupled');
 					this.lose('carrying');
 					this.kill(this, 'expired'); this.gain('nihil');
+					this.combat.overseer.injectColor('green');
 					this.combat.overseer.addChar(char);
 					let chance = 0.9;
 					chance = char.adjust(chance, 'fallDefense');
@@ -6366,7 +6367,7 @@ G={
 				},
 				text: 'Abruptly, [1] starts rapidly shrinking, soon reduced to all but a pitch-black point in the air and letting off an enormous amount of black smoke. Soon after that, the black point disappeared as well.',
 				element: G.moveAssets.elements.alone,
-				successFunc: function() { this.kill(this, 'expired'); this.gain('nihil'); },
+				successFunc: function() { this.kill(this, 'expired'); this.combat.overseer.injectColor('green'); this.gain('nihil'); },
 				req: ['eye_of_the_void']
 			});
 			
