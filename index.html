@@ -4634,7 +4634,7 @@ G={
 				failFunc: function(cl, text) {
 					if (Math.random() < 0.25 && !this.has('survivalist')) { this.gain('fallen'); return text.replace('[S]', ' [1] meanwhile, lost [1:their] balance and fell [onto the ground|face-first].'); }
 				},
-				req: ['shuriken', 'any'],
+				req: ['shuriken', 'any !immaterial'],
 				pReq: ['p:10']
 			});
 			//scrap metal (copy paste go go go)
@@ -4648,7 +4648,7 @@ G={
 				failFunc: function(cl, text) {
 					if (Math.random() < 0.25 && !this.has('survivalist')) { this.gain('fallen'); return text.replace('[S]', ' [1] meanwhile, lost [1:their] balance and fell [onto the ground|face-first].'); }
 				},
-				req: ['scrap_metal', 'any'],
+				req: ['scrap_metal', 'any !immaterial'],
 				pReq: ['e:15']
 			});
 			//cursed knife (4 moves) 
@@ -4663,7 +4663,7 @@ G={
 				text: '[Motivated|Driven|Compelled] by [1:their] [cursed|ominous|unforgettable|creepy] knife, [1] [lurches|throws [1:themself]] at [2] with [incredible speed|surprising agility] and [slices|chops] [2]\'s [[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] eyelid [right |]off!]',
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.sliceLight(),
-				req: ['cursed_knife able%0.75|frenzied', 'any'],
+				req: ['cursed_knife able%0.75|frenzied', 'any !immaterial'],
 				pReq: ['e:15']
 			});
 			new G.move({
@@ -4674,7 +4674,7 @@ G={
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.stabLight('cursed knife', 0.25),
 				failFunc: function() { this.gain('fallen'); },
-				req: ['cursed_knife able%0.5|frenzied', 'any'],
+				req: ['cursed_knife able%0.5|frenzied', 'any !immaterial'],
 				pReq: ['d:5']
 			});
 			new G.move({
@@ -4684,7 +4684,7 @@ G={
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.stabLight('cursed knife'),
-				req: ['cursed_knife able !frenzied', 'any'],
+				req: ['cursed_knife able !frenzied', 'any !immaterial'],
 				pReq: ['e:10']
 			});
 			G.moveAssets.stabHeavy = function(item, chanceNew) {
@@ -4719,7 +4719,7 @@ G={
 				failText: '[1] tries to stab [2] with [1:their] sword, but the sword just went past [2:them] without touching.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 3 + 2); },
-				successFunc: G.moveAssets.stabHeavy('sword'),
+				successFunc: G.moveAssets.stabHeavy('sword !immaterial'),
 				req: ['sword', 'any'],
 				pReq: ['e:15']
 			});
@@ -4730,14 +4730,14 @@ G={
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.2, 'overall'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 2 + 1); },
 				successFunc: G.moveAssets.sliceBig(),
-				req: ['sword', 'any'],
+				req: ['sword', 'any !immaterial'],
 				pReq: ['e:15']
 			});
 			new G.move({
 				chance: 2.5,
 				text: '[1] keeps [2] away with [1:their] sword.',
 				successFunc: function(cl) { cl[1].combat.moveToward(this, -12); },
-				req: ['sword any '+hardDisables, 'able'],
+				req: ['sword any '+hardDisables, 'able !immaterial'],
 				pReq: ['d:5']
 			})
 			//axe (1 move simpler alternative to sword without nearly as many possible modifiers)
@@ -4757,7 +4757,7 @@ G={
 					if (Math.random() < chance) { cl[1].gain('cut up'); return text.replace('[S]', ', and leaving a large gash on [2]\'s body'); }
 					if (Math.random() < chance) { cl[1].gain('fallen'); return text.replace('[S]', ', and also knocking [2:them] onto the ground'); }
 				},
-				req: ['axe any%0.5|able '+hardDisables, 'any'],
+				req: ['axe any%0.5|able '+hardDisables, 'any !immaterial'],
 				pReq: ['e:12']
 			});
 			//embedded removal (causes potential death)
@@ -6248,14 +6248,18 @@ G={
 				}
 			};
 			new G.move({
-				chance: G.moveAssets.summonExpiration('phantasmal dragon', 0.005, 3),
+				chance: function() {
+					return (this.has('phantasmal dragon').mt ** 4) * 0.01;
+				},
 				text: 'Suddenly, [1] lets out a last scream as its body disintegrates into a storm of grayish-white orbs of light!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() { this.kill(this, 'expired'); this.gain('nihil'); },
 				req: ['phantasmal_dragon every !carrying']
 			});
 			new G.move({
-				chance: G.moveAssets.summonExpiration('phantasmal dragon', 0.025, 1),
+				chance: function() {
+					return (this.has('phantasmal dragon').mt **24) * 0.025;
+				},
 				text: 'Suddenly, [1] lets out a last scream as its body disintegrates into a storm of grayish-white orbs of light.<br>As it disintegrates, [2] drops out of [1:their] mouth and starts a hundreds-meter fall onto the ground!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function(cl, text) { 
