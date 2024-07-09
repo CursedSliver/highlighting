@@ -1376,7 +1376,7 @@ G={
 					let token = null;
 					if (perk instanceof G.perkToken) { token = perk; } else { token = this.has(perk); }
 					if (token) { 
-						if (token.perk.onLose) { token.perk.onLose.call(this.perks[this.perks.indexOf(token)]); }
+						if (token.perk.onLose) { token.perk.onLose.call(token); }
 						if (!token.perk.cannotLose || force) { return this.perks.splice(this.perks.indexOf(token), 1); }
 					}
 				}
