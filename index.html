@@ -6362,7 +6362,7 @@ G={
 			});
 			new G.move({
 				chance: function() {
-					return Math.min(this.has('eye of the void').mt ** 3) * 0.01, 10);
+					return Math.min((this.has('eye of the void').mt ** 3) * 0.01, 10);
 				},
 				text: 'Abruptly, [1] starts rapidly shrinking, soon reduced to all but a pitch-black point in the air and letting off an enormous amount of black smoke. Soon after that, the black point disappeared as well.',
 				element: G.moveAssets.elements.alone,
