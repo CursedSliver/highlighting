@@ -673,9 +673,11 @@ G={
 		new G.perk({name:`hallucinating`,desc:`Enchanted in a trance.`,init:{duration:5},onMove:function() { this.duration--; },disable:true,hard:true});
 		new G.perk({name:`invisible`,desc:`Vanished into thin air!`,init:{duration:2},onMove:function() { this.duration--; }});
 		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true});
+		new G.perk({name:`paralyzed`,desc:`For whatever reason, none of your muscles want to listen anymore.`,disable:true,hard:true});
 		new G.perk({name:`ignorable`,desc:`No one really takes notice of them.`});
 		new G.perk({name:`carrying`,desc:`Carrying something heavy.`,init:{items:[]},addItem:function(item){ this.items.push(item); },onMove:function() { this.owner.combat.vertical = Math.max(this.owner.combat.overseer.getHeightAt(this.owner.combat.horizontal), this.owner.combat.vertical - 2.5); }});
 		new G.perk({name:`flying`,desc:`Burrowing through the air!`,init:{heightMult:1},onMove:function() { this.owner.combat.vertical += (15 + 10 * Math.random()) * this.heightMult; }});
+		new G.perk({name:`coupled`,desc:`Horizontal and vertical position locked to the partner.`,init:{partner:null},onMove: function() { if (this.partner) { this.owner.combat.horizontal = this.partner.combat.horizontal; this.owner.combat.vertical = this.partner.combat.vertical; } }});
 		new G.perk({name:`ancient charging`,desc:`Your Ancient scepter is charging up!`,onMove:function() { this.owner.has('ancient scepter').charges++; },onInterrupt:function() { this.owner.lose(this); console.log(this.owner.combat.overseer.injectBack('<br><e>'+this.owner.name+'</e>\'s focus on the ancient scepter has been disrupted!')); },aggro:10})
 		//summon perks
 		new G.perk({name:`grieving`,desc:`Grieving about the loss of a good friend.`,init:{power:1},onMove:function() { this.power--; if (this.power <= 0) { this.owner.lose(this); } }});
@@ -697,11 +699,11 @@ G={
 		G.glob.combat = false;
 		new G.perk({name:`wet`,desc:`Is dripping with water.`,disable:false,injury:false});
 		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false});
-		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 3) + 4 && Math.random() < 0.75) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
-		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`});
+		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 4) + 5 && Math.random() < 0.75) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
+		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 10) + 3 && Math.random() < 0.75) { this.owner.gain('bleeding out'); } }});
 		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.4) { this.owner.gain('lacerated'); } }, update:function() { if (Math.random() < 0.1) { this.count--; if (this.count == 0) { this.owner.lose('cut up'); }}}});
 		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } }});
-		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`});
+		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain(choose(['sick', 'dizzy', 'dazed', 'terrified', 'broken'])); if (Math.random() < 0.1) { this.owner.gain('comatose'); } } }});
 		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:false,ailment:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('seared'); this.count = Math.max(this.count - 3, 1); } }});
 		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('burnt'); this.count = Math.max(this.count - 3, 1); } } });
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`,ailment:true});
@@ -3352,7 +3354,7 @@ G={
 			G.moveAssets = {};
 			G.moveAssets.elements = {};
 			G.moveAssets.elements.alone = new G.element({ interact: 0, interactMin: 0 });
-			let hardDisables = '!unconscious|trapped|shell-shocked|hallucinating';
+			let hardDisables = '!unconscious|trapped|shell-shocked|hallucinating|paralyzed';
 			new G.move({
 				text: '[1] does something ????????',
 				chance: 0.001,
@@ -6135,14 +6137,124 @@ G={
 				}
 			});	
 			new G.move({
-				chance: 1,
+				chance: 0.5,
+				text: '[1] flies toward [2].',
+				successFunc: function(cl) { this.combat.moveToward(cl[1], 100); },
+				req: ['phantasmal_dragon flying !carrying', 'any !=%0.8'],
+				pReq: ['d:100/10000']
+			});
+			new G.move({
+				chance: 0.5,
 				text: '[1] dives toward [2] and picks [2:them] up effortlessly with [1:their] large jaws, then quickly flies back up, carrying [2:them] with [1:them]!',
 				failText: '[1] dives toward [2], but [2:they] managed to avoid [1:them].',
 				fail: function(cl) { return cl[1].adjust(0.1, 'dodge'); },
-				successFunc: function() {
-					
+				successFunc: function(cl) {
+					this.gain('carrying').setItem.call(this.has('carrying'), cl[1]);
+					this.gain('skipped');
+					cl[1].gain('paralyzed');
+					cl[1].gain('coupled').partner = this;
 				},
-				req: ['phantasmal_dragon !carrying']
+				req: ['phantasmal_dragon flying !carrying', 'any !=%0.8'],
+				pReq: ['d:200']
+			});
+			new G.move({
+				chance: 1,
+				text: '[1] bites down, crushing [2] between its rock-hard lower jaw and innumerably many upper teeth.<br>If you hear closely, you can even hear the sound of [a few bones being broken|flesh being grinded down into a fine sludge|armor cracking under the weight|[2:their] soul leaving [2:their] body].',
+				element: G.moveAssets.elements.alone,
+				func: function() {
+					this.combat.horizontal += (Math.random() < 0.5)?-1:1 * (Math.random() * 40 + 40);
+				},
+				successFunc: function() {
+					this.gain('skipped');
+					let char = this.has('carrying').items[0];
+					this.combat.overseer.addChar(char);
+					this.combat.overseer.injectColor('red');
+
+					char.gain('scratched');
+					char.gain('bruised');
+					let chance = 0.75;
+					chance = char.adjust(chance, 'defenseGen');
+
+					if (Math.random() < chance) { char.gain('bruised'); }
+					if (Math.random() < Math.pow(chance, 2)) { char.gain('bruised'); }
+					if (Math.random() < chance) { char.gain('cut up'); }
+					if (Math.random() < chance) { char.gain('cut up'); }
+					if (Math.random() < chance) { char.gain('cut up'); }
+					if (Math.random() < chance) { char.gain('cut up'); }
+					if (Math.random() < chance) { char.gain('singed'); }
+					if (Math.random() < Math.pow(chance, 3)) { char.gain('bleeding out'); }
+				},
+				req: ['phantasmal_dragon carrying flying']
+			});
+			G.adjustFuncs.fallDefense = function(chance) {
+				let pow = 1;
+				pow += this.isDisabled() * 0.6;
+				pow += this.isInjured() * 0.2;
+
+				if (this.has('levitating')) { pow *= 0.001; }
+				if (this.has('flying')) { pow = 0; }
+				if (this.has('wizard robe')) { pow *= 0.85; }
+				if (this.has('ninja')) { pow *= 0.7; }
+				if (this.has('survivalist')) { pow *= 0.85; }
+				if (this.has('ironskin')) { pow *= 0.5; }
+
+				return 1 - Math.pow(1 - chance, pow);
+			}
+			new G.move({
+				chance: 0.3,
+				text: 'Out of boredom, [1] lets [1:their] mouth open, dropping [2] from the sky down several hundred meters onto the ground as [1:they] flies off to find [1:their] next victim...',
+				element: G.moveAssets.elements.alone,
+				func: function() {
+					this.combat.horizontal += (Math.random() < 0.5)?-1:1 * (Math.random() * 40 + 40);
+				},
+				successFunc: function(cl, text) {
+					let char = this.has('carrying').items[0];
+					char.lose('paralyzed');
+					char.lose('coupled');
+					this.lose('carrying');
+					this.combat.overseer.addChar(char);
+					let chance = 0.9;
+					chance = char.adjust(chance, 'fallDefense');
+
+					if (Math.random() < chance) { this.has('phantasmal dragon').creator.kill(char, 'lacking a parachute'); return; }
+					char.gain('crippled');
+					char.gain('unconscious');
+					return text + '<br>Somehow, [2] miraculously survived the fall! Despite this, [2:they] are still very much knocked out from the fall.';
+				},
+				req: ['phantasmal_dragon carrying flying']
+			});
+			G.moveAssets.summonExpiration = function(idPerkName, chanceMult, pow) {
+				return function() {
+					return (this.has(idPerkName).mt ** pow) * chanceMult;
+				}
+			};
+			new G.move({
+				chance: G.moveAssets.summonExpiration('phantasmal dragon', 0.005, 3),
+				text: 'Suddenly, [1] lets out a last scream as its body disintegrates into a storm of grayish-white orbs of light!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() { this.kill(this, 'expired'); this.gain('nihil'); },
+				req: ['phantasmal_dragon every !carrying']
+			});
+			new G.move({
+				chance: G.moveAssets.summonExpiration('phantasmal dragon', 0.025, 1),
+				text: 'Suddenly, [1] lets out a last scream as its body disintegrates into a storm of grayish-white orbs of light.<br>As it disintegrates, [2] drops out of [1:their] mouth and starts a hundreds-meter fall onto the ground!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function(cl, text) { 
+					let char = this.has('carrying').items[0];
+					char.lose('paralyzed');
+					char.lose('coupled');
+					this.lose('carrying');
+					this.kill(this, 'expired'); this.gain('nihil');
+					this.combat.overseer.addChar(char);
+					let chance = 0.9;
+					chance = char.adjust(chance, 'fallDefense');
+
+					if (Math.random() < chance) { this.has('phantasmal dragon').creator.kill(char, 'lacking a parachute'); return; }
+					char.gain('crippled');
+					char.gain('unconscious');
+					return text + '<br>Somehow, [2] miraculously survived the fall! Despite this, [2:they] are still very much knocked out from the fall.';
+				},
+				req: ['phantasmal_dragon every carrying']
 			});
 			
 			G.parse = function(text,actors)
