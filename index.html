@@ -6394,6 +6394,18 @@ G={
 					return (this.has('ancient scepter').charges >= 2);
 				}
 			});	
+			G.adjustFuncs.electricityDefense = function(chance) {
+				let pow = 1;
+				if (this.has('wet')) { pow += 2; }
+				if (this.has('ironskin')) { pow += 2; }
+				
+				if (this.has('combat gear')) { pow *= 0.9; }
+				if (this.has('parka')) { pow *= 0.9; }
+				if (this.has('dapper suit')) { pow *= 0.9; }
+				if (this.has('knight armor')) { pow *= 0.2; }
+
+				return 1 - Math.pow(1 - chance, pow);
+			};
 			new G.move({
 				chance: 1,
 				text: 'Suddenly, one of [1]\'s stray lightning bolts float low enough to the ground to become attracted to the ground!<br>The streak of cyan-violet lightning hits [2][S]!',
@@ -6406,7 +6418,7 @@ G={
 					for (let i = 0; i < 20; i++) {
 						if (Math.random() < chance) { cl[1].gain('singed'); }
 					}
-					if (Math.random() < Math.pow(chance, 2)) { this.has('heavenly hypercane').creator.kill(cl[1], 'overclocked natural AED'); }
+					if (Math.random() < Math.pow(chance, 2)) { this.has('heavenly hypercane').creator.kill(cl[1], 'overclocked natural AED'); return text.replace('[S]', ', stopping [2:their] heart'); }
 					if (Math.random() < chance) { cl[1].gain('paralyzed'); return text.replace('[S]', ', which completely paralyzes [2:them]'); }
 					return text.replace('[S]', ', and while [2:they] survived, it still left [2:them] with some pretty heavy burns');
 				},
