@@ -2903,6 +2903,8 @@ G={
 	 					> h + v (t for total)
 	   				e
 						> the "effort function"
+	  				p
+	   					> the "projectile effort function", a modified version of the effort function for projectiles
 				*/
 				if (pReq.length == 0) { return true; }
 				if (!otherChar) { return true; }
@@ -2932,6 +2934,7 @@ G={
 						if (key=='d' && ((c1h-c2h)*(c1h-c2h) + (c1v-c2v)*(c1v-c2v) >= min*min && (c1h-c2h)*(c1h-c2h) + (c1v-c2v)*(c1v-c2v) <= max*max)) { fitOR = true; break; }
 						if (key=='t' && (Math.abs((c1h + c1v) - (c2h + c2v)) >= min && Math.abs((c1h + c1v) - (c2h + c2v)) <= max)) { fitOR = true; break; }
 						if (key=='e' && c1.dist(otherChar) >= min && c1.dist(otherChar) <= max) { fitOR = true; break; }
+						if (key=='p' && c1.projectileDist(otherChar) >= min && cl.projectileDist(otherChar) <= max) { fitOR = true; break; }
 					}
 					if (!fitOR) { fitAND = false; break; }
 				}
@@ -3139,6 +3142,17 @@ G={
 				}
 				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult;
 			} //vertical is here too, but each vertical distance above adds and each vertical distance below removes
+			G.combatTracker.prototype.projectileDist = function(target) {
+				let verticalOffset = target.combat.vertical - this.vertical;
+				let add = 0;
+				let mult = 1;
+				if (verticalOffset >= 0) {
+					add = Math.pow(target.combat.vertical, 0.5) * 5;
+				} else {
+					mult = 1 / (-verticalOffset * 0.05 + 1);
+				}
+				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult;
+			}
 			G.combatOverseer.prototype.getHeightAt = function(horizontal) {
 				//"this" is the overseer
 				//not implemented (planning on a perlin noise here)
@@ -4347,7 +4361,7 @@ G={
 						cl[1].gain('bruised'); cl[1].gain('fallen'); return text.replace('[S]', ' and [knocking|catapulting] [2:them] onto the [ground|floor]');
 					}
 				},
-				pReq: ['e:15']
+				pReq: ['p:15']
 			});
 			new G.move({
 				chance: 2,
@@ -4456,7 +4470,7 @@ G={
 					if (Math.random() < Math.pow(chance, (this.has('marksmen')?2:4))) { cl[1].gain('dazed'); return text.replace('[S]', 'The pebbles managed to hit [2:them] right on the head, stunning [2:them]!'); }
 				},
 				req: ['slingshot able|any%0.5 '+hardDisables, 'any'],
-				pReq: ['e:10/100']
+				pReq: ['p:10/100']
 			});
 
 			//pets general
@@ -4522,7 +4536,7 @@ G={
 					return text.replace('[T]', '');
 				},
 				req: ['pet_rock !determined any%0.75|sociopath '+hardDisables, 'any'],
-				pReq: ['e:10/50 d:5/80']
+				pReq: ['p:10/50 d:5/80']
 			});
 
 			//fun stabbing weapons (shuriken melee, cursed knife, scrap metal, sword jousting)
@@ -4621,7 +4635,7 @@ G={
 					if (Math.random() < 0.25 && !this.has('survivalist')) { this.gain('fallen'); return text.replace('[S]', ' [1] meanwhile, lost [1:their] balance and fell [onto the ground|face-first].'); }
 				},
 				req: ['shuriken', 'any'],
-				pReq: ['e:10']
+				pReq: ['p:10']
 			});
 			//scrap metal (copy paste go go go)
 			new G.move({
@@ -4635,7 +4649,7 @@ G={
 					if (Math.random() < 0.25 && !this.has('survivalist')) { this.gain('fallen'); return text.replace('[S]', ' [1] meanwhile, lost [1:their] balance and fell [onto the ground|face-first].'); }
 				},
 				req: ['scrap_metal', 'any'],
-				pReq: ['e:10']
+				pReq: ['e:15']
 			});
 			//cursed knife (4 moves) 
 			new G.move({ //cursed knife nerf
@@ -4910,7 +4924,7 @@ G={
 				reqFunc: function() {
 					return this.has('handgun').loaded;
 				},
-				pReq: ['e:4/1000']
+				pReq: ['p:4/1000']
 			});
 
 			//grenades (4 moves for 0 1 2 and 3 people respectively, plus one idling)
@@ -5030,7 +5044,7 @@ G={
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
 				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2|*able '+hardDisables, '- any', '- any', 'any'],
-				pReq: ['h:2/20 v:2'],
+				pReq: ['h:2/20 v:2 p:1/30'],
 			};
 			new G.move(grenadeObj);
 			grenadeObj.element = new G.element({interact: 2, interactMin: 2}); grenadeObj.chance += 2.5; grenadeObj.req[0] = 'grenade any%0.6|suicidal|devious%0.2|sociopath%0.2';
@@ -5173,7 +5187,7 @@ G={
 					}
 				},
 				req: ['bow able', 'any'],
-				pReq: ['e:6/100']
+				pReq: ['p:6/100']
 			});
 			//shuriken throw
 			new G.move({
@@ -5204,7 +5218,7 @@ G={
 				},
 				failFunc: function() { this.lose('shuriken'); },
 				req: ['shuriken', 'any'],
-				pReq: ['e:4/25']
+				pReq: ['p:4/25']
 			});
 
 			//shotgun (1 load, 1 fire)
@@ -5289,7 +5303,7 @@ G={
 				},
 				failFunc: function() { this.has('shotgun').loaded = 0; },
 				req: ['shotgun any%0.75|marksmen '+hardDisables, '- any'],
-				pReq: ['h:10 v:1'],
+				pReq: ['p:15'],
 				reqFunc: function() { return this.has('shotgun').loaded; }
 			});
 
@@ -5359,7 +5373,7 @@ G={
 					return text.replace('[S]', oxfordsConcat(afflictions));
 				},
 				req: ['flamethrower any%0.3|pyromania%0.4|able%0.2 '+hardDisables, 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any', 'delete%0.3 !=%0.75 any'], //if same team has chance to cancel; e.g. priortizes people not on the smae team but not completely exclude teammates
-				pReq: ['e:12', 'e:12', 'e:12', 'e:12', 'e:22'],
+				pReq: ['p:12', 'p:12', 'p:12', 'p:12', 'p:22'],
 				reqFunc: function() {
 					return (this.has('flamethrower').ammo > 0);
 				}
@@ -5405,7 +5419,7 @@ G={
 					cl[1].fleeCombat();
 				},
 				req: ['magic_wand any '+hardDisables, '+ !able'],
-				pReq: ['d:25']
+				pReq: ['p:25']
 			});
 			new G.move({
 				chance: 1,
@@ -5415,7 +5429,7 @@ G={
 					cl[1].gain('ironskin').duration = 4;
 				},
 				req: ['magic_wand able|any%0.4 '+hardDisables, '+ any%0.4|*able'],
-				pReq: ['d:20']
+				pReq: ['p:20']
 			});
 			new G.move({
 				chance: 1,
@@ -5427,7 +5441,7 @@ G={
 					cl[1].gain('vulnerable').duration = 5;
 				},
 				req: ['magic_wand able|any%0.4 '+hardDisables, '- able|any%0.4'],
-				pReq: ['d:20']
+				pReq: ['p:20']
 			});
 			new G.move({
 				chance: 1,
@@ -5440,7 +5454,7 @@ G={
 					cl[1].gain('terrified');
 				},
 				req: ['magic_wand able|any%0.4 '+hardDisables, '-'],
-				pReq: ['d:20']
+				pReq: ['p:20']
 			});
 			new G.move({
 				chance: 1.5,
@@ -5460,7 +5474,7 @@ G={
 					}
 				},
 				req: ['magic_wand', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen', 'delete%0.5 !=%0.85 !fallen'],
-				pReq: ['d:30', 'd:30', 'd:30', 'd:30', 'd:30', 'd:30', 'd:60']
+				pReq: ['p:30', 'p:30', 'p:30', 'p:30', 'p:30', 'p:30', 'p:60']
 			});
 			new G.move({
 				chance: 2,
@@ -5525,7 +5539,7 @@ G={
 				},
 				req: ['rocket_launcher any%0.25|able%0.5|pyromania%0.25|sociopath%0.25|frenzied%0.25 '+hardDisables, '!=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any', 'delete%0.4 !=%0.75 any'],
 				reqFunc: function() { return (this.has('rocket launcher').loaded == 1); },
-				pReq: ['d:30', 'd:30', 'd:30', 'd:30', 'd:40']
+				pReq: ['p:30', 'p:30', 'p:30', 'p:30', 'p:40']
 			});
 
 			new G.move({
@@ -5952,7 +5966,7 @@ G={
 					return text.replace('[S]', 'and managed to [steal|snatch] a '+item.perk.name+' from [2:their] [body|hands]');
 				},
 				req: ['hawk !carrying levitating', 'any real'],
-				pReq: ['d:50']
+				pReq: ['p:50']
 			});
 			new G.move({
 				chance: 2,
