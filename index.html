@@ -6149,7 +6149,7 @@ G={
 				failText: '[1] dives toward [2], but [2:they] managed to avoid [1:them].',
 				fail: function(cl) { return cl[1].adjust(0.1, 'dodge'); },
 				successFunc: function(cl) {
-					this.gain('carrying').perk.setItem.call(this.has('carrying'), cl[1]);
+					this.gain('carrying').perk.addItem.call(this.has('carrying'), cl[1]);
 					this.gain('skipped');
 					cl[1].gain('paralyzed');
 					cl[1].gain('coupled').partner = this;
