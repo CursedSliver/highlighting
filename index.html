@@ -2934,7 +2934,7 @@ G={
 						if (key=='d' && ((c1h-c2h)*(c1h-c2h) + (c1v-c2v)*(c1v-c2v) >= min*min && (c1h-c2h)*(c1h-c2h) + (c1v-c2v)*(c1v-c2v) <= max*max)) { fitOR = true; break; }
 						if (key=='t' && (Math.abs((c1h + c1v) - (c2h + c2v)) >= min && Math.abs((c1h + c1v) - (c2h + c2v)) <= max)) { fitOR = true; break; }
 						if (key=='e' && c1.dist(otherChar) >= min && c1.dist(otherChar) <= max) { fitOR = true; break; }
-						if (key=='p' && c1.projectileDist(otherChar) >= min && cl.projectileDist(otherChar) <= max) { fitOR = true; break; }
+						if (key=='p' && c1.projectileDist(otherChar) >= min && c1.projectileDist(otherChar) <= max) { fitOR = true; break; }
 					}
 					if (!fitOR) { fitAND = false; break; }
 				}
