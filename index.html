@@ -3155,6 +3155,7 @@ G={
 				let obj = new G.interruptUnit(interruptedChar, move);
 				this.combat.interrupts.push(obj);
 				this.combat.lastInterrupt = obj;
+				this.combat.overseer.nonInteractiveMoveCount = Math.max(this.combat.overseer.nonInteractiveMoveCount - 3, 0);
 				for (let i of interruptedChar.perks) {
 					if (i.perk.onInterrupt) {
 						i.perk.onInterrupt.call(i);
@@ -6176,6 +6177,7 @@ G={
 					char.gain('bruised');
 					let chance = 0.75;
 					chance = char.adjust(chance, 'defenseGen');
+					this.interrupt(char);
 
 					if (Math.random() < chance) { char.gain('bruised'); }
 					if (Math.random() < Math.pow(chance, 2)) { char.gain('bruised'); }
@@ -6217,6 +6219,7 @@ G={
 					this.combat.overseer.addChar(char);
 					let chance = 0.9;
 					chance = char.adjust(chance, 'fallDefense');
+					this.interrupt(char);
 
 					if (Math.random() < chance) { this.has('phantasmal dragon').creator.kill(char, 'lacking a parachute'); return; }
 					char.gain('crippled');
