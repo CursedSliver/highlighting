@@ -6150,6 +6150,9 @@ G={
 				},
 				req: ['ancient_scepter'],
 				reqFunc: function() {
+					for (let i in this.combat.overseer.extras) {
+						if (this.combat.overseer.extras[i].has('phantasmal dragon') && this.combat.overseer.extras[i].has('phantasmal dragon').creator == this) { return false; }
+					}
 					return (this.has('ancient scepter').charges >= 2);
 				}
 			});	
