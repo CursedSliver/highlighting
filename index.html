@@ -6319,7 +6319,7 @@ G={
 				pReq: ['d:35']
 			});
 			new G.move({
-				chance: 0,
+				chance: 20,
 				text: 'With an inverse shockwave imploding air into [1:their] center, [1]\'s pupil begins glowing with a fiery red as bright-red flames in the form of a concentrated high-velocity beam arrives at [2]\'s body![S]',
 				successFunc: function(cl, text) {
 					cl[1].lose('mark of the void');
@@ -6362,7 +6362,7 @@ G={
 			});
 			new G.move({
 				chance: function() {
-					return Math.min((this.has('eye of the void').mt ** 3) * 0.002, 10);
+					return Math.min((this.has('eye of the void').mt ** 3) * 0.0025, 10);
 				},
 				text: 'Abruptly, [1] starts rapidly shrinking, soon reduced to all but a pitch-black point in the air and letting off an enormous amount of black smoke. Soon after that, the black point disappeared as well.',
 				element: G.moveAssets.elements.alone,
