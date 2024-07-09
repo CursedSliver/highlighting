@@ -3312,6 +3312,7 @@ G={
 					if (m.reqFunc && !m.reqFunc.call(this, targets)) { continue; }
 					let chance = m.chance;
 					if (typeof m.chance == 'function') { chance = m.chance.call(this, targets); }
+					if (chance > 100) { chance = 100; console.log('Warning: chance for a move is exceeding 100! Chance: '+chance); }
 					for (let ii = 0; ii < randomFloor(chance); ii++) {
 						availableMoves.push([m, targets]);
 					}
@@ -6359,7 +6360,9 @@ G={
 				req: ['able mark_of_the_void', 'eye_of_the_void']
 			});
 			new G.move({
-				chance: G.moveAssets.summonExpiration('eye of the void', 0.01, 3),
+				chance: function() {
+					return (this.has('eye of the void').mt ** 3) * 0.01;
+				},
 				text: 'Abruptly, [1] starts rapidly shrinking, soon reduced to all but a pitch-black point in the air and letting off an enormous amount of black smoke. Soon after that, the black point disappeared as well.',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() { this.kill(this, 'expired'); this.gain('nihil'); },
