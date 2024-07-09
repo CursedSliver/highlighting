@@ -671,6 +671,8 @@ G={
 		new G.perk({name:`weak`,desc:`Muscles no longer work properly.`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`vulnerable`,desc:`No matter what you wear, it still hurts...`,init:{duration:5},onMove:function() { this.duration--; }});
 		new G.perk({name:`hallucinating`,desc:`Enchanted in a trance.`,init:{duration:5},onMove:function() { this.duration--; },disable:true,hard:true});
+		new G.perk({name:`invulnerable`,desc:`Completely invincible.`});
+		new G.perk({name:`immaterial`,desc:`Does not possess a directly interactable physical form.`});
 		new G.perk({name:`invisible`,desc:`Vanished into thin air!`,init:{duration:2},onMove:function() { this.duration--; }});
 		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true});
 		new G.perk({name:`paralyzed`,desc:`For whatever reason, none of your muscles want to listen anymore.`,disable:true,hard:true});
@@ -6154,7 +6156,7 @@ G={
 					cl[1].gain('paralyzed');
 					cl[1].gain('coupled').partner = this;
 				},
-				req: ['phantasmal_dragon flying !carrying', 'any !=%0.8'],
+				req: ['phantasmal_dragon flying !carrying', 'any !=%0.8 !flying !invulnerable !immaterial'],
 				pReq: ['d:200']
 			});
 			new G.move({
