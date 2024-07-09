@@ -4663,8 +4663,8 @@ G={
 				text: '[Motivated|Driven|Compelled] by [1:their] [cursed|ominous|unforgettable|creepy] knife, [1] [lurches|throws [1:themself]] at [2] with [incredible speed|surprising agility] and [slices|chops] [2]\'s [[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] [index|middle|fifth] [finger|toe] [right |]off!|[left|right] eyelid [right |]off!]',
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.sliceLight(),
-				req: ['cursed_knife able%0.75|frenzied', 'any !immaterial'],
-				pReq: ['e:15']
+				req: ['cursed_knife able%0.75|frenzied able', 'any !immaterial'],
+				pReq: ['d:15']
 			});
 			new G.move({
 				chance: 2,
@@ -4674,7 +4674,7 @@ G={
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.stabLight('cursed knife', 0.25),
 				failFunc: function() { this.gain('fallen'); },
-				req: ['cursed_knife able%0.5|frenzied', 'any !immaterial'],
+				req: ['cursed_knife able%0.5|frenzied able', 'any !immaterial'],
 				pReq: ['d:5']
 			});
 			new G.move({
@@ -4685,7 +4685,7 @@ G={
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.stabLight('cursed knife'),
 				req: ['cursed_knife able !frenzied', 'any !immaterial'],
-				pReq: ['e:10']
+				pReq: ['d:10']
 			});
 			G.moveAssets.stabHeavy = function(item, chanceNew) {
 				if (!chanceNew) { chanceNew = 0.5; }
