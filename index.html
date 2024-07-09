@@ -6275,8 +6275,8 @@ G={
 					char.lose('coupled');
 					this.lose('carrying');
 					this.combat.overseer.injectColor('green');
-					this.kill(this, 'expired'); this.gain('nihil');
 					this.combat.overseer.addChar(char);
+					this.kill(this, 'expired'); this.gain('nihil');
 					let chance = 0.9;
 					chance = char.adjust(chance, 'fallDefense');
 
