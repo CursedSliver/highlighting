@@ -674,6 +674,7 @@ G={
 		new G.perk({name:`invulnerable`,desc:`Completely invincible.`});
 		new G.perk({name:`infallible`,desc:`Will never be slow.`});
 		new G.perk({name:`immaterial`,desc:`Does not possess a directly interactable physical form.`});
+		new G.perk({name:`untargetable`,desc:`Cannot be targeted.`});
 		new G.perk({name:`invisible`,desc:`Vanished into thin air!`,init:{duration:2},onMove:function() { this.duration--; }});
 		new G.perk({name:`levitating`,desc:`Is higher than everyone else.`,init:{duration:2},onMove:function() { this.duration--; this.owner.combat.vertical += 5; },disable:true});
 		new G.perk({name:`paralyzed`,desc:`For whatever reason, none of your muscles want to listen anymore.`,disable:true,hard:true});
@@ -3216,6 +3217,7 @@ G={
 			}
 			G.char.prototype.targetCount = function(perpentrator) {
 				if (!this.combat) { return 1; }
+				if (this.has('untargetable')) { return 0; }
 				let count = 1;
 				if (this.has('annoying')) { count += 1; }
 				if (this.has('nerd')) { count += 0.6; }
@@ -6134,13 +6136,13 @@ G={
 				successFunc: function() {
 					this.gain('ancient charging');
 				},
-				req: ['ancient_scepter any%0.5|able%0.5|wizard_robe%0.5 '+hardDisables],
+				req: ['ancient_scepter any%0.5|able%0.5|wizard_robe%0.5|levitating '+hardDisables],
 				reqFunc: function() {
 					return (this.has('ancient scepter').charges < this.has('wizard robe')?4:2);
 				}
 			});
 			new G.move({
-				chance: 0.5,
+				chance: 1,
 				text: '[1] holds [1:their] ancient scepter up into the air, chanting something unintellgible as the magical orb begins to glow brightly!<br>Suddenly, a grayish-white portal emerges in a flash of light as a serpentine figure flies out of it, roaring! <br>Looking closely, it\'s a ghastly wyvern, entirely composed of sharp looking, semi-translucent armor with a pair of glowing white eyes...',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
@@ -6152,7 +6154,7 @@ G={
 					dragon.gain('bulky');
 					dragon.gain('mint enhanced');
 				},
-				req: ['ancient_scepter'],
+				req: ['ancient_scepter able%0.5|wizard_robe able'],
 				reqFunc: function() {
 					for (let i in this.combat.overseer.extras) {
 						if (this.combat.overseer.extras[i].has('phantasmal dragon') && this.combat.overseer.extras[i].has('phantasmal dragon').creator == this) { return false; }
@@ -6289,7 +6291,7 @@ G={
 			});
 
 			new G.move({
-				chance: 0.5,
+				chance: 1,
 				text: '[1] holds [1:their] ancient scepter up into the air, chanting something unintellgible as the magical orb begins to glow brightly!<br>Suddenly, vast swaths of inky void emanates out of the orb, coagulating into a sphere as a distinct point of light begin forming from within! Looking closer, the whole thing resembles an... eye?',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
@@ -6300,7 +6302,7 @@ G={
 					eye.gain('infallible');
 					eye.gain('skipped').count = 2;
 				},
-				req: ['ancient_scepter'],
+				req: ['ancient_scepter able%0.5|wizard_robe able'],
 				reqFunc: function() {
 					for (let i in this.combat.overseer.extras) {
 						if (this.combat.overseer.extras[i].has('eye of the void') && this.combat.overseer.extras[i].has('eye of the void').creator == this) { return false; }
@@ -6316,7 +6318,7 @@ G={
 					cl[1].gain('terrified');
 					this.gain('skipped');
 				},
-				req: ['eye_of_the_void every', 'any%0.1|able !mark_of_the_void'],
+				req: ['eye_of_the_void every', 'any%0.1|able !=%0.9 !mark_of_the_void'],
 				pReq: ['d:35']
 			});
 			new G.move({
@@ -6336,7 +6338,7 @@ G={
 					if (Math.random() < Math.pow(chance, 2)) { cl[1].gain('shell-shocked'); }
 					return text.replace('[S]', '<br>Miraculously, [2:they] survived this attack, but is left with third-degree burns all over [2:their] body...');
 				},
-				req: ['eye_of_the_void every', 'any mark_of_the_void'],
+				req: ['eye_of_the_void every', '+|- any mark_of_the_void'],
 				pReq: ['d:60']
 			});
 			new G.move({
@@ -6363,12 +6365,52 @@ G={
 			});
 			new G.move({
 				chance: function() {
-					return Math.min(((this.has('eye of the void').mt - 3) ** 3) * 0.01, 10);
+					return Math.min(((this.has('eye of the void').mt - 3) ** 3) * 0.006, 10);
 				},
 				text: 'Abruptly, [1] starts rapidly shrinking, soon reduced to all but a pitch-black point in the air and letting off an enormous amount of black smoke. Soon after that, the black point disappeared as well.',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() { this.combat.overseer.injectColor('green'); this.kill(this, 'expired'); this.gain('nihil'); },
 				req: ['eye_of_the_void']
+			});
+
+			new G.move({
+				chance: 1,
+				text: '[1] holds [1:their] ancient scepter up into the air, chanting something unintellgible as the magical orb begins to glow brightly!<br>Suddenly, immense quantities of mist and steam pour out of the blue orb, rapidly rising into the air! Soon, they start forming clouds that stretch across the horizon and reach high into space - but no water is falling, and it is simply the thunderous roars that continue on for the rest of eternity...',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() {
+					this.has('ancient scepter').charges -= 2;
+					let storm = G.newPhantomChar(G.perksBN['heavenly hypercane'], this.combat.overseer, this);
+					storm.gain('immaterial');
+					storm.gain('invulnerable');
+					storm.gain('infallible');
+					storm.gain('untargetable');
+					storm.gain('skipped').count = 4;
+				},
+				req: ['ancient_scepter able%0.5|wizard_robe able'],
+				reqFunc: function() {
+					for (let i in this.combat.overseer.extras) {
+						if (this.combat.overseer.extras[i].has('heavenly hypercane')) { return false; }
+					}
+					return (this.has('ancient scepter').charges >= 2);
+				}
+			});	
+			new G.move({
+				chance: 1,
+				text: 'Suddenly, one of [1]\'s stray lightning bolts float low enough to the ground to become attracted to the ground!<br>The streak of cyan-violet lightning hits [2][S]!',
+				successFunc: function(cl, text) {
+					this.gain('skipped').count = Math.floor(Math.random() * 6) + 2;
+					cl[1].gain('singed');
+					let chance = 0.5;
+					chance = cl[1].adjust(chance, 'electricityDefense');
+
+					for (let i = 0; i < 20; i++) {
+						if (Math.random() < chance) { cl[1].gain('singed'); }
+					}
+					if (Math.random() < Math.pow(chance, 2)) { this.has('heavenly hypercane').creator.kill(cl[1], 'overclocked natural AED'); }
+					if (Math.random() < chance) { cl[1].gain('paralyzed'); return text.replace('[S]', ', which completely paralyzes [2:them]'); }
+					return text.replace('[S]', ', and while [2:they] survived, it still left [2:them] with some pretty heavy burns');
+				},
+				req: ['heavenly_hypercane', '!=%0.2 every']
 			});
 			
 			G.parse = function(text,actors)
