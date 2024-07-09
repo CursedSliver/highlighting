@@ -3888,7 +3888,7 @@ G={
 				func: G.moveAssets.readyForPunch,
 				pReq: ['h:3 v:0.25'],
 				successFunc: G.moveAssets.mediumHeadHit(),
-				req: ['', 'any']
+				req: ['any '+hardDisables, 'any']
 			});
 			new G.move({
 				chance: 0.75,
