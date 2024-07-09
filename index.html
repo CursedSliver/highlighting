@@ -6226,7 +6226,7 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			}
 			new G.move({
-				chance: 0.3,
+				chance: 0.6,
 				text: 'Out of boredom, [1] lets [1:their] mouth open, dropping [2] from the sky down several hundred meters onto the ground as [1:they] flies off to find [1:their] next victim...',
 				element: G.moveAssets.elements.alone,
 				func: function() {
@@ -6276,13 +6276,13 @@ G={
 					this.lose('carrying');
 					this.combat.overseer.injectColor('green');
 					this.combat.overseer.addChar(char);
-					this.kill(this, 'expired'); this.gain('nihil');
 					let chance = 0.9;
 					chance = char.adjust(chance, 'fallDefense');
 
 					if (Math.random() < chance) { this.has('phantasmal dragon').creator.kill(char, 'lacking a parachute'); return; }
 					char.gain('crippled');
 					char.gain('unconscious');
+					this.kill(this, 'expired'); this.gain('nihil');
 					return text + '<br>Somehow, [2] miraculously survived the fall! Despite this, [2:they] are still very much knocked out from the fall.';
 				},
 				req: ['phantasmal_dragon every carrying']
@@ -6363,7 +6363,7 @@ G={
 			});
 			new G.move({
 				chance: function() {
-					return Math.min((this.has('eye of the void').mt ** 3) * 0.0025, 10);
+					return Math.min((this.has('eye of the void').mt ** 3) * 0.005, 10);
 				},
 				text: 'Abruptly, [1] starts rapidly shrinking, soon reduced to all but a pitch-black point in the air and letting off an enormous amount of black smoke. Soon after that, the black point disappeared as well.',
 				element: G.moveAssets.elements.alone,
