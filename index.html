@@ -573,7 +573,7 @@ G={
 			this.t = 0;
 			if (obj) { for (let i in obj) { this[i] = obj[i]; } }
 			if (this.combat) { this.mt = 0; }
-			if (this.perk.init) { for (let i in this.perk.init) { this[i] = this.perk.init[i]; } }
+			if (this.perk.init) { for (let i in this.perk.init) { this[i] = deepArrCopy(this.perk.init[i]); } }
 		}
 
 		/*
