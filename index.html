@@ -6342,11 +6342,15 @@ G={
 					let mult = 1;
 					if (this.has('cowardly')) { add += 2.5; }
 					if (this.has('vigilant')) { add += 2.5; }
-					if (this.has('terrified')) { add += 5; }
+					if (this.has('terrified')) { add += 4; }
+					if (this.has('analytical')) { add += 1;}
 					add += this.isInjured() * 0.5;
 
 					mult *= Math.pow(0.8, this.isAiled());
 					if (this.has('blind')) { mult *= 0.1; }
+					if (this.has('naive')) { mult *= 0.5; }
+					if (this.has('dizzy')) { mult *= 0.8; }
+					if (this.has('dazed')) { mult *= 0.8; }
 
 					return add * mult;
 				},
