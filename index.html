@@ -6415,6 +6415,7 @@ G={
 					let chance = 0.5;
 					chance = cl[1].adjust(chance, 'electricityDefense');
 
+					this.combat.overseer.injectColor('red');
 					for (let i = 0; i < 20; i++) {
 						if (Math.random() < chance) { cl[1].gain('singed'); }
 					}
