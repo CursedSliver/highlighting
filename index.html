@@ -5190,7 +5190,7 @@ G={
 						this.lose('bow'); return text + '<br>The bow was also broken in the attempt!';
 					}
 				},
-				req: ['bow able', 'any'],
+				req: ['bow able', 'any !immaterial'],
 				pReq: ['p:6/100']
 			});
 			//shuriken throw
@@ -5221,7 +5221,7 @@ G={
 					}
 				},
 				failFunc: function() { this.lose('shuriken'); },
-				req: ['shuriken', 'any'],
+				req: ['shuriken', 'any !immaterial'],
 				pReq: ['p:4/25']
 			});
 
@@ -5306,7 +5306,7 @@ G={
 					return text.replace('[S]', ', but [2:they] didn\'t anything more than a few scratches!');
 				},
 				failFunc: function() { this.has('shotgun').loaded = 0; },
-				req: ['shotgun any%0.75|marksmen '+hardDisables, '- any'],
+				req: ['shotgun any%0.75|marksmen '+hardDisables, '- any !immaterial'],
 				pReq: ['p:15'],
 				reqFunc: function() { return this.has('shotgun').loaded; }
 			});
