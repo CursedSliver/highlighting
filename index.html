@@ -2063,7 +2063,7 @@ G={
 			
 			
 			//finding items
-			var baseItemMult=1;
+			var baseItemMult=1.6;
 				var newItemMult=baseItemMult*0.2 // New item spawns
 				var newPetMult=baseItemMult*0.1 // New pet spawns
 				var newMatMult=baseItemMult*0.4 // New material spawns
@@ -2461,6 +2461,9 @@ G={
                 new G.act(perkAttackMult*attackKill*0.1,[coldBloodKiller+' laughed grenade|rocket_launcher','- any '+victimKill],`[RED][1] blows up [2] and [3] when they're talking together!<br>When the smoke clears, [1] is laughing [evily|maniacally|devilously|excessively]!`,p=>{p[1].kill(p[2],`explosion`);p[1].kill(p[3],`explosion`);p[1].lose('grenade');});
                 new G.act(perkAttackMult*attackKill*0.1,[coldBloodKiller+' laughed flamethrower|magic_wand|ancient_scepter','- any '+victimKill],`[RED][1] sets [2] aflame and laughs very [evily|maniacally|devilously|excessively] as they burn!`,p=>{p[1].kill(p[2],`incinerated`);});
                 new G.act(perkAttackMult*attackKill*0.2,[coldBloodKiller+' laughed cursed_knife','- any '+victimKill],`[RED][1] just keeps stabbing [2] even after they'ved died, all the while laughing quite [evily|maniacally|devilously|deranged]!`,p=>{p[1].kill(p[2],`cursed_knife`);});
+			// Freezing sapphire combat -CS
+			new G.act(perkAttackMult*attackKill*0.5,[coldBloodKiller+' freezing_sapphire','- any '+victimKill],`[RED][1] creeps up behind [2] and throw [1:their] freezing sapphire, turning [2:them] into a solid block of ice - before promptly [throwing [2:them] down a [cliff|lake]|smashing it into pieces|burying it into the ground]`,p=>{p[1].kill(p[2], 'freezing sapphire');p[1].lose('freezing sapphire');});
+				new G.act(perkAttackMult*attackKill*0.3,[coldBloodKiller+' freezing_sapphire devious|sociopath','- any '+victimKill],`[RED][1] creeps up behind [2] and quickly tackles [2:them] to the ground, before promptly shoving [1:their] freezing sapphire down [2:their] throat!`,p=>{ p[1].kill(p[2], 'glacial stasis'); p[1].lose('freezing sapphire'); });
             // Big Stick Combat
 			new G.act(perkAttackMult*attackMinor*0.6,[hesitentKiller+' big_stick bulky|any%0.8','- any !knight_armor%0.2|kite_shield%0.2 '+victimMinor],`[RED][1] wacked [2] with [1:their] stick, leaving a nasty bruise.`,p=>{p[2].gain('bruised');});
 			new G.act(perkAttackMult*attackModerate*0.2,[hesitentKiller+' big_stick bulky|any%0.8','- any !knight_armor%0.2|kite_shield%0.2 '+victimModerate],`[RED][1] beat [2] black and blue with [1:their] stick, beaking a bone or two.`,p=>{p[2].gain('broken');});
