@@ -587,6 +587,7 @@ G={
 		"onMove": function, called at the start of every move selection
   		"onInterrupt": function, called when interrupted in combat
     		"aggro": number, adds the number to the count for target selection (tier does the same thing but more complicated and actually represents something else)
+	  	"onDeath": function, called when the carrying character dies
   		*/
 		G.glob={type:'trait',def:true};
 		new G.perk({name:`no perk`,desc:`No perk selected.`});
@@ -721,7 +722,8 @@ G={
 		new G.perk({name:`unconscious`,desc:`Not quite comatose, but almost there.`});
 		new G.perk({name:`comatose`,desc:`Unconscious, and unable to speak or move.`,out:true});
 		new G.perk({name:`revived`,desc:`Was just resurrected through some miracle or other.`,out:true,injury:false});
-		new G.perk({name:`will respawn`,desc:`respawn anchor set!`,disable:false,injury:false});
+		new G.perk({name:`will respawn`,desc:`Respawn anchor set!`,disable:false,injury:false});
+		new G.perk({name:`angel\'s revival`,desc:`Resurrection is imminent...`,disable:false,injury:false});
 		new G.perk({name:`dead`,desc:`Dead and gone. Sorry!`,out:true});
 		new G.perk({name:`ghost`,desc:`Brought back from the dead in a mischievous incorporeal form.`,out:true});
 		new G.perk({name:`zombie`,desc:`Brought back from the dead in a smelly, mindless form.`,out:true});
@@ -819,8 +821,8 @@ G={
 		new G.perk({name:`freezing sapphire`,desc:`Can be thrown to freeze everyone.`,tier:1});
 		new G.perk({name:`high pressure garden hose`,desc:`Good at knocking people over, not so good for killing people.`,tier:1});
 		new G.perk({name:`topaz with a hole`,desc:`Tingly to the touch.`,tier:2});
-		new G.perk({name:`topaz on a stick`,desc:``,tier:3});
-		new G.perk({name:`angel in a bottle`,desc:`SUSSY AMONGUS`,tier:3});
+		new G.perk({name:`topaz on a stick`,desc:`Shall lightning smite you!`,tier:3});
+		new G.perk({name:`angel in a bottle`,desc:`SUSSY AMONGUS`,tier:3,onDeath:function() { if (Math.random() < 1 / 3) { this.owner.gain('angel\'s revival'); } this.owner.lose(this); }});
 		new G.perk({name:`nuclear bomb`,desc:`A nuke.`,tier:9});
 		
 		//creator
@@ -1396,6 +1398,7 @@ G={
 							G.deadThisRound.push(this);
 						}
 						if (this.onDeath) { this.onDeath.call(this); }
+						for (let i of this.perks) { if (i.perk.onDeath) { i.perk.onDeath.call(i); } }
 						this.gain('dead');
 						if (reason) this.deathReason=reason;
 						if (this.combat) {
@@ -2055,6 +2058,8 @@ G={
 			new G.act(0.25,['respawn_anchor any !inventor%0.5|goth%0.6|the_gift%0.6'],`[1] places down [1:their] respawn anchor and attempts to activate it, however, the respawn anchor broke while fidgeting with its complex inner workings.`,p=>{p[1].lose('respawn anchor');});
 			new G.act(0.125,['respawn_anchor any !inventor%0.5|goth%0.6|the_gift%0.6'],`[RED][1] places down [1:their] respawn anchor and attempts to activate it.<br>However, [1:they] made a mistake while trying to activate it, and the respawn anchor blew up into a miniature mushroom cloud in front of [1:them], killing [1:them] instantly!`,p=>{p[1].kill(p[1], 'respawn anchor');p[1].lose('respawn anchor');});
 			new G.act(0.125,['respawn_anchor any !inventor%0.5|goth%0.6|the_gift%0.6', 'any', 'delete%0.8 any', 'delete%0.8 any', 'delete%0.8 any', 'delete%0.8 any', 'delete%0.8 any'],`[RED][1] places down [1:their] respawn anchor and attempts to activate it.<br>However, [1:they] made a mistake while trying to activate it, and the respawn anchor blew up into a miniature mushroom cloud in front of [1:them], killing [1:them] instantly. [ALL-1] were also caught in this explosion, killing them as well!`,p=>{for (let i = 1; i < p.length; i++) { p[1].kill(p[i], '[INTENTIONAL GAME DESIGN]'); } p[1].lose('respawn anchor'); });
+			new G.act(1,['angel\'s_revival dead !nihil !sheep'],'[BLUE]Out of nowhere, a point in the sky begin to glow a glorious golden shine, as a pair of wings grow out of it - carrying [1]! <br>As it turns out, when [1:they] last died, their angel in a bottle shattered, which lead to [1:their] revival.',p=>{ p[1].revive(); p[1].lose('angel\'s revival'); });
+			new G.act(1,['angel\'s_revival dead !nihil !sheep'],'[BLUE]Out of nowhere, a point in the sky begin to glow a glorious golden shine, as a pair of wings grow out of it - carrying [1]! <br>As it turns out, when [1:they] last died, their angel in a bottle shattered, which lead to [1:their] revival.<br>The angel set [1:them] down gently, then hands [1:them] something - another angel in a bottle!',p=>{ p[1].revive(); p[1].lose('angel\'s revival'); p[1].gain('angel in a bottle'); });
 			
 			
 			//finding items
