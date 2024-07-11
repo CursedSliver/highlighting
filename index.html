@@ -5720,7 +5720,7 @@ G={
 				successFunc: function() {
 					let cl = deepArrCopy(this.team.chars);
 					for (let i = cl.length - 1; i >= 0; i--) {
-						if (cl[i] == this) { cl.splice(i, 1); }
+						if (cl[i] == this) { cl.splice(i, 1); continue; }
 						if (cl[i].isOut() || (cl[i].combat && cl[i].combat.overseer == this.combat.overseer)) { cl.splice(i, 1); }
 					}
 					let list = [];
