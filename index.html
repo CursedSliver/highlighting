@@ -807,8 +807,8 @@ G={
 		new G.perk({name:`roll of fabric`,desc:`Thick rolls of fabric, a literal canvas to work with.`,tier:0});
 
 		// Consumables - CS
-		new G.perk({name:`batch of cookies`,desc:`Can be consumed multiple times to rid oneself of ailments. Delicious!`,tier:1});
-		new G.perk({name:`hot chocolate`,desc:`Can be consumed multiple times to heal oneself of injuries.`,tier:2});
+		new G.perk({name:`batch of cookies`,desc:`Can be consumed multiple times to rid oneself of ailments. Delicious!`,tier:1,init:{uses:2}});
+		new G.perk({name:`hot chocolate`,desc:`Can be consumed multiple times to heal oneself of injuries.`,tier:2,init:{uses:2}});
 		new G.perk({name:`extreme cinnamon soda`,desc:`Can be consumed to enter an invincible frenzy.`,tier:3});
 		new G.perk({name:`mint essence`,desc:`Can be consumed to gain immunity to all curses, but is rather difficult to swallow.`,tier:2});
 		new G.perk({name:`vanilla ice cream`,desc:`The compellment to acquire this item is unparalleled.`,tier:1});
@@ -3661,7 +3661,8 @@ G={
 				text: '[1] takes out [1:their] batch of [freshly baked |]cookies and [gorges on|devours|eats] them, recovering from [1:their] ailments!',
 				successFunc: function() {
 					this.cureAilments();
-					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('batch of cookies'); this.combat.overseer.injectBack('<br>[1] has eaten all of [1:their] cookies.'); }
+					this.has('batch of cookies').uses--;
+					if (this.has('batch of cookies').uses <= 0 && Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('batch of cookies'); this.combat.overseer.injectBack('<br>[1] has eaten all of [1:their] cookies.'); }
 				},
 				req: ['batch_of_cookies any%0.05|ailed '+hardDisables]
 			});
@@ -3670,7 +3671,8 @@ G={
 				text: '[1] takes out [1:their] [hot |steaming |fragrant |magical |]hot chocolate and [consumes|drinks|drains] it, recovering from [1:their] injuries!',
 				successFunc: function() {
 					this.healInjuries();
-					if (Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('hot chocolate'); this.combat.overseer.injectBack('<br>[1] has drank all of [1:their] hot chocolate.'); }
+					this.has('hot chocolate').uses--;
+					if (this.has('hot chocolate').uses <= 0 && Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('hot chocolate'); this.combat.overseer.injectBack('<br>[1] has drank all of [1:their] hot chocolate.'); }
 				},
 				req: ['hot_chocolate any%0.05|injured '+hardDisables]
 			});
