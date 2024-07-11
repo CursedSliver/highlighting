@@ -6547,7 +6547,7 @@ G={
 					const all = this.combat.overseer.all();
 					let list = [];
 					for (let i of all) {
-						if (cl[1].projectileDist(i) <= 17.5 && (this.team != i || i.team == 0 || i == this)) { list.push(i); }
+						if (cl[1].combat.projectileDist(i) <= 17.5 && (this.team != i || i.team == 0 || i == this)) { list.push(i); }
 					}
 					for (let i of list) { this.combat.overseer.addChar(i); i.gain('deep frozen').duration = 3; }
 				},
