@@ -811,7 +811,7 @@ G={
 		new G.perk({name:`hot chocolate`,desc:`Can be consumed multiple times to heal oneself of injuries.`,tier:2});
 		new G.perk({name:`extreme cinnamon soda`,desc:`Can be consumed to enter an invincible frenzy.`,tier:3});
 		new G.perk({name:`mint essence`,desc:`Can be consumed to gain immunity to all curses, but is rather difficult to swallow.`,tier:2});
-		new G.perk({name:`vanilla ice cream`,desc:`Can be consumed.`,tier:1});
+		new G.perk({name:`vanilla ice cream`,desc:`The compellment to acquire this item is unparalleled.`,tier:1});
 		new G.perk({name:`cookie dough`,desc:`Can be consumed, or be baked into a proper batch of cookies. Premature consumption may lead to sickness.`,tier:0});
 		new G.perk({name:`pancreas pellet`,desc:`A highly magical pellet that cures literally everything at once.`,tier:3});
 
@@ -2300,7 +2300,40 @@ G={
             new G.act(0.03125,['random_orb !gun_parts|peaceful'],`[BLUE][1] is almost about to draw a gun out of [1:their] random item orb, when the whole thing falls apart.<br>How do these parts go back together?!`,p=>{p[1].gain('gun parts');p[1].lose('random orb');});
 			new G.act(0.03125,['random_orb !roll_of_fabric'],`[BLUE][1] [plays with|rolls] [1:their] random [item |]orb around to pass the time, but it begins to unravel.<br>Soon, all that's left of the orb is various [textiles|fabrics].`,p=>{p[1].gain('roll of fabric');p[1].lose('random orb');});
             new G.act(0.03125,['random_orb !magic_dust'],`[BLUE][1] trips and drops [1:their] random item orb and it cracks.<br>It isn't showing pictures of items anymore, but it seems to be full of a rainbow of dusty sparkles.`,p=>{p[1].gain('magic dust');p[1].lose('random orb');});
-            
+
+			//Vanilla ice cream trading
+			//Note: unlike random item orb, not all items are available for trading
+			// - Melee
+			const vanillaIceCreamTradingText = '[BLUE][Noticing|Glancing at|Feeling|Smelling|Psychically sensing] the [irresistable |]vanilla ice cream that [1] carries, [2] comes up to [1:them], offering ';
+			new G.act(0.035,['vanilla_ice_cream !pitchfork', 'pitchfork !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] pointy pitchfork for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'pitchfork');});
+            new G.act(0.02,['vanilla_ice_cream !sword', 'sword !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] sharp, gleaming sword for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'sword');});
+			new G.act(0.02,['vanilla_ice_cream !axe', 'axe !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [light hand-held axe|heavy greataxe] for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'axe');});
+			// - Ranged
+			new G.act(0.035,['vanilla_ice_cream !bow', 'bow !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [masterfully|intricately] crafted bow for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'bow');});
+			new G.act(0.035,['vanilla_ice_cream !grenade', 'grenade !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] powerful grenade for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'grenade');})
+			// - Firearms
+			new G.act(0.035,['vanilla_ice_cream !handgun', 'handgun !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] brand-new, reflective handgun alongside a handful of bullets for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'handgun');});
+			new G.act(0.015,['vanilla_ice_cream !shotgun', 'shotgun !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [rusty|aged] - but still effective - shotgun alongside shells, for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'shotgun');});
+			new G.act(0.015,['vanilla_ice_cream !flamethrower', 'flamethrower !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] handy flamethrower for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'flamethrower');});
+			// - Magic
+			new G.act(0.02,['vanilla_ice_cream !magic_wand', 'magic_wand !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [crystalline|magnificant|colorful|kaleidoscopic|beautiful] magic wand for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'magic wand');});
+			new G.act(0.03,['vanilla_ice_cream !lucky_coin', 'lucky_coin !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [shiny|golden] lucky coin, for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'lucky coin');});
+			new G.act(0.03,['vanilla_ice_cream !random_orb', 'random_orb !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [unopened|promising] random item orb for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'random orb');});
+			// - Clothing
+			new G.act(0.035,['vanilla_ice_cream !dapper_suit', 'dapper_suit !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [handsome|hardy|ceremonial|durable] dapper suit for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'dapper suit');});
+			new G.act(0.035,['vanilla_ice_cream !parka', 'parka !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [warm|handy|lightweight|comfortable] parka for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'parka');});
+			// - Armor
+			new G.act(0.015,['vanilla_ice_cream !kevlar_vest', 'kevlar_vest !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [ultra-strong|extremely durable] kevlar vest for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'kevlar vest');});
+			// - Medicine
+			new G.act(0.03,['vanilla_ice_cream !medicine', 'medicine !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] medicine on hand for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'medicine');});
+			new G.act(0.03,['vanilla_ice_cream !tourniquet', 'tourniquet !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] life-saving tourniquet. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'tourniquet');});
+			new G.act(0.02,['vanilla_ice_cream !AED', 'AED !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [death-reversing |resuscitating |]AED for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'AED');});
+			new G.act(0.02,['vanilla_ice_cream !first_aid_kit', 'first_aid_kit !vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] [promising |versatile |unused |]first aid kit for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.',p=>{p[1].give(p[2],'vanilla ice cream'); p[2].give(p[1], 'first aid kit');});
+			// - Misc
+			new G.act(0.03,['vanilla_ice_cream', 'vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] very own vanilla ice cream for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.');
+			// Consumption
+			new G.act(0.01,['vanilla_ice_cream'],'[RED][1] can no longer resist the [scent|freshness|allure|smell|look|psychic influence] of [1:their] vanilla ice cream, and devours it all in one sitting!',p=>{p[1].lose('vanilla ice cream');});
+			
 			// Item Loss
 			// - Melee 10%
 			new G.act(baseItemLoss*0.03,['big_stick clumsy%0.5|naive%0.2|any%0.5 !scrappy%0.5|peaceful%0.5|survivalist%0.2|lucky_coin%0.2'],`[RED]While training [1] accidentally whacks [1:their] big stick against a [tree|rock], which snaps it in half.`,p=>{p[1].lose('big stick');});
