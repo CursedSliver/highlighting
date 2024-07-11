@@ -2045,7 +2045,7 @@ G={
 			new G.act(1,['laughed'],`[1] keeps up their evil laughing practice, [Muahahahahahaa|Ehehehehee|Buahahahaaaaa]!`);
 			new G.act(1,['sheep'],`[1] is a sheep and [grazes peacefully|doesn't do much|baahs softly|glances away, a sad look in [1:their] eyes].`);
 				new G.act(0.5,['peaceful%0.5|kind%0.5|animal_ken%0.5|cute%0.2|any%0.5 !sociopath%0.8|survivalist%0.8','sheep cute|any%0.5 !annoying%0.5|cowardly%0.2'],`[1] gently pets [2], who is a sheep.`);
-			new G.act(1,['will_respawn dead !nihil !sheep'],`[BLUE]Suddenly, [1] materializes out of thin air in a storm of purple mist! Looking around, [1:they] notices the respawn anchor besides [1:them], crumbling and decaying...`,p=>{p[1].revive();});
+			new G.act(1,['will_respawn dead !nihil !sheep'],`[BLUE]Suddenly, [1] materializes out of thin air in a storm of purple mist! Looking around, [1:they] notices the respawn anchor besides [1:them], crumbling and decaying...`,p=>{p[1].revive();p[1].lose('will respawn');});
 			// Misc Idling -TW
 			new G.act(0.1,['!sociopath|devious|leader deaths:0'],`[1] [doesn't know yet how bad things are gonna get.|knows not of the horrors yet to come.|is pretty optimistic about all of this.]`);
 			new G.act(0.1,['!sociopath|devious|leader deaths:>0'],`[1] [sobs quietly...|starts sobbing uncontrollably.|just wants it to end already...]`);
