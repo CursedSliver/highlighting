@@ -4170,7 +4170,7 @@ G={
 			});
 
 			//savage kill methods (devious/sociopath path) - CS
-			let deviousKiller = ['sociopath|devious%0.6|inventor%0.3|able%0.02 !peaceful|meek%0.5|clumsy%0.5'];
+			let deviousKiller = ['sociopath|devious%0.6|inventor%0.3|able%0.02 !peaceful|meek%0.5|clumsy%0.5 '+hardDisables];
 			G.adjustFuncs.tryGrab = function(chance) {
 				let pow = 1;
 				if (this.has('bruised')) { pow += 0.1 * this.has('bruised').count; }
@@ -4235,7 +4235,7 @@ G={
 					this.combat.overseer.injectBack(' Luckily, [2] manages to remove it before its too late.');
 				},
 				pReq: ['h:6 v:1'],
-				req: [deviousKiller+' tourniquet', '- fallen'],
+				req: [deviousKiller+' tourniquet', '- fallen !deep_frozen'],
 			});
 			new G.move({
 				chance: 1,
@@ -4249,7 +4249,7 @@ G={
 				},
 				func: G.moveAssets.veryCloseCombat,
 				pReq: ['h:6 v:1'],
-				req: [deviousKiller+' freezing_sapphire', '- fallen']
+				req: [deviousKiller+' freezing_sapphire', '- fallen !deep_frozen']
 			});
 			new G.move({
 				chance: 1,
@@ -4263,7 +4263,7 @@ G={
 				},
 				func: G.moveAssets.veryCloseCombat,
 				pReq: ['h:6 v:1'],
-				req: [deviousKiller+' AED', '- fallen']
+				req: [deviousKiller+' AED', '- fallen !deep_frozen']
 			});
 			new G.move({
 				chance: 1,
@@ -4281,7 +4281,7 @@ G={
 				},
 				func: G.moveAssets.veryCloseCombat,
 				pReq: ['h:6 v:1'],
-				req: [deviousKiller+' AED', '- fallen']
+				req: [deviousKiller+' AED', '- fallen !deep_frozen']
 			});
 
 			//finishing moves
@@ -4294,7 +4294,7 @@ G={
 				},
 				func: G.moveAssets.veryCloseCombat,
 				pReq: ['e:1'],
-				req: ['able any%0.2|able%0.5|frenzied|devious%0.5|sociopath '+hardDisables, 'out|unconscious *able|out']
+				req: ['able any%0.2|able%0.5|frenzied|devious%0.5|sociopath '+hardDisables, 'out|unconscious *able|out !deep_frozen']
 			});
 			new G.move({
 				chance: 3,
@@ -4303,7 +4303,7 @@ G={
 					this.combat.moveToward(cl[1], Math.random() * 10 + 10);
 				},
 				pReq: ['e:1/100'],
-				req: ['able able%0.5|frenzied|devious%0.5|sociopath '+hardDisables, 'out|unconscious *able|out']
+				req: ['able able%0.5|frenzied|devious%0.5|sociopath '+hardDisables, 'out|unconscious *able|out !deep_frozen']
 			});
 
 			//stick & pitchfork
@@ -6547,11 +6547,12 @@ G={
 					const all = this.combat.overseer.all();
 					let list = [];
 					for (let i of all) {
+						if (i == cl[1]) { continue; }
 						if (cl[1].combat.projectileDist(i) <= 17.5 && (this.team != i || i.team == 0 || i == this)) { list.push(i); }
 					}
 					for (let i of list) { this.combat.overseer.addChar(i); i.gain('deep frozen').duration = 3; }
 				},
-				req: ['freezing_sapphire', 'any'],
+				req: ['freezing_sapphire any '+hardDisables, 'any'],
 				pReq: ['p:20/50']
 			});
 			
