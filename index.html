@@ -719,7 +719,8 @@ G={
 		new G.perk({name:`trapped`,desc:`Stuck in a trap, and waiting to be freed, if something doesn't kill them first.`});
 		new G.perk({name:`unconscious`,desc:`Not quite comatose, but almost there.`});
 		new G.perk({name:`comatose`,desc:`Unconscious, and unable to speak or move.`,out:true});
-		new G.perk({name:`revived`,desc:`Was just resurrected through some miracle or other.`,out:true});
+		new G.perk({name:`revived`,desc:`Was just resurrected through some miracle or other.`,out:true,injury:false});
+		new G.perk({name:`will respawn`,desc:`respawn anchor set!`,disable:false,injury:false});
 		new G.perk({name:`dead`,desc:`Dead and gone. Sorry!`,out:true});
 		new G.perk({name:`ghost`,desc:`Brought back from the dead in a mischievous incorporeal form.`,out:true});
 		new G.perk({name:`zombie`,desc:`Brought back from the dead in a smelly, mindless form.`,out:true});
@@ -812,13 +813,13 @@ G={
 		new G.perk({name:`pancreas pellet`,desc:`A highly magical pellet that cures literally everything at once.`,tier:3});
 
 		// Additional items - CS
-		new G.perk({name:`snake charmer\'s flute`,desc:``,tier:2});
-		new G.perk({name:`respawn anchor`,desc:``,tier:3});
-		new G.perk({name:`freezing sapphire`,desc:``,tier:1});
-		new G.perk({name:`high pressure garden hose`,desc:``,tier:1});
-		new G.perk({name:`topaz with a hole`,desc:``,tier:2});
+		new G.perk({name:`snake charmer\'s flute`,desc:`Calls forth a snake to ascend upwards indefinitely.`,tier:2});
+		new G.perk({name:`respawn anchor`,desc:`Respawn! Note: might cause deaths via [INTENTIONAL GAME DESIGN].`,tier:3});
+		new G.perk({name:`freezing sapphire`,desc:`Can be thrown to freeze everyone.`,tier:1});
+		new G.perk({name:`high pressure garden hose`,desc:`Good at knocking people over, not so good for killing people.`,tier:1});
+		new G.perk({name:`topaz with a hole`,desc:`Tingly to the touch.`,tier:2});
 		new G.perk({name:`topaz on a stick`,desc:``,tier:3});
-		new G.perk({name:`angel in a bottle`,desc:``,tier:3});
+		new G.perk({name:`angel in a bottle`,desc:`SUSSY AMONGUS`,tier:3});
 		new G.perk({name:`nuclear bomb`,desc:`A nuke.`,tier:9});
 		
 		//creator
@@ -2044,6 +2045,7 @@ G={
 			new G.act(1,['laughed'],`[1] keeps up their evil laughing practice, [Muahahahahahaa|Ehehehehee|Buahahahaaaaa]!`);
 			new G.act(1,['sheep'],`[1] is a sheep and [grazes peacefully|doesn't do much|baahs softly|glances away, a sad look in [1:their] eyes].`);
 				new G.act(0.5,['peaceful%0.5|kind%0.5|animal_ken%0.5|cute%0.2|any%0.5 !sociopath%0.8|survivalist%0.8','sheep cute|any%0.5 !annoying%0.5|cowardly%0.2'],`[1] gently pets [2], who is a sheep.`);
+			new G.act(1,['will_respawn dead !nihil !sheep'],`[BLUE]Suddenly, [1] materializes out of thin air in a storm of purple mist! Looking around, [1:they] notices the respawn anchor besides [1:them], crumbling and decaying...`,p=>{p[1].revive();});
 			// Misc Idling -TW
 			new G.act(0.1,['!sociopath|devious|leader deaths:0'],`[1] [doesn't know yet how bad things are gonna get.|knows not of the horrors yet to come.|is pretty optimistic about all of this.]`);
 			new G.act(0.1,['!sociopath|devious|leader deaths:>0'],`[1] [sobs quietly...|starts sobbing uncontrollably.|just wants it to end already...]`);
@@ -6424,6 +6426,44 @@ G={
 					return text.replace('[S]', ', and while [2:they] survived, it still left [2:them] with some pretty heavy burns');
 				},
 				req: ['heavenly_hypercane', '!=%0.2 every']
+			});
+
+			new G.move({
+				chance: 0.25,
+				text: '[1] wonders whether to activate [1:their] respawn anchor.',
+				element: G.moveAssets.elements.alone,
+				req: ['respawn_anchor']
+			});
+			G.adjustFuncs.activation = function(chance) {
+				let pow = 1;
+
+				if (this.has('clumsy')) { pow += 0.6; }
+				if (this.has('meek')) { pow += 0.3; }
+				if (this.has('naive')) { pow += 0.3; }
+				pow += 0.2 * this.isAiled();
+				
+				if (this.has('inventor')) { pow *= 0.5; }
+				if (this.has('artist')) { pow *= 0.75; }
+				if (this.has('vigilant')) { pow *= 0.95; }
+
+				return 1 - Math.pow(1 - chance, pow);
+			}
+			new G.move({
+				chance: 1,
+				text: '[1] places down [1:their] respawn anchor and attempts to activate it. Soon enough, it started to glow, signaling a successful activation!',
+				failText: '[1] places down [1:their] respawn anchor and attempts to activate it[S].',
+				fail: function() { return this.adjust(0.5, 'activation'); },
+				successFunc: function() { this.gain('will respawn'); },
+				failFunc: function(cl, text) {
+					let chance = 0.4;
+					chance = this.adjust(chance, 'activation');
+
+					if (Math.random() < Math.pow(chance, 2)) { this.kill(this, 'respawn anchor'); this.lose('respawn anchor'); return text + '<br>However, [1:they] made a mistake while trying to activate it, and the respawn anchor blew up into a miniature mushroom cloud in front of [1:them], killing [1:them] instantly!'; }
+					if (Math.random() < chance) { this.lose('respawn anchor'); return text.replace('[S]', ', however, the respawn anchor broke while fidgeting with its complex inner workings'); }
+					return text.replace('[S]', ', however, [1:they] couldn\'t quite figure out how to do so, and gives up shortly after');
+				},
+				element: G.moveAssets.elements.alone,
+				req: ['respawn_anchor any%0.8|cowardly']
 			});
 			
 			G.parse = function(text,actors)
