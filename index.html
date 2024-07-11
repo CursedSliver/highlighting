@@ -712,6 +712,7 @@ G={
 		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:false,ailment:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('seared'); this.count = Math.max(this.count - 3, 1); } }});
 		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('burnt'); this.count = Math.max(this.count - 3, 1); } } });
 		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`,ailment:true});
+		new G.perk({name:`deep frozen`,desc:`Encased in ice!`,hard:true,init:{duration:1},onMove: function() { this.duration--; }});
 		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true,injury:false}); // Removed Disabled
 		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true,injury:false});
 		new G.perk({name:`missing leg`,desc:`Missing a whole leg!`});
@@ -1629,9 +1630,9 @@ G={
 						if (item == 'any') { return cNegate(actualTrue, this.isOut()); } 
 						if (item == 'inTeam') { return cNegate(actualTrue, !this.team); }
 						if (item == 'noTeam') { return cNegate(actualTrue, this.team); }
-						if (item == '-') { return cNegate(actualTrue, (this.team === prevTeam && !(prevTeam == 0 || this.team == 0))); }
-						if (item == '+') { return cNegate(actualTrue, (!(this.team === prevTeam) && !(prevTeam == 0 || this.team == 0))); }
-						if (item == '=') { return cNegate(actualTrue, !(this.team === firstTeam && !(firstTeam == 0 || this.team == 0))); }
+						if (item == '-') { return cNegate(actualTrue, (this.team === prevTeam && this.team != 0)); }
+						if (item == '+') { return cNegate(actualTrue, (!(this.team === prevTeam) && this.team != 0)); }
+						if (item == '=') { return cNegate(actualTrue, !(this.team === firstTeam && this.team != 0)); }
 						if (item == 'ailed') { return cNegate(actualTrue, !this.isAiled()); }
 						if (item == 'injured') { return cNegate(actualTrue, !this.isInjured()); }
 						if (item == 'every') { return actualTrue; }
@@ -3080,6 +3081,9 @@ G={
 				}
 				return str;
 			}
+			G.combatOverseer.prototype.all = function() {
+				return this.participants.concat(this.extras);
+			}
 			G.combatOverseer.prototype.end = function() {
 				G.ongoingCombats.splice(G.ongoingCombats.indexOf(this), 1);
 			}
@@ -3163,6 +3167,9 @@ G={
 					mult = 1 / (-verticalOffset * 0.05 + 1);
 				}
 				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult;
+			}
+			G.combatTracker.prototype.straightDist = function(target) {
+				return (Math.pow(target.combat.vertical - this.combat.vertical, 2) + Math.pow(target.combat.horizontal - this.combat.horizontal, 2)) ** 0.5
 			}
 			G.combatOverseer.prototype.getHeightAt = function(horizontal) {
 				//"this" is the overseer
@@ -3385,7 +3392,7 @@ G={
 			G.moveAssets = {};
 			G.moveAssets.elements = {};
 			G.moveAssets.elements.alone = new G.element({ interact: 0, interactMin: 0 });
-			let hardDisables = '!unconscious|trapped|shell-shocked|hallucinating|paralyzed';
+			let hardDisables = '!unconscious|trapped|shell-shocked|hallucinating|paralyzed|deep_frozen';
 			new G.move({
 				text: '[1] does something ????????',
 				chance: 0.001,
@@ -3424,13 +3431,15 @@ G={
 				req: ['cowardly able', 'able']
 			});
 			new G.move({
-				chance: 100,
+				chance: 25,
 				text: 'Seeing that [1:their] enemies have either fleed or is dead, [1] stops fighting.',
 				successFunc: function() { this.fleeCombat(true); },
 				element: G.moveAssets.elements.alone,
 				reqFunc: function() {
-					for (let i in this.combat.overseer.participants) {
-						if (this.combat.overseer.participants[i].team != this.team || !this.combat.overseer.participants[i].team) { return false; }
+					const all = this.combat.overseer.all();
+					for (let i in all) {
+						if (all[i] == this) { continue; }
+						if (all[i].team != this.team || !all[i].team) { return false; }
 					}
 					return true;
 				},
@@ -3685,10 +3694,28 @@ G={
 				req: ['shell-shocked|hallucinating']
 			});
 			new G.move({
-				chance: 2,
+				chance: 1,
 				text: '[1] [stares into the distance and mumbles some nonsense|runs in place, laughing hysterically|breaks down in tears|mourns about the endless expanse of nothing in front of [1:them]|clutches [1:their] face in imaginary pain|freezes in shock from the violent imagery in [1:their] eyes].',
 				req: ['hallucinating']
 			});
+			new G.move({
+				chance: 2,
+				text: 'In a flash, the images on [1:their] eyes explodes into a fine mist.',
+				req: ['hallucinating'],
+				reqFunc: function() { return this.has('hallucinating').duration <= 0; }
+			});
+			new G.move({
+				chance: 1,
+				text: '[1]\'s icy tomb sits silently, staring at nowhere in particular.',
+				req: ['deep_frozen']
+			});
+			new G.move({
+				chance: 2,
+				text: 'Suddenly, [1]\'s icy shell cracks as the spell weakens!<br>Before long, all of it crumbles into nothing, as [1:they] emerges from within.',
+				req: ['deep_frozen'],
+				reqFunc: function() { return this.has('deep frozen').duration <= 0; }
+			});
+			
 			new G.move({
 				chance: function() {
 					if (!this.isDisabled()) { return 0; }
@@ -5502,10 +5529,11 @@ G={
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.has('magic wand').charges--;
-					for (let i in this.combat.overseer.participants) {
-						this.combat.overseer.participants[i].gain('wet');
-						if (this.combat.overseer.participants[i] == this) { continue; }
-						this.combat.overseer.addChar(this.combat.overseer.participants[i]);
+					const all = this.combat.overseer.all();
+					for (let i in all) {
+						all[i].gain('wet');
+						if (all[i] == this) { continue; }
+						this.combat.overseer.addChar(all[i]);
 					}
 				},
 				req: ['magic_wand nerd'],
@@ -5701,10 +5729,11 @@ G={
 				text: '[1] wishes that everyone would just stop fighting.<br>[1:g|His|Her|Their|Its] wish ring shimmers for a second, and then...',
 				failText: '[1] wishes that everyone would just stop fighting.<br>[1:g|His|Her|Their|Its] wish ring shimmers for a second, [S]',
 				successFunc: function() {
-					for (let i in this.combat.overseer.participants) {
-						if (this.combat.overseer.participants[i] == this) { continue; }
-						this.combat.overseer.addChar(this.combat.overseer.participants[i]);
-						this.combat.overseer.participants[i].fleeCombat(true);
+					const all = this.combat.overseer.all();
+					for (let i in all) {
+						if (all[i] == this) { continue; }
+						this.combat.overseer.addChar(all[i]);
+						if (all[i].real) { all[i].fleeCombat(true); }
 					}
 				},
 				req: ['wish_ring able%0.1|*able '+hardDisables]
@@ -5746,8 +5775,9 @@ G={
 				reqFunc: function() {
 					let teamCount = 0;
 					let opponentCount = 0;
-					for (let i in this.combat.overseer.participants) {
-						if (this.combat.overseer.participants[i].team == this.team) { teamCount++; }
+					const all = this.combat.overseer.all();
+					for (let i in all) {
+						if (all[i].team == this.team) { teamCount++; }
 						else { opponentCount++; }
 					}
 					if (teamCount >= opponentCount) { return false; }
@@ -5779,8 +5809,9 @@ G={
 					
 					let teamCount = 0;
 					let opponentCount = 0;
-					for (let i in this.combat.overseer.participants) {
-						if (this.combat.overseer.participants[i].team == this.team) { teamCount++; } else { opponentCount++; }
+					const all = this.combat.overseer.all();
+					for (let i in all) {
+						if (all[i].team == this.team) { teamCount++; } else { opponentCount++; }
 					}
 					return (teamCount < opponentCount);
 				}
@@ -5800,11 +5831,12 @@ G={
 				text: '[1] wishes that this whole thing would just come to a conclusion already...<br>[1:g|His|Her|Their|Its] wish ring shimmers for a second, and then... <e>[S]</e> is the only one left standing.',
 				fail: function() { return 0; },
 				successFunc: function(cl, text) {
-					let chosen = choose(this.combat.overseer.participants);
-					for (let i in this.combat.overseer.participants) {
-						this.combat.overseer.addChar(this.combat.overseer.participants[i]);
-						if (this.combat.overseer.participants == chosen) { continue; }
-						this.kill(this.combat.overseer.participants[i], 'ceased to exist');
+					const all = this.combat.overseer.all();
+					let chosen = choose(all);
+					for (let i in all) {
+						this.combat.overseer.addChar(all[i]);
+						if (all[i] == chosen) { continue; }
+						this.kill(all[i], 'ceased to exist');
 					}
 					return text.replace('[S]', chosen.name);
 				},
@@ -5815,12 +5847,13 @@ G={
 				text: '[1] wishes for no one to suffer anymore.<br>[1:g|His|Her|Their|Its] wish ring shimmers for a second, and then... to [1:their] shock, everyone\'s wounds and scars all healed at once!',
 				failText: '[1] wishes for no one to suffer anymore.<br>[1:g|His|Her|Their|Its] wish ring shimmers for a second, and then... [S]',
 				successFunc: function() {
-					for (let i in this.combat.overseer.participants) {
-						for (let ii = this.combat.overseer.participants[i].perks.length - 1; ii >= 0; ii--) {
-							let innerPerk = this.combat.overseer.participants[i].perks[ii].perk;
-							if (!innerPerk.out && (innerPerk.disable || innerPerk.injury || innerPerk.ailment)) { this.combat.overseer.participants[i].lose(this.combat.overseer.participants[i].perks[ii]); }
+					const all = this.combat.overseer.all();
+					for (let i in all) {
+						for (let ii = all[i].perks.length - 1; ii >= 0; ii--) {
+							let innerPerk = all[i].perks[ii].perk;
+							if (!innerPerk.out && (innerPerk.disable || innerPerk.injury || innerPerk.ailment)) { all[i].lose(all[i].perks[ii]); }
 						}
-						if (this.combat.overseer.participants[i] != this) { this.combat.overseer.addChar(this.combat.overseer.participants[i]); }
+						if (all[i] != this) { this.combat.overseer.addChar(all[i]); }
 					}
 				},
 				req: ['wish_ring any%0.5|*able', 'hidden !able|injured|ailed', 'hidden !able|injured|ailed']
@@ -6365,7 +6398,7 @@ G={
 					let mult = 1;
 					if (this.has('cowardly')) { add += 2.5; }
 					if (this.has('vigilant')) { add += 2.5; }
-					if (this.has('terrified')) { add += 4; }
+					if (this.has('terrified')) { add += 5; }
 					if (this.has('analytical')) { add += 1;}
 					add += this.isInjured() * 0.5;
 
@@ -6378,7 +6411,7 @@ G={
 					return add * mult;
 				},
 				text: 'Sensing imminent death, [1] runs away from [2]!',
-				successFunc: function(cl) { this.combat.moveToward(cl[1], -1 * (Math.random() * 20 + 20)); },
+				successFunc: function(cl) { this.combat.moveToward(cl[1], -1 * (Math.random() * 40 + 30)); },
 				req: ['able mark_of_the_void', 'eye_of_the_void']
 			});
 			new G.move({
@@ -6444,6 +6477,7 @@ G={
 				req: ['heavenly_hypercane', '!=%0.2 every']
 			});
 
+			//respawn anchor (1 move + idle)
 			new G.move({
 				chance: 0.5,
 				text: '[1] wonders whether to activate [1:their] respawn anchor.',
@@ -6467,7 +6501,7 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			}
 			new G.move({
-				chance: 3,
+				chance: 5,
 				text: '[1] places down [1:their] respawn anchor and attempts to activate it. Soon enough, it started to glow, signaling a successful activation!',
 				failText: '[1] places down [1:their] respawn anchor and attempts to activate it[S].',
 				fail: function() { return this.adjust(0.5, 'activation'); },
@@ -6495,6 +6529,30 @@ G={
 				},
 				element: G.moveAssets.elements.alone,
 				req: ['respawn_anchor any%0.8|cowardly']
+			});
+
+			//freezing sapphire
+			new G.move({
+				chance: function() {
+					const all = this.combat.overseer.all();
+					let count = 0;
+					for (let i of all) {
+						if (i.team != this.team || i.team == 0) { count++; }
+					}
+					return Math.pow(count, 2.5) * 0.5;
+				},
+				text: '[1] throws [1:their] freezing sapphire, which shatters on contact and explodes into an expanding cloud of freezing mist that envelops [ALL-1]! <br>After the mist dissipated, all those affected has been turned into living statues of magical ice.',
+				successFunc: function(cl) {
+					this.lose('freezing sapphire');
+					const all = this.combat.overseer.all();
+					let list = [];
+					for (let i of all) {
+						if (cl[1].projectileDist(i) <= 17.5 && (this.team != i || i.team == 0 || i == this)) { list.push(i); }
+					}
+					for (let i of list) { this.combat.overseer.addChar(i); i.gain('deep frozen').duration = 3; }
+				},
+				req: ['freezing_sapphire', 'any'],
+				pReq: ['p:20/50']
 			});
 			
 			G.parse = function(text,actors)
