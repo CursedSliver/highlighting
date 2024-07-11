@@ -6071,7 +6071,11 @@ G={
 					wolf.gain(choose(['haste', 'bulky', 'cowardly', 'meek']));
 					wolf.gain('vulnerable');
 					wolf.cloneID = this.cloneID + 1;
-					wolf.name += ' #' + wolf.cloneID;
+					let count = 0;
+					for (let i of this.combat.overseer.extras) {
+						if (i.has('wolf') && i.has('wolf').creator == this.has('wolf').creator) { count++; }
+					}
+					wolf.name += ' #' + count;
 					this.lose('pet wolf');
 				},
 				req: ['wolf any']
