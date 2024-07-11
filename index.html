@@ -5719,7 +5719,7 @@ G={
 				failText: '[1] wishes that [there were more people fighting on [1:their] side|[1:they] weren\'t so outnumbered].<br>[1:g|His|Her|Their|Its] wish ring shimmers for a second, [S]',
 				successFunc: function() {
 					let cl = deepArrCopy(this.team.chars);
-					for (let i in cl) {
+					for (let i = cl.length - 1; i >= 0; i--) {
 						if (cl[i] == this) { cl.splice(i, 1); }
 						if (cl[i].isOut() || (cl[i].combat && cl[i].combat.overseer == this.combat.overseer)) { cl.splice(i, 1); }
 					}
