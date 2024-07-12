@@ -2217,30 +2217,30 @@ G={
 
             
 			// Crafting for self -TW
-			new G.act(itemCraftMult*0.04,['scrap_metal scrappy%0.2|artist%0.2|any%0.5 !big_stick|peaceful|inventor%0.2'],`[BLUE][1] attaches [1:their] metal scraps to a stick, making a big, crude, club`,p=>{p[1].gain('big stick');p[1].lose('scrap metal');});
-				new G.act(itemCraftMult*0.03,['scrap_metal scrappy%0.2|artist%0.2|any%0.5 !pitchfork|peaceful%0.5|inventor%0.5'],`[BLUE][1] fashions a new pitchfork from [1:their] scrap metal.<br>Turns out most of the scrap was from some farm tools.`,p=>{p[1].gain('pitchfork');p[1].lose('scrap metal');});
-				new G.act(itemCraftMult*0.025,['scrap_metal inventor%0.5|scrappy%0.2|artist%0.2|any%0.5 !sword|peaceful'],`[BLUE][1] forges the spare metal [1:they] found into a fine blade<br>[1] practices swinging it around in the air.`,p=>{p[1].gain('sword');p[1].lose('scrap metal');});
-				new G.act(itemCraftMult*0.025,['scrap_metal inventor%0.5|scrappy%0.2|artist%0.2|any%0.5 !axe|peaceful'],`[BLUE][1] takes the time to forge an axe head out of [1:their] spare chunks of metal.<br>The new axe is crude, but effective.`,p=>{p[1].gain('axe');p[1].lose('scrap metal');});
-				new G.act(itemCraftMult*0.025,['scrap_metal inventor%0.5|scrappy%0.2|artist%0.2|any%0.5 !shuriken|peaceful'],`[BLUE][1] forges the scraps of metal into various throwing knives.<br>They may not all match, but they should still be deadly.`,p=>{p[1].gain('knight armor');p[1].lose('scrap metal');});
-				new G.act(itemCraftMult*0.025,['scrap_metal inventor%0.5|scrappy%0.2|artist%0.2|any%0.5 !bow|peaceful'],`[BLUE][1] fletches some arrows and a bow together in [1:their] spare time.<br>With [1:their] metal scrap acting as arrowheads, [1] soon has a new weapon.`,p=>{p[1].gain('bow');p[1].lose('scrap metal');});
-				new G.act(itemCraftMult*0.02,['scrap_metal inventor%0.5|scrappy%0.2|artist%0.2|kind%0.2|any%0.5 !kite_shield'],`[BLUE][1] carefully takes the time to forge reinforcements for a wooden base.<br>Eventually, [1] has an effective kite shield for [1:their] protection!`,p=>{p[1].gain('knight armor');p[1].lose('scrap metal');});
+			new G.act(itemCraftMult*0.04,['scrap_metal scrappy%0.2|artist%0.3|any%0.5 !big_stick|peaceful|inventor%0.2'],`[BLUE][1] attaches [1:their] metal scraps to a stick, making a big, crude, club`,p=>{p[1].gain('big stick');p[1].lose('scrap metal');});
+				new G.act(itemCraftMult*0.03,['scrap_metal scrappy%0.2|artist%032|any%0.5 !pitchfork|peaceful%0.5|inventor%0.5'],`[BLUE][1] fashions a new pitchfork from [1:their] scrap metal.<br>Turns out most of the scrap was from some farm tools.`,p=>{p[1].gain('pitchfork');p[1].lose('scrap metal');});
+				new G.act(itemCraftMult*0.025,['scrap_metal inventor%0.5|scrappy%0.2|artist%0.3|any%0.5 !sword|peaceful'],`[BLUE][1] forges the spare metal [1:they] found into a fine blade<br>[1] practices swinging it around in the air.`,p=>{p[1].gain('sword');p[1].lose('scrap metal');});
+				new G.act(itemCraftMult*0.025,['scrap_metal inventor%0.5|scrappy%0.2|artist%0.3|any%0.5 !axe|peaceful'],`[BLUE][1] takes the time to forge an axe head out of [1:their] spare chunks of metal.<br>The new axe is crude, but effective.`,p=>{p[1].gain('axe');p[1].lose('scrap metal');});
+				new G.act(itemCraftMult*0.025,['scrap_metal inventor%0.5|scrappy%0.2|artist%0.3|any%0.5 !shuriken|peaceful'],`[BLUE][1] forges the scraps of metal into various throwing knives.<br>They may not all match, but they should still be deadly.`,p=>{p[1].gain('knight armor');p[1].lose('scrap metal');});
+				new G.act(itemCraftMult*0.025,['scrap_metal inventor%0.5|scrappy%0.2|artist%0.3|any%0.5 !bow|peaceful'],`[BLUE][1] fletches some arrows and a bow together in [1:their] spare time.<br>With [1:their] metal scrap acting as arrowheads, [1] soon has a new weapon.`,p=>{p[1].gain('bow');p[1].lose('scrap metal');});
+				new G.act(itemCraftMult*0.02,['scrap_metal inventor%0.5|scrappy%0.2|artist%0.3|kind%0.2|any%0.5 !kite_shield'],`[BLUE][1] carefully takes the time to forge reinforcements for a wooden base.<br>Eventually, [1] has an effective kite shield for [1:their] protection!`,p=>{p[1].gain('knight armor');p[1].lose('scrap metal');});
 				new G.act(itemCraftMult*0.01,['scrap_metal inventor%0.5|any%0.2 !knight_armor'],`[BLUE][1] cleverly forges a whole suit of armor.<br>[1] knew that scrap metal would be put to good use!`,p=>{p[1].gain('knight armor');p[1].lose('scrap metal');});
-            new G.act(itemCraftMult*0.1,['gun_parts scrappy%0.2|artist%0.2|any%0.5 !handgun|peaceful|inventor%0.5'],`[BLUE][1] manages to piece togeather a simple working gun from the parts [1:they] found.`,p=>{p[1].gain('handgun');p[1].lose('gun parts');});
+            new G.act(itemCraftMult*0.1,['gun_parts scrappy%0.2|artist%0.3|any%0.5 !handgun|peaceful|inventor%0.5'],`[BLUE][1] manages to piece togeather a simple working gun from the parts [1:they] found.`,p=>{p[1].gain('handgun');p[1].lose('gun parts');});
                 new G.act(itemCraftMult*0.06,['gun_parts !shotgun|peaceful|inventor%0.5'],`[BLUE][1] begins making shells for the new shotgun [1:they] finished building.<br>[1]'s gun parts found a good use.`,p=>{p[1].gain('shotgun');p[1].lose('gun parts');});
 				new G.act(itemCraftMult*0.03,['gun_parts inventor%0.5|pyromania%0.8|scrappy%0.25|artist%0.25|any%0.5 !flamethrower|peaceful'],`[BLUE][1] pieces togeather the gun parts [1:they] found into a flamethrower!<br>Now this is a fire arm!`,p=>{p[1].gain('flamethrower');p[1].lose('gun parts');});
                 new G.act(itemCraftMult*0.01,['gun_parts inventor%0.5|any%0.2 !lasergun|peaceful'],`[BLUE][1] hides away in a surge of inspiration.<br>When [1:g|he returns|she returns|they return|it returns], [1:their] assembled gunparts glow with a new scientific hum.`,p=>{p[1].gain('lasergun');p[1].lose('gun parts');});
             new G.act(itemCraftMult*0.04,['roll_of_fabric scrappy%0.2|any%0.5 !leather_scraps|inventor%0.2|artist%0.5'],`[BLUE][1] makes a mess of [1:their] roll of fabric...<br>The once high quality leather is now merely scraps of armor.`,p=>{p[1].gain('leather scraps');p[1].lose('roll of fabric');});
-				new G.act(itemCraftMult*0.04,['roll_of_fabric scrappy%0.2|artist%0.2|any%0.5 !slingshot|peaceful|inventor%0.5'],`[BLUE][1] tries out a sling made from [1:their] fabric, but it's hard to use...<br>[1] settles for turning it into a slingshot instead.`,p=>{p[1].gain('slingshot');p[1].lose('roll of fabric');});
+				new G.act(itemCraftMult*0.04,['roll_of_fabric scrappy%0.2|artist%0.3|any%0.5 !slingshot|peaceful|inventor%0.5'],`[BLUE][1] tries out a sling made from [1:their] fabric, but it's hard to use...<br>[1] settles for turning it into a slingshot instead.`,p=>{p[1].gain('slingshot');p[1].lose('roll of fabric');});
 				new G.act(itemCraftMult*0.03,['roll_of_fabric scrappy%0.2|artist%0.5|any%0.5 !bikini|inventor%0.5'],`[BLUE][1] works on a new outfit with [1:their] rolls of fabric.<br>There wasn't much fabric to work with, but [1]'s new bikini sure is stunning!`,p=>{p[1].gain('bikini');p[1].lose('roll of fabric');});
 				new G.act(itemCraftMult*0.02,['roll_of_fabric scrappy%0.2|artist%0.5|any%0.5 !dapper_suit|inventor%0.5'],`[BLUE][1] measures [1:themself] before tailoring [1:their] fabric.<br>It's a lot of hard work, but [1]'s new dapper suit is priceless!`,p=>{p[1].gain('dapper suit');p[1].lose('roll of fabric');});
 				new G.act(itemCraftMult*0.03,['roll_of_fabric scrappy%0.2|artist%0.5|any%0.5 !parka|inventor%0.5'],`[BLUE][1] is tired of wearing [1:their] bundles of fabric for warmth...<br>[1] fashions the fabric into a proper parka instead.`,p=>{p[1].gain('parka');p[1].lose('roll of fabric');});
-				new G.act(itemCraftMult*0.01,['roll_of_fabric inventor%0.5|scrappy%0.2|artist%0.2|any%0.5 !kevlar_vest'],`[BLUE][1] realizes some of [1:their] fabric is kevlar!<br>A new vest could be pricelessly lifesaving, [1] works on one right away.`,p=>{p[1].gain('kevlar vest');p[1].lose('roll of fabric');});
-				new G.act(itemCraftMult*0.02,['roll_of_fabric inventor%0.5|scrappy%0.2|artist%0.2|medic%0.5|any%0.5 !tourniquet'],`[BLUE][1] tries fashioning a tourniquet from [1:their] fabric.<br>[q] takes a while to find a proper windlass rod, but the new tourniquet is ready for an emergency.`,p=>{p[1].gain('tourniquet');p[1].lose('roll of fabric');});
-				new G.act(itemCraftMult*0.01,['roll_of_fabric inventor%0.5|scrappy%0.2|artist%0.2|medic%0.5|any%0.5 !first_aid_kit'],`[BLUE][1] takes the time to sterilize rolls of cloth for bandages.<br>It's time consuming, but a first aid kit is worth the effort.`,p=>{p[1].gain('first aid kit');p[1].lose('roll of fabric');});
+				new G.act(itemCraftMult*0.01,['roll_of_fabric inventor%0.5|scrappy%0.2|artist%0.3|any%0.5 !kevlar_vest'],`[BLUE][1] realizes some of [1:their] fabric is kevlar!<br>A new vest could be pricelessly lifesaving, [1] works on one right away.`,p=>{p[1].gain('kevlar vest');p[1].lose('roll of fabric');});
+				new G.act(itemCraftMult*0.02,['roll_of_fabric inventor%0.5|scrappy%0.2|artist%0.3|medic%0.5|any%0.5 !tourniquet'],`[BLUE][1] tries fashioning a tourniquet from [1:their] fabric.<br>[q] takes a while to find a proper windlass rod, but the new tourniquet is ready for an emergency.`,p=>{p[1].gain('tourniquet');p[1].lose('roll of fabric');});
+				new G.act(itemCraftMult*0.01,['roll_of_fabric inventor%0.5|scrappy%0.2|artist%0.3|medic%0.5|any%0.5 !first_aid_kit'],`[BLUE][1] takes the time to sterilize rolls of cloth for bandages.<br>It's time consuming, but a first aid kit is worth the effort.`,p=>{p[1].gain('first aid kit');p[1].lose('roll of fabric');});
 			new G.act(itemCraftMult*0.1,['magic_dust scrappy%0.2|artist%0.2|the_gift%0.2|any%0.5 !magic_wand|inventor%0.5'],`[BLUE][1] spills [1:their] magic dust over a stick.<br>The new wand begins to glow softly, leaving a trail of sparkles`,p=>{p[1].gain('magic wand');p[1].lose('magic dust');});
 				new G.act(itemCraftMult*0.02,['magic_dust clumsy|any%0.5 !lucky_coin'],`[BLUE][1] trips and spills their magic dust everywhere! What a waste...<br>Wait, [1] finds a shimmering coin that was hidden in the dust...?`,p=>{p[1].gain('lucky coin');p[1].lose('magic dust');});
 				new G.act(itemCraftMult*0.02,['magic_dust inventor%0.5|the_gift%0.5|artist%0.2|goth%0.2|any%0.5 !ancient_scepter|peaceful%0.5'],`[BLUE][1] finds an old shadowy orb that whispers softly...<br>[1] pours the magic dust on it, as it swirls cloudly back to life.`,p=>{p[1].gain('ancient scepter');p[1].lose('magic dust');});
-				new G.act(itemCraftMult*0.05,['magic_dust inventor%0.5|pyromania%0.2|unstable%0.2|scrappy%0.2|artist%0.2|any%0.5 !grenade|peaceful'],`[BLUE][1] tries compacting as much magic dust into as small of a container as possible.<br>The new makeshift grenade cracks unstably.`,p=>{p[1].gain('grenade');p[1].lose('magic dust');});
+				new G.act(itemCraftMult*0.05,['magic_dust inventor%0.5|pyromania%0.2|unstable%0.2|scrappy%0.2|artist%0.3|any%0.5 !grenade|peaceful'],`[BLUE][1] tries compacting as much magic dust into as small of a container as possible.<br>The new makeshift grenade cracks unstably.`,p=>{p[1].gain('grenade');p[1].lose('magic dust');});
 				new G.act(itemCraftMult*0.01,['magic_dust inventor%0.5|artist%0.5|the_gift%0.5|any%0.2 !wizard_robe'],`[BLUE][1] finds an old robe, and decorates it with [1:their] magic dust.<br>[1] slips on [1:their] new wizard cosplay.`,p=>{p[1].gain('wizard robe');p[1].lose('magic dust');});
 			new G.act(itemCraftMult*0.04,['scrap_metal roll_of_fabric inventor%0.5|scrappy%0.2|artist%0.2|any%0.5 !riot_shield'],`[BLUE][1] finds a large chunk of durable plexiglass.<br>[1] uses [1:their] metal scraps to make a rim and handle for [1:their] new makeshift riot shield.`,p=>{p[1].gain('riot shield');p[1].lose('scrap metal');p[1].lose('roll of fabric');});
 				new G.act(itemCraftMult*0.02,['gun_parts scrap_metal inventor%0.5|scrappy%0.2|artist%0.2|any%0.5 !rocket_launcher|peaceful'],`[BLUE][1] cleverly figures out how to use [1:their] gun parts and scrap metal to make a whole rocket launcher.<br>[1] begins working on the ammo next...`,p=>{p[1].gain('rocket launcher');p[1].lose('gun parts');p[1].lose('scrap metal');});
@@ -2250,6 +2250,8 @@ G={
 				new G.act(itemCraftMult*0.03,['roll_of_fabric scrap_metal inventor%0.5|scrappy%0.2|artist%0.2|any%0.5 !combat_gear'],`[BLUE][1] realizes some of the fabric is kevlar!<br>With some forged scrap metal and full body tailoring, the new combat gear looks ready for war!`,p=>{p[1].gain('combat gear');p[1].lose('roll of fabric');p[1].lose('scrap metal');});
 				new G.act(itemCraftMult*0.01,['magic_dust scrap_metal inventor%0.5|scrappy%0.2|the_gift%0.5|artist%0.2|any%0.5 !wish_ring'],`[BLUE][1] forges [1:their] metal scraps into a ring, and cools it in the magic dust.<br>It sparkles softly in the light...`,p=>{p[1].gain('wish ring');p[1].lose('magic dust');p[1].lose('scrap metal');});
 				new G.act(itemCraftMult*0.03,['magic_dust roll_of_fabric inventor%0.5|scrappy%0.2|the_gift%0.5|artist%0.5|any%0.5 !wizard_robe'],`[BLUE][1] tailors a custom fitting robe for [1:themself]<br>With the help of [1:their] magic dust, the new robe begins to flutter with power.`,p=>{p[1].gain('wizard robe');p[1].lose('magic dust');p[1].lose('roll of fabric');});
+			//topaz
+			new G.act(itemCraftMult*0.5,['topaz_with_a_hole inventor%0.5|scrappy%0.2|artist%0.3|any%0.5|the_gift%0.5|goth%0.2|big_stick !topaz_on_a_stick'],`[BLUE][1] remembers [1:their] topaz with a suspiciously shaped hole, and soon realized...<br>[1] got a nearby branch and put the topaz onto one end, which neatly snaps together! In [1:their]\'s [amazement|astonishment], the topaz feels tingly and electric to the touch, now faintly glowing yellow!`,p=>{ p[1].lose('topaz with a hole'); p[1].gain('topaz on a stick'); });
             // Crafting for teammates -TW
 				// TODO - write new teamwork craft. (Friendly and Leader-inspired)
 			new G.act(itemCraftMult*0.01,['inventor kind|any%0.5','+ scrap_metal !peaceful'],`[BLUE][2] asks [1] for help with [forging|finding a use for] the metal [scrap|scraps] [2:they] found.<br>[1] stokes an improvised forge, and soon [2] has a new sword to protect themselves!`,p=>{p[2].lose('scrap metal');p[2].gain('sword');});
@@ -2550,7 +2552,7 @@ G={
 				new G.act(perkAttackMult*attackKill*0.5,[hesitentKiller+' pet_rock gremlin%0.8|annoying%0.5|naive%0.5|animal_ken%0.2|any%0.5 !missing_arm', '- any pet_rock !missing_arm'],'[RED][1] decides to play rock paper scissors with [2]! <br>In an instant, both reveal their hands - [1] with rock, [2] with scissor!<br>Then, [1] smashes [1:their] pet rock down [2]\'s skull!',p=>{p[1].kill(p[2],'paper-scissor-youredead');}); //inspired by trufflz - CS
 			// High pressure garden hose charging
 			new G.act(1.6,['high_pressure_garden_hose any any%0.8|artist'],'[BLUE][1] finds a pool of water, and seeing [1:their] emptied tank of the garden hose, [1:they] fills it up in preparation for future problems.',p=>{p[1].has('high pressure garden hose').charges++;p[1].has('high pressure garden hose').content='water';},p=>{return (p[1].has('high pressure garden hose').charges <= 0 && p[1].has('high pressure garden hose').content == 'none'); });
-			new G.act(1,['high_pressure_garden_hose any any%0.5|artist%0.4|inventor%0.5|devious%0.35|sociopath%0.5'],'[BLUE][1] finds a vial of acid, and seeing [1:their] garden hose, a dark, yet bright idea blooms in [1:their] head...',p=>{p[1].has('high pressure garden hose').charges = Math.min(p[1].has('high pressure garden hose').charges + 1, 1);p[1].has('high pressure garden hose').content='acid';},p=>{return (p[1].has('high pressure garden hose').content != 'acid'); });
+			new G.act(2,['high_pressure_garden_hose any any%0.5|artist%0.4|inventor%0.5|devious%0.35|sociopath%0.5'],'[BLUE][1] finds a vial of acid, and seeing [1:their] garden hose, a dark, yet bright idea blooms in [1:their] head...',p=>{p[1].has('high pressure garden hose').charges = Math.min(p[1].has('high pressure garden hose').charges + 1, 1);p[1].has('high pressure garden hose').content='acid';},p=>{return (p[1].has('high pressure garden hose').content != 'acid'); });
 			// Shuriken Combat
 			new G.act(perkAttackMult*attackMinor*0.3,[hesitentKiller+' shuriken ninja%0.8|marksmen%0.5|any%0.5','- any !kite_shield%0.2|riot_shield%0.2|lucky_coin%0.2 '+victimMinor],`[1] grazed [2] with a few of [1:their] gleaming shuriken.`,p=>{p[2].gain('scratched');});
 			new G.act(perkAttackMult*attackModerate*0.3,[hesitentKiller+' shuriken ninja%0.8|marksmen%0.5|any%0.5','- any !kite_shield%0.2|riot_shield%0.2|lucky_coin%0.2 '+victimModerate],`[1] managed to leave [2] with a few lacerations after tossing knives at [2:them].`,p=>{p[2].gain('cut up');});
@@ -2763,9 +2765,9 @@ G={
 			new G.act(0.3,['!has_killed peaceful|kind','+ has_killed'],`[1] still can't believe [2] killed someone...`);
 			new G.act(0.3,['!devious|sociopath|survivalist','+ dead'],`[1] [reminisces about|thinks about|remembers|recalls something about|remembers how much [1:g|he misses|she misses|they miss|it misses]] [2] and sobs quietly.`);
 			new G.act(0.3,['!devious|sociopath|survivalist alive:1'],`[1] [reminisces about|thinks about|remembers|remembers how much [1:g|he misses|she misses|they miss|it misses]] everybody and sobs quietly.`);
-
 			
-			
+			new G.act(0.5,['mint_essence any%0.5|injured%0.5|ailed%0.5|*able%0.5'],`[1] decides to finally consume that mint essence [1:they] had for its effects... and with a bit of struggling, [1:they] managed it!`,p=>{p[1].lose('mine essence');p[1].gain('mint enhanced')});
+			new G.act(0.5,['mint_essence any !injured%0.2|ailed%0.2|*able%0.2'],`[1] decides to finally consume that mint essence [1:they] had for its effects, but it wouldn't go down [1:their] throat. [1] just finds it too [disgusting|repulsive|spicy|stimulating|minty].`);
 			
 			//accidents happen
 			new G.act(0.008,['!survivalist any'],`[RED][1] [wasn't looking and fell off a cliff...|eats something [1:they] shouldn't have and dies of horrible stomach pains.|gets mauled by wild animals.|trips and falls in a really bad way, breaking [1:their] neck.]`,p=>{p[1].die(`accident`);});
@@ -6725,6 +6727,37 @@ G={
 				req: ['high_pressure_garden_hose', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any'],
 				reqFunc: function() { return (this.has('high pressure garden hose').charges >= 1 && this.has('high pressure garden hose').content == 'acid'); },
 				pReq: ['p:20', 'p:20', 'p:20', 'p:25']
+			});
+
+			//mint essence
+			new G.move({
+				chance: 1,
+				text: '[1] tries to swallow [1:their] mint essence, and with a bit of struggling, [1:they] manages it!',
+				failText: '[1] tries to swallow [1:their] mint essence, but [1:they] found it too strong to swallow right now.',
+				fail: function() {
+					let chance = 0.5;
+					let pow = 1;
+					pow *= Math.pow(0.8, this.isDisabled());
+					pow *= Math.pow(0.8, this.isInjured());
+					pow *= Math.pow(0.8, this.isAiled());
+
+					return 1 - Math.pow(1 - chance, pow);
+				},
+				successFunc: function() {
+					this.lose('mint essence');
+					this.gain('mint enhanced');
+				},
+				element: G.moveAssets.elements.alone,
+				req: ['mint_essence any%0.5|able']
+			});
+
+			//topaz with a hole crafting
+			new G.move({
+				chance: 1,
+				text: '[BLUE][1] remembers [1:their] topaz with a suspiciously shaped hole, and soon realized...<br>[1] got a nearby branch and put the topaz onto one end, which neatly snaps together! In [1:their]\'s [amazement|astonishment], the topaz feels tingly and electric to the touch, now faintly glowing yellow!',
+				element: G.moveAssets.elements.alone,
+				successFunc: function() { this.lose('topaz with a hole'); this.gain('topaz on a stick'); },
+				req: ['topaz_with_a_hole inventor%0.5|scrappy%0.2|artist%0.3|any%0.5|the_gift%0.5|goth%0.2|big_stick !topaz_on_a_stick']
 			});
 			
 			G.parse = function(text,actors)
