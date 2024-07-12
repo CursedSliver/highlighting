@@ -6653,7 +6653,7 @@ G={
 					for (let i = 0; i < afflictions.length; i++) {
 						afflictions[i] = afflictions[i].replace('[N]', '['+(i + 2)+']');
 					}
-					return text + '<br>It hits [ALL-1], which '+oxfordsConcat(afflictions)+'!';
+					return text + '<br>It hits [ALL-1], ' + oxfordsConcat(afflictions) + '!';
 				},
 				req: ['high_pressure_garden_hose', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any'],
 				reqFunc: function() { return this.has('high pressure garden hose').charges >= 1; },
