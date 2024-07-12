@@ -6519,6 +6519,9 @@ G={
 				let pow = 1;
 				if (this.has('wet')) { pow += 2; }
 				if (this.has('ironskin')) { pow += 2; }
+				if (this.has('singed')) { pow += this.has('singed').count * 0.2; }
+				if (this.has('seared')) { pow += this.has('seared').count * 1.5; }
+				if (this.has('burnt')) { pow += this.has('burnt').count * 6; }
 				
 				if (this.has('combat gear')) { pow *= 0.9; }
 				if (this.has('parka')) { pow *= 0.9; }
