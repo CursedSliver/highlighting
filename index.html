@@ -819,7 +819,7 @@ G={
 		new G.perk({name:`snake charmer\'s flute`,desc:`Calls forth a snake to ascend upwards indefinitely.`,tier:2});
 		new G.perk({name:`respawn anchor`,desc:`Respawn! Note: might cause deaths via [INTENTIONAL GAME DESIGN].`,tier:3});
 		new G.perk({name:`freezing sapphire`,desc:`Can be thrown to freeze everyone.`,tier:1});
-		new G.perk({name:`high pressure garden hose`,desc:`Good at knocking people over, not so good for killing people.`,tier:1});
+		new G.perk({name:`high pressure garden hose`,desc:`Good at knocking people over, not so good for killing people.`,tier:1,init:{charges:1}});
 		new G.perk({name:`topaz with a hole`,desc:`Tingly to the touch.`,tier:2});
 		new G.perk({name:`topaz on a stick`,desc:`Shall lightning smite you!`,tier:3});
 		new G.perk({name:`angel in a bottle`,desc:`SUSSY AMONGUS`,tier:3,onDeath:function() { if (Math.random() < 1 / 3) { this.owner.gain('angel\'s revival'); } this.owner.lose(this); }});
@@ -2061,7 +2061,6 @@ G={
 			new G.act(1,['angel\'s_revival dead !nihil !sheep'],'[BLUE]Out of nowhere, a point in the sky begin to glow a glorious golden shine, as a pair of wings grow out of it - carrying [1]! <br>As it turns out, when [1:they] last died, their angel in a bottle shattered, which lead to [1:their] revival.',p=>{ p[1].revive(); p[1].lose('angel\'s revival'); });
 			new G.act(1,['angel\'s_revival dead !nihil !sheep'],'[BLUE]Out of nowhere, a point in the sky begin to glow a glorious golden shine, as a pair of wings grow out of it - carrying [1]! <br>As it turns out, when [1:they] last died, their angel in a bottle shattered, which lead to [1:their] revival.<br>The angel set [1:them] down gently, then hands [1:them] something - another angel in a bottle!',p=>{ p[1].revive(); p[1].lose('angel\'s revival'); p[1].gain('angel in a bottle'); });
 			
-			
 			//finding items
 			var baseItemMult=1.6;
 				var newItemMult=baseItemMult*0.2 // New item spawns
@@ -2332,7 +2331,7 @@ G={
 			// - Misc
 			new G.act(0.06,['vanilla_ice_cream any', 'vanilla_ice_cream'],vanillaIceCreamTradingText+'[2:their] very own vanilla ice cream for it. [1] [gratefully |happily |delightfully |]accepts, and they go on their separate ways without a problem.');
 			// Consumption
-			new G.act(0.02,['vanilla_ice_cream'],'[RED][1] can no longer resist the [scent|freshness|allure|smell|look|psychic influence] of [1:their] vanilla ice cream, and devours it all in one sitting!',p=>{p[1].lose('vanilla ice cream');});
+			new G.act(0.04,['vanilla_ice_cream'],'[RED][1] can no longer resist the [scent|freshness|allure|smell|look|psychic influence] of [1:their] vanilla ice cream, and devours it all in one sitting!',p=>{p[1].lose('vanilla ice cream');});
 			
 			// Item Loss
 			// - Melee 10%
@@ -2634,9 +2633,9 @@ G={
 			var healthModerate='bulky%0.2|stubborn%0.2|plot_armor%0.4|any%0.5 !cut_up%0.3|broken%0.3|shot%0.3|singed%0.3';
 			var healthMajor='bulky%0.1|stubborn%0.1|plot_armor%0.6|any%0.5 !bleeding_out%0.5|burnt%0.5|missing_arm%0.5|missing_leg%0.5|badly_poisoned%0.5';
 			
-			var healthRecover=1.5;
-			var healthWorsen=0.75;
-			var healthHeal=1.5;
+			var healthRecover=2;
+			var healthWorsen=0.5;
+			var healthHeal=2;
 			var healthDeath=0.75;
 			
 			// - Minor (
@@ -2669,6 +2668,9 @@ G={
 				new G.act(healthDeath*0.7,['burnt any !first_aid_kit%0.5|medicine%0.5|medic%0.5 '+injuredMajor],`[RED][1] [dies|falls|drops] from their extensive burns.`,p=>{p[1].die(`burn wounds`);});
 			new G.act(healthRecover*0.1,['badly_poisoned any '+healthMajor],`[1] begins recovering from [1:their] severe [poison|toxic] build up, but hasn't fully recovered yet.`,p=>{p[1].lose(`badly poisoned`);p[1].gain('poisoned');});
 				new G.act(healthDeath*0.7,['badly_poisoned any !medicine%0.5|medic%0.5 '+injuredMajor],`[RED][1] [dies|falls|loses] to the [severe poison|toxic buildup] within them.`,p=>{p[1].die(`poison`);});
+			// - Via magical means
+			new G.act(healthHeal*1,['injured !unconscious|comatose|shell-shocked'],`[1] takes out [1:their] [magical|fragrant] hot chocolate and [drinks|sips on] it, recovering from [1:their] injuries!`,p=>{p[1].has('hot chocolate').uses--; if (p[1].has('hot chocolate').uses <= 0 && Math.random() < 0.4) { p[1].lose('hot chocolate'); } p[1].healInjuries(); });
+			new G.act(healthHeal*1,['ailed !unconscious|comatose|shell-shocked'],`[1] takes out [1:their] [delicious|still-hot] batch of cookies and [eats|snacks on] it, alleviating [1:their] ailments!`,p=>{p[1].has('batch of cookies').uses--; if (p[1].has('batch of cookies').uses <= 0 && Math.random() < 0.4) { p[1].lose('batch of cookies'); } p[1].cureAilments(); });
 			// - First Aid Self
 			new G.act(healthHeal*0.5,['bruised|sick|dizzy medicine medic%0.8|analytical%0.2|first_aid_kit%0.2|any%0.5'],`[BLUE][1] takes some medication to take the edge off [1:their] pain, feeling better and more clear headed overall.`,p=>{p[1].lose(`bruised`);p[1].lose(`sick`);p[1].lose(`dizzy`);});
 			new G.act(healthHeal*0.5,['cut_up|shot|scratched first_aid_kit%0.8|medic%0.5|medicine%0.2|roll_of_fabric%0.2|any%0.2'],`[BLUE][1] [carefully|calmly|expertly] treats [1:their] own [wounds|lacerations] with what supplies [1:g|he has|she has|they have|it has], stopping any bleeding and preventing future infection.`,p=>{p[1].lose(`shot`);p[1].lose(`cut up`);p[1].lose(`scratched`);});
@@ -6598,6 +6600,64 @@ G={
 				},
 				req: ['freezing_sapphire any '+hardDisables, 'any'],
 				pReq: ['p:20/50']
+			});
+
+			//high pressure garden hose 
+			new G.move({
+				chance: 3,
+				text: '[1] fills up [1:their] garden hose with water.',
+				successFunc: function() { this.has('high pressure garden hose').charges++; },
+				req: ['high_pressure_garden_hose'],
+				reqFunc: function() { return this.has('high pressure garden hose').charges < 1; }
+			});
+			G.adjustFuncs.stanceDefense = function(chance) {
+				let pow = 1;
+				if (this.has('knight armor')) { pow += 1; } 
+				if (this.has('clumsy')) { pow += 0.5; }
+				if (this.has('meek')) { pow += 0.5; }
+				if (this.has('blind')) { pow += 0.5; }
+				if (this.has('dizzy')) { pow += 0.5; }
+				if (this.has('dazed')) { pow += 0.5; }
+				pow += 0.5 * this.isInjured();
+				pow += 0.5 * this.isAiled();
+				pow += 0.5 * this.isDisabled();
+
+				if (this.has('combat gear')) { pow *= 0.7; }
+				if (this.has('ironskin')) { pow *= 0.6; }
+				if (this.has('infallible')) { pow *= 0.1; }
+				if (this.has('riot shield') || this.has('kite shield')) { pow *= 0.5; }
+
+				return 1 - Math.pow(1 - chance, pow);
+			};
+			new G.move({
+				chance: 6,
+				text: '[1] opens the valve on [1:their] garden hose, with water rushing out of it with incredibly high velocities!',
+				successFunc: function(cl, text) {
+					this.has('high pressure garden hose').charges--;
+					if (cl.length <= 1) { return text + '<br>However, it did not hit anyone!'; }
+					let afflictions = [];
+					for (let i = 1; i < cl.length; i++) {
+						if (cl[i].has('fallen')) {
+							cl[i].gain('bruised');
+							if (Math.random() < cl[i].adjust(0.5, 'defenseGen')) { cl[i].gain('bruised'); }
+							if (Math.random() < cl[i].adjust(0.5, 'defenseGen')) { cl[i].gain('bruised'); }
+							afflictions.push('greatly bruising [N]');
+							continue;
+						}
+ 						let chance = Math.pow(1 / (this.combat.projectileDist(cl[i]) + 1), 0.33);
+						chance = cl[i].adjust(chance, 'stanceDefense');
+						if (Math.random() < chance) { cl[i].gain('fallen'); }
+						if (Math.random() < chance) { cl[i].gain('bruised'); }
+						afflictions.push('knocking [N] down');
+					}
+					for (let i = 0; i < afflictions.length; i++) {
+						afflictions[i] = afflictions[i].replace('[N]', '['+(i + 2)+']');
+					}
+					return text + '<br>It hits [ALL-1], which '+oxfordsConcat(afflictions)+'!';
+				},
+				req: ['high_pressure_garden_hose', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any'],
+				reqFunc: function() { return this.has('high pressure garden hose').charges >= 1; },
+				pReq: ['p:20', 'p:20', 'p:20', 'p:20']
 			});
 			
 			G.parse = function(text,actors)
