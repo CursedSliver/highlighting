@@ -6606,6 +6606,7 @@ G={
 			new G.move({
 				chance: 3,
 				text: '[1] fills up [1:their] garden hose with water.',
+				element: G.moveAssets.elements.alone,
 				successFunc: function() { this.has('high pressure garden hose').charges++; },
 				req: ['high_pressure_garden_hose'],
 				reqFunc: function() { return this.has('high pressure garden hose').charges < 1; }
@@ -6632,6 +6633,10 @@ G={
 			new G.move({
 				chance: 6,
 				text: '[1] opens the valve on [1:their] garden hose, with water rushing out of it with incredibly high velocities!',
+				element: new G.element({
+					interact: 4,
+					interactMin: 0
+				}),
 				successFunc: function(cl, text) {
 					this.has('high pressure garden hose').charges--;
 					if (cl.length <= 1) { return text + '<br>However, it did not hit anyone!'; }
@@ -6657,7 +6662,7 @@ G={
 				},
 				req: ['high_pressure_garden_hose', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any', 'delete%0.5 !=%0.8 any'],
 				reqFunc: function() { return this.has('high pressure garden hose').charges >= 1; },
-				pReq: ['p:20', 'p:20', 'p:20', 'p:20']
+				pReq: ['p:20', 'p:20', 'p:20', 'p:25']
 			});
 			
 			G.parse = function(text,actors)
