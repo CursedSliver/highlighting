@@ -6661,21 +6661,17 @@ G={
 					let afflictions = [];
 					for (let i = 1; i < cl.length; i++) {
 						if (cl[i].has('fallen')) {
-							cl[i].gain('singed');
-							let chance = cl[i].adjust(0.5, 'defenseGen');
-							for (let i = 0; i < 6; i++) {
-								if (Math.random() < chance) { cl[i].gain('singed'); }
-							}
-							afflictions.push('heavily burning [N]');
+							cl[i].gain('bruised');
+							if (Math.random() < cl[i].adjust(0.5, 'defenseGen')) { cl[i].gain('bruised'); }
+							if (Math.random() < cl[i].adjust(0.5, 'defenseGen')) { cl[i].gain('bruised'); }
+							afflictions.push('greatly bruising [N]');
 							continue;
 						}
  						let chance = Math.pow(1 / (this.combat.projectileDist(cl[i]) + 1), 0.33);
 						chance = cl[i].adjust(chance, 'stanceDefense');
 						if (Math.random() < chance) { cl[i].gain('fallen'); }
-						for (let i = 0; i < 3; i++) {
-							if (Math.random() < chance) { cl[i].gain('singed'); }
-						}
-						afflictions.push('knocking down and burning [N]');
+						if (Math.random() < chance) { cl[i].gain('bruised'); }
+						afflictions.push('knocking [N] down');
 					}
 					for (let i = 0; i < afflictions.length; i++) {
 						afflictions[i] = afflictions[i].replace('[N]', '['+(i + 2)+']');
@@ -6700,17 +6696,21 @@ G={
 					let afflictions = [];
 					for (let i = 1; i < cl.length; i++) {
 						if (cl[i].has('fallen')) {
-							cl[i].gain('bruised');
-							if (Math.random() < cl[i].adjust(0.5, 'defenseGen')) { cl[i].gain('bruised'); }
-							if (Math.random() < cl[i].adjust(0.5, 'defenseGen')) { cl[i].gain('bruised'); }
-							afflictions.push('greatly bruising [N]');
+							cl[i].gain('singed');
+							let chance = cl[i].adjust(0.5, 'defenseGen');
+							for (let ii = 0; ii < 6; i++) {
+								if (Math.random() < chance) { cl[i].gain('singed'); }
+							}
+							afflictions.push('heavily burning [N]');
 							continue;
 						}
  						let chance = Math.pow(1 / (this.combat.projectileDist(cl[i]) + 1), 0.33);
 						chance = cl[i].adjust(chance, 'stanceDefense');
 						if (Math.random() < chance) { cl[i].gain('fallen'); }
-						if (Math.random() < chance) { cl[i].gain('bruised'); }
-						afflictions.push('knocking [N] down');
+						for (let ii = 0; ii < 3; i++) {
+							if (Math.random() < chance) { cl[i].gain('singed'); }
+						}
+						afflictions.push('knocking down and burning [N]');
 					}
 					for (let i = 0; i < afflictions.length; i++) {
 						afflictions[i] = afflictions[i].replace('[N]', '['+(i + 2)+']');
