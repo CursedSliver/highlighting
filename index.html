@@ -821,7 +821,7 @@ G={
 		new G.perk({name:`freezing sapphire`,desc:`Can be thrown to freeze everyone.`,tier:1});
 		new G.perk({name:`high pressure garden hose`,desc:`Good at knocking people over, not so good for killing people.`,tier:1,init:{charges:1,content:'water'}});
 		new G.perk({name:`topaz with a hole`,desc:`Tingly to the touch.`,tier:2});
-		new G.perk({name:`topaz on a stick`,desc:`Shall lightning smite you!`,tier:3});
+		new G.perk({name:`topaz on a stick`,desc:`Shall lightning smite you!`,tier:3,init:{charges:1}});
 		new G.perk({name:`angel in a bottle`,desc:`SUSSY AMONGUS`,tier:3,onDeath:function() { if (Math.random() < 1 / 3) { this.owner.gain('angel\'s revival'); } this.owner.lose(this); }});
 		new G.perk({name:`nuclear bomb`,desc:`A nuke.`,tier:9});
 		
@@ -6674,11 +6674,12 @@ G={
 							afflictions.push('greatly bruising [N]');
 							continue;
 						}
+						cl[i].moveToward(this, -6);
  						let chance = Math.pow(1 / (this.combat.projectileDist(cl[i]) + 1), 0.33);
 						chance = cl[i].adjust(chance, 'stanceDefense');
-						if (Math.random() < chance) { cl[i].gain('fallen'); }
 						if (Math.random() < chance) { cl[i].gain('bruised'); }
-						afflictions.push('knocking [N] down');
+						if (Math.random() < chance) { cl[i].gain('fallen'); afflictions.push('knocking [N] down'); }
+						afflictions.push('makes [N] stumble');
 					}
 					for (let i = 0; i < afflictions.length; i++) {
 						afflictions[i] = afflictions[i].replace('[N]', '['+(i + 2)+']');
@@ -6758,6 +6759,56 @@ G={
 				element: G.moveAssets.elements.alone,
 				successFunc: function() { this.lose('topaz with a hole'); this.gain('topaz on a stick'); },
 				req: ['topaz_with_a_hole inventor%0.5|scrappy%0.2|artist%0.3|any%0.5|the_gift%0.5|goth%0.2|big_stick !topaz_on_a_stick']
+			});
+
+			//topaz on a stick (2 moves, 1 strike and 1 ranged, plus one charge)
+			new G.move({
+				chance: 3,
+				text: '[1] holds up [1:their] topaz on a stick onto the sky, as request for more power! And it seems that the gods agree...',
+				failText: '[1] holds up [1:their] topaz on a stick onto the sky, as request for more power! But [nothing happens|it seems that the gods are a bit reluctant]...',
+				fail: 0.25,
+				element: G.moveAssets.elements.alone,
+				successFunc: function() { this.has('topaz on a stick').charges++; },
+				reqFunc: function() { return this.has('topaz on a stick').charges < (this.has('wizard robe')?2:1); }
+			});
+			new G.move({
+				chance: 4,
+				text: '[1] [back |]strikes [2] with [1:their] topaz on a stick, [S]!',
+				failText: '[1] tries to strike [2] with [1:their] topaz on a stick, but [2:they] managed to [narrowly |]avoid it.',
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.1, 'swing'), 'dodge'); },
+				func: G.moveAssets.readyForPunch,
+				successFunc: function(cl, text) {
+					this.has('topaz on a stick').charges--;
+					let chance = cl[1].adjust(0.4, 'electricityDefense');
+
+					if (Math.random() < Math.pow(chance, 4) && (cl[1].isInjured() || cl[1].isAiled())) { this.kill(cl[1], 'electrifried'); return text.replace('[S]', 'which stops [2:their] heart'); }
+					if (Math.random() < Math.pow(chance, 2.5)) { cl[1].gain('paralyzed'); cl[1].gain('fallen'); return text.replace('[S]', 'which leaves [2:them] completely paralyzed'); }
+					for (let i = 0; i < 10; i++) {
+						if (Math.random() < chance) { cl[1].gain('singed'); }
+					}
+					if (Math.random() < chance && !cl[1].has('fallen')) { cl[1].gain('fallen'); return text.replace('[S]', 'leaving [2:them] on the ground and defenseless'); }
+					return text.replace('[S]', 'leaving a greatly seared, wildly branching and growing mark on [2:them]');
+				},
+				req: ['topaz_on_a_stick any%0.3|able%0.6|ninja%0.2|wizard_robe%0.2', 'any'],
+				reqFunc: function() { return (this.has('topaz on a stick').charges > 0); },
+				pReq: ['e:10']
+			});
+			new G.move({
+				chance: 4,
+				text: '[1] murmurs something quietly, and [1:their] topaz on a stick gets brighter with every syllable... then, as the light comes to a climax, a thunderous bolt of lightning outshining the sun snaps to [2][S]!',
+				successFunc: function(cl, text) {
+					this.has('topaz on a stick').charges--;
+					let chance = cl[1].adjust(0.8, 'electricityDefense');
+
+					if (Math.random() < Math.pow(chance, 4) && (cl[1].isInjured() || cl[1].isAiled())) { this.kill(cl[1], 'electrifried'); return text.replace('[S]', 'which stops [2:their] heart'); }
+					if (Math.random() < Math.pow(chance, 2.5)) { cl[1].gain('paralyzed'); cl[1].gain('fallen'); return text.replace('[S]', 'which leaves [2:them] completely paralyzed'); }
+					for (let i = 0; i < 10; i++) {
+						if (Math.random() < chance) { cl[1].gain('singed'); }
+					}
+					return text.replace('[S]', 'leaving a greatly seared, wildly branching and growing mark on [2:them]');
+				},
+				req: ['topaz_on_a_stick any%0.5|able%0.2|wizard_robe%0.2|the_gift%0.4|marksmen%0.1|cowardly%0.1|meek%0.1', '!=%0.75 any'],
+				pReq: ['e:15/40']
 			});
 			
 			G.parse = function(text,actors)
