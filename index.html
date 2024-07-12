@@ -2549,8 +2549,8 @@ G={
 				new G.act(perkAttackMult*attackKill*0.4,[coldBloodKiller+' slingshot pet_rock annoying%0.5|marksmen%0.5|any%0.5 !missing_arm','- any'],`[RED][1] sics their pet rock on [2] through [1:their] sling shot!<br>Head shot! [2]'s skull is left shattered and bloody as [2:their] body drops dead.`,p=>{p[1].kill(p[2],`pet rock`);});
 				new G.act(perkAttackMult*attackKill*0.5,[hesitentKiller+' pet_rock gremlin%0.8|annoying%0.5|naive%0.5|animal_ken%0.2|any%0.5 !missing_arm', '- any pet_rock !missing_arm'],'[RED][1] decides to play rock paper scissors with [2]! <br>In an instant, both reveal their hands - [1] with rock, [2] with scissor!<br>Then, [1] smashes [1:their] pet rock down [2]\'s skull!',p=>{p[1].kill(p[2],'paper-scissor-youredead');}); //inspired by trufflz - CS
 			// High pressure garden hose charging
-			new G.act(0.8,['high_pressure_garden_hose any any%0.8|artist'],'[BLUE][1] finds a pool of water, and seeing [1:their] emptied tank of the garden hose, [1:they] fills it up in preparation for future problems.',p=>{p[1].has('high pressure garden hose').charges++;p[1].has('high pressure garden hose').content='water';},p=>{return (p[1].has('high pressure garden hose').charges <= 0); });
-			new G.act(1,['high_pressure_garden_hose any any%0.25|artist%0.4|inventor%0.6|devious%0.2|sociopath%0.3'],'[BLUE][1] finds a vial of acid, and seeing [1:their] garden hose, a dark, yet bright idea blooms in [1:their] head...',p=>{p[1].has('high pressure garden hose').charges++;p[1].has('high pressure garden hose').content='acid';},p=>{return (p[1].has('high pressure garden hose').charges <= 0); });
+			new G.act(1.6,['high_pressure_garden_hose any any%0.8|artist'],'[BLUE][1] finds a pool of water, and seeing [1:their] emptied tank of the garden hose, [1:they] fills it up in preparation for future problems.',p=>{p[1].has('high pressure garden hose').charges++;p[1].has('high pressure garden hose').content='water';},p=>{return (p[1].has('high pressure garden hose').charges <= 0 && p[1].has('high pressure garden hose').content == 'none'); });
+			new G.act(2,['high_pressure_garden_hose any any%0.25|artist%0.4|inventor%0.6|devious%0.2|sociopath%0.3'],'[BLUE][1] finds a vial of acid, and seeing [1:their] garden hose, a dark, yet bright idea blooms in [1:their] head...',p=>{p[1].has('high pressure garden hose').charges++;p[1].has('high pressure garden hose').content='acid';},p=>{return (p[1].has('high pressure garden hose').charges <= 0 && p[1].has('high pressure garden hose').content != 'acid'); });
 			// Shuriken Combat
 			new G.act(perkAttackMult*attackMinor*0.3,[hesitentKiller+' shuriken ninja%0.8|marksmen%0.5|any%0.5','- any !kite_shield%0.2|riot_shield%0.2|lucky_coin%0.2 '+victimMinor],`[1] grazed [2] with a few of [1:their] gleaming shuriken.`,p=>{p[2].gain('scratched');});
 			new G.act(perkAttackMult*attackModerate*0.3,[hesitentKiller+' shuriken ninja%0.8|marksmen%0.5|any%0.5','- any !kite_shield%0.2|riot_shield%0.2|lucky_coin%0.2 '+victimModerate],`[1] managed to leave [2] with a few lacerations after tossing knives at [2:them].`,p=>{p[2].gain('cut up');});
@@ -6656,6 +6656,7 @@ G={
 				}),
 				successFunc: function(cl, text) {
 					this.has('high pressure garden hose').charges--;
+					this.has('high pressure garden hose').content = 'none';
 					if (cl.length <= 1) { return text + '<br>However, it did not hit anyone!'; }
 					let afflictions = [];
 					for (let i = 1; i < cl.length; i++) {
@@ -6694,6 +6695,7 @@ G={
 				}),
 				successFunc: function(cl, text) {
 					this.has('high pressure garden hose').charges--;
+					this.has('high pressure garden hose').content = 'none';
 					if (cl.length <= 1) { return text + '<br>However, it did not hit anyone!'; }
 					let afflictions = [];
 					for (let i = 1; i < cl.length; i++) {
