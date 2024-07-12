@@ -6754,8 +6754,8 @@ G={
 
 			//topaz with a hole crafting
 			new G.move({
-				chance: 1,
-				text: '[BLUE][1] remembers [1:their] topaz with a suspiciously shaped hole, and soon realized...<br>[1] got a nearby branch and put the topaz onto one end, which neatly snaps together! In [1:their]\'s [amazement|astonishment], the topaz feels tingly and electric to the touch, now faintly glowing yellow!',
+				chance: 0.5,
+				text: '[1] remembers [1:their] topaz with a suspiciously shaped hole, and soon realized...<br>[1] got a nearby branch and put the topaz onto one end, which neatly snaps together! In [1:their]\'s [amazement|astonishment], the topaz feels tingly and electric to the touch, now faintly glowing yellow!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() { this.lose('topaz with a hole'); this.gain('topaz on a stick'); },
 				req: ['topaz_with_a_hole inventor%0.5|scrappy%0.2|artist%0.3|any%0.5|the_gift%0.5|goth%0.2|big_stick !topaz_on_a_stick']
