@@ -821,7 +821,7 @@ G={
 		new G.perk({name:`freezing sapphire`,desc:`Can be thrown to freeze everyone.`,tier:1});
 		new G.perk({name:`high pressure garden hose`,desc:`Good at knocking people over, not so good for killing people.`,tier:1,init:{charges:1,content:'water'}});
 		new G.perk({name:`topaz with a hole`,desc:`Tingly to the touch.`,tier:2});
-		new G.perk({name:`topaz on a stick`,desc:`Shall lightning smite you!`,tier:3,init:{charges:1}});
+		new G.perk({name:`topaz on a stick`,desc:`Shall lightning smite you!`,tier:3,init:{charges:0}});
 		new G.perk({name:`angel in a bottle`,desc:`SUSSY AMONGUS`,tier:3,onDeath:function() { if (Math.random() < 1 / 3) { this.owner.gain('angel\'s revival'); } this.owner.lose(this); }});
 		new G.perk({name:`nuclear bomb`,desc:`A nuke.`,tier:9});
 		
@@ -6773,7 +6773,7 @@ G={
 				element: G.moveAssets.elements.alone,
 				successFunc: function() { this.has('topaz on a stick').charges++; },
 				req: ['topaz_on_a_stick any%0.8|wizard_robe '+hardDisables],
-				reqFunc: function() { return this.has('topaz on a stick').charges < (this.has('wizard robe')?2:1); }
+				reqFunc: function() { return this.has('topaz on a stick').charges < (this.has('wizard robe')?3:2); }
 			});
 			new G.move({
 				chance: 4,
@@ -6798,11 +6798,11 @@ G={
 				pReq: ['e:10']
 			});
 			new G.move({
-				chance: 4,
+				chance: 2,
 				text: '[1] murmurs something quietly, and [1:their] topaz on a stick gets brighter with every syllable... then, as the light comes to a climax, a thunderous bolt of lightning outshining the sun snaps to [2], [S]!',
 				successFunc: function(cl, text) {
-					this.has('topaz on a stick').charges--;
-					let chance = cl[1].adjust(0.8, 'electricityDefense');
+					this.has('topaz on a stick').charges -= 2;
+					let chance = cl[1].adjust(0.6, 'electricityDefense');
 
 					if (Math.random() < Math.pow(chance, 4) && (cl[1].isInjured() || cl[1].isAiled())) { this.kill(cl[1], 'electrifried'); return text.replace('[S]', 'which stops [2:their] heart'); }
 					if (Math.random() < Math.pow(chance, 2.5)) { cl[1].gain('paralyzed'); cl[1].gain('fallen'); return text.replace('[S]', 'which leaves [2:them] completely paralyzed'); }
