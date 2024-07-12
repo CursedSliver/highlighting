@@ -2251,7 +2251,7 @@ G={
 				new G.act(itemCraftMult*0.01,['magic_dust scrap_metal inventor%0.5|scrappy%0.2|the_gift%0.5|artist%0.2|any%0.5 !wish_ring'],`[BLUE][1] forges [1:their] metal scraps into a ring, and cools it in the magic dust.<br>It sparkles softly in the light...`,p=>{p[1].gain('wish ring');p[1].lose('magic dust');p[1].lose('scrap metal');});
 				new G.act(itemCraftMult*0.03,['magic_dust roll_of_fabric inventor%0.5|scrappy%0.2|the_gift%0.5|artist%0.5|any%0.5 !wizard_robe'],`[BLUE][1] tailors a custom fitting robe for [1:themself]<br>With the help of [1:their] magic dust, the new robe begins to flutter with power.`,p=>{p[1].gain('wizard robe');p[1].lose('magic dust');p[1].lose('roll of fabric');});
 			//topaz
-			new G.act(itemCraftMult*0.5,['topaz_with_a_hole inventor%0.5|scrappy%0.2|artist%0.3|any%0.5|the_gift%0.5|goth%0.2|big_stick !topaz_on_a_stick'],`[BLUE][1] remembers [1:their] topaz with a suspiciously shaped hole, and soon realized...<br>[1] got a nearby branch and put the topaz onto one end, which neatly snaps together! In [1:their]\'s [amazement|astonishment], the topaz feels tingly and electric to the touch, now faintly glowing yellow!`,p=>{ p[1].lose('topaz with a hole'); p[1].gain('topaz on a stick'); });
+			new G.act(itemCraftMult*1.5,['topaz_with_a_hole inventor%0.5|scrappy%0.2|artist%0.3|any%0.5|the_gift%0.5|goth%0.2|big_stick !topaz_on_a_stick'],`[BLUE][1] remembers [1:their] topaz with a suspiciously shaped hole, and soon realized...<br>[1] got a nearby branch and put the topaz onto one end, which neatly snaps together! In [1:their]\'s [amazement|astonishment], the topaz feels tingly and electric to the touch, now faintly glowing yellow!`,p=>{ p[1].lose('topaz with a hole'); p[1].gain('topaz on a stick'); });
             // Crafting for teammates -TW
 				// TODO - write new teamwork craft. (Friendly and Leader-inspired)
 			new G.act(itemCraftMult*0.01,['inventor kind|any%0.5','+ scrap_metal !peaceful'],`[BLUE][2] asks [1] for help with [forging|finding a use for] the metal [scrap|scraps] [2:they] found.<br>[1] stokes an improvised forge, and soon [2] has a new sword to protect themselves!`,p=>{p[2].lose('scrap metal');p[2].gain('sword');});
@@ -6754,7 +6754,7 @@ G={
 
 			//topaz with a hole crafting
 			new G.move({
-				chance: 0.5,
+				chance: 0.9,
 				text: '[1] remembers [1:their] topaz with a suspiciously shaped hole, and soon realized...<br>[1] got a nearby branch and put the topaz onto one end, which neatly snaps together! In [1:their]\'s [amazement|astonishment], the topaz feels tingly and electric to the touch, now faintly glowing yellow!',
 				element: G.moveAssets.elements.alone,
 				successFunc: function() { this.lose('topaz with a hole'); this.gain('topaz on a stick'); },
