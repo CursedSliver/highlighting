@@ -6769,6 +6769,7 @@ G={
 				fail: 0.25,
 				element: G.moveAssets.elements.alone,
 				successFunc: function() { this.has('topaz on a stick').charges++; },
+				req: ['topaz_on_a_stick any%0.8|wizard_robe '+hardDisables],
 				reqFunc: function() { return this.has('topaz on a stick').charges < (this.has('wizard robe')?2:1); }
 			});
 			new G.move({
