@@ -6872,7 +6872,7 @@ G={
 							//if does not match, returns false
 							if (actors)
 							{
-								if (act.reqFunc && !act.reqFunc(actors)) { continue; }
+								if (act.reqFunc && !act.reqFunc([0].concat(actors))) { continue; }
 								choice=act;
 								break;
 							}
