@@ -6812,6 +6812,7 @@ G={
 					return text.replace('[S]', 'leaving a greatly seared, wildly branching and growing mark on [2:them]');
 				},
 				req: ['topaz_on_a_stick any%0.5|able%0.2|wizard_robe%0.2|the_gift%0.4|marksmen%0.1|cowardly%0.1|meek%0.1 '+hardDisables, '!=%0.75 any'],
+				reqFunc: function() { return (this.has('topaz on a stick').charges > 0); },
 				pReq: ['e:15/40']
 			});
 			
