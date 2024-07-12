@@ -5752,7 +5752,7 @@ G={
 				},
 				req: ['wish_ring !able any%0.1|naive !suicidal !frenzied !determined '+hardDisables]
 			});
-			G.moveDefault.fail = function(cl) { if (cl[1].has('mint enhanced') && (cl[1].team != this.team || this.team == 0)) { return 1; } return this.adjust(0.5, 'wish'); }
+			G.moveDefault.fail = function(cl) { if (cl[1] && cl[1].has('mint enhanced') && (cl[1].team != this.team || this.team == 0)) { return 1; } return this.adjust(0.5, 'wish'); }
 			G.moveAssets.wishRingFailFunc = function(cl, text) {
 				let chance = 1 - this.adjust(0.95, 'wish');
 				
