@@ -7158,7 +7158,7 @@ G={
 								if (participants[i].makeMove()) { participants[i].fleeCombat(); }
 							}
 							for (let i in participants) { if (participants[i].combat && isNaN(participants[i].combat.horizontal)) { throw 'NaN has appeared!'; } }
-							if (participants.length <= 1 || Math.random() > 1 / (count + 1)) { break; }
+							if (participants.length <= 1 || Math.random() > 1 / (count * 0.5 + 1)) { break; }
 							count++;
 						}
 						str += G.parseBoxes(overseer.processInjects());
