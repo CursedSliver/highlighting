@@ -812,7 +812,7 @@ G={
 		new G.perk({name:`extreme cinnamon soda`,desc:`Can be consumed to enter an invincible frenzy.`,tier:3});
 		new G.perk({name:`mint essence`,desc:`Can be consumed to gain immunity to all curses, but is rather difficult to swallow.`,tier:2});
 		new G.perk({name:`vanilla ice cream`,desc:`The compellment to acquire this item is unparalleled.`,tier:1});
-		new G.perk({name:`cookie dough`,desc:`Can be consumed, or be baked into a proper batch of cookies. Premature consumption may lead to sickness.`,tier:0});
+		new G.perk({name:`cookie dough`,desc:`Can be consumed, or be baked into a proper batch of cookies. Premature consumption may lead to sickness.`,tier:0,init:{uses:2}});
 		new G.perk({name:`pancreas pellet`,desc:`A highly magical pellet that cures literally everything at once.`,tier:3});
 
 		// Additional items - CS
@@ -2252,6 +2252,8 @@ G={
 				new G.act(itemCraftMult*0.03,['magic_dust roll_of_fabric inventor%0.5|scrappy%0.2|the_gift%0.5|artist%0.5|any%0.5 !wizard_robe'],`[BLUE][1] tailors a custom fitting robe for [1:themself]<br>With the help of [1:their] magic dust, the new robe begins to flutter with power.`,p=>{p[1].gain('wizard robe');p[1].lose('magic dust');p[1].lose('roll of fabric');});
 			//topaz
 			new G.act(itemCraftMult*1.5,['topaz_with_a_hole inventor%0.5|scrappy%0.2|artist%0.3|any%0.5|the_gift%0.5|goth%0.2|big_stick !topaz_on_a_stick'],`[BLUE][1] remembers [1:their] topaz with a suspiciously shaped hole, and soon realized...<br>[1] got a nearby branch and put the topaz onto one end, which neatly snaps together! In [1:their]\'s [amazement|astonishment], the topaz feels tingly and electric to the touch, now faintly glowing yellow!`,p=>{ p[1].lose('topaz with a hole'); p[1].gain('topaz on a stick'); });
+			//cooking
+			new G.act(itemCraftMult*0.75,['cookie_dough any%0.5|pyromania%0.3|flamethrower%0.25|survivalist%0.2|inventor%0.3|artist%0.2|big_stick%0.05|the_gift%0.5'],`[BLUE][1] starts a fire and uses it to bake [1:their] cookie dough into brand-new, [steaming|delicious] batches of cookies! While the methods are crude and the finished product looks [rather disappointing|somewhat disfigured|slightly malformed|arguably undercooked], they are still as [delicious|tasty] as ever.`,p=>{ p[1].gain('batch of cookies').uses = p[1].has('cookie dough').uses; p[1].lose('cookie dough'); });
             // Crafting for teammates -TW
 				// TODO - write new teamwork craft. (Friendly and Leader-inspired)
 			new G.act(itemCraftMult*0.01,['inventor kind|any%0.5','+ scrap_metal !peaceful'],`[BLUE][2] asks [1] for help with [forging|finding a use for] the metal [scrap|scraps] [2:they] found.<br>[1] stokes an improvised forge, and soon [2] has a new sword to protect themselves!`,p=>{p[2].lose('scrap metal');p[2].gain('sword');});
@@ -2678,8 +2680,10 @@ G={
 			new G.act(healthRecover*0.1,['badly_poisoned any '+healthMajor],`[1] begins recovering from [1:their] severe [poison|toxic] build up, but hasn't fully recovered yet.`,p=>{p[1].lose(`badly poisoned`);p[1].gain('poisoned');});
 				new G.act(healthDeath*0.7,['badly_poisoned any !medicine%0.5|medic%0.5 '+injuredMajor],`[RED][1] [dies|falls|loses] to the [severe poison|toxic buildup] within them.`,p=>{p[1].die(`poison`);});
 			// - Via magical means
-			new G.act(healthHeal*1,['injured !unconscious|shell-shocked'],`[1] takes out [1:their] [magical|fragrant] hot chocolate and [drinks|sips on] it, recovering from [1:their] injuries!`,p=>{p[1].has('hot chocolate').uses--; if (p[1].has('hot chocolate').uses <= 0 && Math.random() < 0.4) { p[1].lose('hot chocolate'); } p[1].healInjuries(); });
-			new G.act(healthHeal*1,['ailed !unconscious|shell-shocked'],`[1] takes out [1:their] [delicious|still-hot] batch of cookies and [eats|snacks on] it, alleviating [1:their] ailments!`,p=>{p[1].has('batch of cookies').uses--; if (p[1].has('batch of cookies').uses <= 0 && Math.random() < 0.4) { p[1].lose('batch of cookies'); } p[1].cureAilments(); });
+			new G.act(healthHeal*1,['hot_chocolate injured !unconscious|shell-shocked'],`[1] takes out [1:their] [magical|fragrant] hot chocolate and [drinks|sips on] it, recovering from [1:their] injuries!`,p=>{p[1].has('hot chocolate').uses--; if (p[1].has('hot chocolate').uses <= 0 && Math.random() < 0.4) { p[1].lose('hot chocolate'); } p[1].healInjuries(); });
+			new G.act(healthHeal*1,['batch_of_cookies ailed !unconscious|shell-shocked'],`[1] takes out [1:their] [delicious|still-hot] batch of cookies and [eats|snacks on] it, alleviating [1:their] ailments!`,p=>{p[1].has('batch of cookies').uses--; if (p[1].has('batch of cookies').uses <= 0 && Math.random() < 0.4) { p[1].lose('batch of cookies'); } p[1].cureAilments(); });
+			new G.act(healthHeal*0.3,['cookie_dough ailed !sick !unconscious|shell-shocked'],`[1] takes out [1:their] [raw |]cookie dough and [eats|snacks on] it, alleviating [1:their] ailments!`,p=>{p[1].has('cookie dough').uses--; if (p[1].has('cookie dough').uses <= 0) { p[1].lose('cookie dough'); } p[1].cureAilments(); });
+			new G.act(healthHeal*0.3,['cookie_dough ailed !survivalist%0.3 !unconscious|shell-shocked'],`[1] takes out [1:their] [raw |]cookie dough and [eats|snacks on] it, alleviating [1:their] ailments! However, soon after consuming it, [1:they] begin feeling a little sick and nauseous...`,p=>{p[1].has('cookie dough').uses--; if (p[1].has('cookie dough').uses <= 0) { p[1].lose('cookie dough'); } p[1].gain('sick'); p[1].gain('dizzy'); p[1].gain('dazed'); });
 			// - First Aid Self
 			new G.act(healthHeal*0.5,['bruised|sick|dizzy medicine medic%0.8|analytical%0.2|first_aid_kit%0.2|any%0.5'],`[BLUE][1] takes some medication to take the edge off [1:their] pain, feeling better and more clear headed overall.`,p=>{p[1].lose(`bruised`);p[1].lose(`sick`);p[1].lose(`dizzy`);});
 			new G.act(healthHeal*0.5,['cut_up|shot|scratched first_aid_kit%0.8|medic%0.5|medicine%0.2|roll_of_fabric%0.2|any%0.2'],`[BLUE][1] [carefully|calmly|expertly] treats [1:their] own [wounds|lacerations] with what supplies [1:g|he has|she has|they have|it has], stopping any bleeding and preventing future infection.`,p=>{p[1].lose(`shot`);p[1].lose(`cut up`);p[1].lose(`scratched`);});
@@ -3676,6 +3680,17 @@ G={
 					if (this.has('batch of cookies').uses <= 0 && Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('batch of cookies'); this.combat.overseer.injectBack('<br>[1] has eaten all of [1:their] cookies.'); }
 				},
 				req: ['batch_of_cookies any%0.05|ailed '+hardDisables]
+			});
+			new G.move({
+				chance: 1.5,
+				text: '[1] takes out [1:their] mound of cookie dough and [gorges on|devours|eats] them, recovering from [1:their] ailments!',
+				successFunc: function(cl, text) {
+					if (!this.has('sick')) { this.cureAilments(); }
+					this.has('cookie dough').uses--;
+					if (this.has('cookie dough').uses <= 0) { this.lose('cookie dough'); this.combat.overseer.injectBack('<br>[1] has eaten all of [1:their] cookies dough.'); }
+					if (this.has('sick') || Math.random() < this.has('survivalist')?0.4:0.6) { this.gain('sick'); this.gain('dizzy'); this.gain('dazed'); return text + '<br>However, shortly after eating it raw, [1:they] began filling a little bit sickly and nauseous...'; }
+				},
+				req: ['cookie_dough ailed '+hardDisables]
 			});
 			new G.move({
 				chance: 3,
