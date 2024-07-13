@@ -809,7 +809,7 @@ G={
 		// Consumables - CS
 		new G.perk({name:`batch of cookies`,desc:`Can be consumed multiple times to rid oneself of ailments. Delicious!`,tier:1,init:{uses:2}});
 		new G.perk({name:`hot chocolate`,desc:`Can be consumed multiple times to heal oneself of injuries.`,tier:2,init:{uses:2}});
-		new G.perk({name:`extreme cinnamon soda`,desc:`Can be consumed to enter an invincible frenzy.`,tier:3});
+		new G.perk({name:`extreme cinnamon soda`,desc:`Can be consumed to enter an invincible frenzy.`,tier:3,init:{uses:2}});
 		new G.perk({name:`mint essence`,desc:`Can be consumed to gain immunity to all curses, but is rather difficult to swallow.`,tier:2});
 		new G.perk({name:`vanilla ice cream`,desc:`The compellment to acquire this item is unparalleled.`,tier:1});
 		new G.perk({name:`cookie dough`,desc:`Can be consumed, or be baked into a proper batch of cookies. Premature consumption may lead to sickness.`,tier:0,init:{uses:2}});
@@ -3701,6 +3701,39 @@ G={
 					if (this.has('hot chocolate').uses <= 0 && Math.random() < 0.4 - (this.has('survivalist')?0.1:0)) { this.lose('hot chocolate'); this.combat.overseer.injectBack('<br>[1] has drank all of [1:their] hot chocolate.'); }
 				},
 				req: ['hot_chocolate any%0.05|injured '+hardDisables]
+			});
+			new G.move({
+				chance: function() {
+					let chance = 1.5;
+					chance += this.isInjured() * 0.3;
+					chance += this.isAiled() * 0.3;
+					chance += this.isDisabled() * 0.3;
+					if (this.has('bruised')) { chance += this.has('bruised').count * 0.15; }
+					if (this.has('cut up')) { chance += this.has('cut up').count * 0.15; }
+					if (this.has('singed')) { chance += this.has('singed').count * 0.075; }
+					if (this.has('seared')) { chance += this.has('seared').count * 0.15; }
+
+					return chance;
+				},
+				text: 'Feeling [hopeless|useless|like on the edge of death], [1] takes out [1:their] bubbly cinnamon water infused with madness, and dumps a whole bunch down [1:their] throat! ',
+				successFunc: function(cl, text) {
+					this.has('extreme cinnamon soda').uses--;
+					if (this.has('extreme cinnamon soda').uses <= 0 && Math.random() < 0.8) { this.lose('extreme cinnamon soda'); this.combat.overseer.injectBack('<br>[1] has drank all of [1:their] extreme cinnamon soda!'); }
+					this.gain('frenzied');
+					this.gain('determined');
+					this.gain('high morale').duration = 100;
+					this.gain('invigorated').power = 7;
+					this.combat.overseer.injectColor('red');
+					let newText = '';
+					if (this.has('fallen')) { newText = 'And suddenly, against all odds, [1:they] stands up with a pained smile and uncannily dilated eyes...'; } else {
+						newText = 'And suddenly, [1:their] eyes begin to dilate into an uncanny oval, accompanied by barrages of concerning muscle twitches!';
+					}
+					this.lose('fallen');
+					this.healInjuries();
+					this.healAilments();
+					return text + newText;
+				},
+				req: ['extreme_cinnamon_soda injured|ailed !able '+hardDisables]
 			});
 			new G.move({
 				chance: function() { return Math.pow(this.has('grieving').power, 0.3) * 0.3; },
