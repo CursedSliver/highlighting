@@ -4453,7 +4453,7 @@ G={
 			//finishing moves
 			new G.move({
 				chance: 6,
-				text: 'Seeing [2] all knocked out, [1] decides to finish it once and for all and takes [2:their] life!',
+				text: 'Seeing [2] all knocked out, [1] decides to finish it once and for all and takes [2]\'s life!',
 				successFunc: function(cl) {
 					this.interrupt(cl[1]);
 					this.kill(cl[1], choose(['merciful asphyxation', 'collapsing brain', 'severed neck', 'heart transplant donor', 'mummified', 'buried alive', 'leaky blood transfusion']));
