@@ -6726,7 +6726,7 @@ G={
 							afflictions.push('greatly bruising [N]');
 							continue;
 						}
-						cl[i].moveToward(this, -6);
+						cl[i].combat.moveToward(this, -6);
  						let chance = Math.pow(1 / (this.combat.projectileDist(cl[i]) + 1), 0.33);
 						chance = cl[i].adjust(chance, 'stanceDefense');
 						if (Math.random() < chance) { cl[i].gain('bruised'); }
