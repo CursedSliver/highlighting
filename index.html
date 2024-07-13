@@ -3424,7 +3424,7 @@ G={
 					if (re) { overseer.replacePrompt(re); }
 				}
 				
-				if ((this.has('frenzied') && Math.random() < 0.25) || (this.has('haste') && Math.random() < 0.05)) { return this.makeMove(); }
+				if ((this.has('frenzied') && Math.random() < 0.25) || (this.has('haste') && Math.random() < 0.05) || (this.has('invigorated') && Math.random() < Math.pow(0.85, this.has('invigorated').power))) { return this.makeMove(); }
 				if (overseer.nonInteractiveMoveCount > overseer.participants.length * 4 + 4 && overseer.participants.length > 1) { overseer.addBox('Since nothing is really happening, the fight is now considered over.', []); for (let i in overseer.participants) { overseer.participants[i].fleeCombat(true); } }
 				return this.has('fleed');
 			}
