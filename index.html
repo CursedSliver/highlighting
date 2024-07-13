@@ -626,9 +626,9 @@ G={
 		new G.perk({name:`the gift`,desc:`Has a rare supernatural talent and is attracted to the strange.`});
 		
 		new G.perk({name:`plot armor`,desc:`This character is almost impossible to kill. Not for serious games.`});
-		new G.perk({name:`nerd`,desc:`Filled to the brim with obscure knowledge and technical gossips.`});
-		new G.perk({name:`vigilant`,desc:`Especially observant and keen.`});
-		new G.perk({name:`haste`,desc:`Fast and agile.`});
+		new G.perk({name:`nerd`,desc:`Filled to the brim with obscure knowledge and technical gossips.`,onDeath:function() { console.log(this); }});
+		new G.perk({name:`vigilant`,desc:`Especially observant and keen.`,onDeath:function() { console.log(this); }});
+		new G.perk({name:`haste`,desc:`Fast and agile.`,onDeath:function() { console.log(this); }});
 		new G.perk({name:`omnipotence`,desc:`Unnecessary.`,tier:Infinity});
 		G.glob={type:'trait',def:false};
 		new G.perk({name:`any`,desc:`Applies to everyone.`});
@@ -1398,7 +1398,7 @@ G={
 							G.deadThisRound.push(this);
 						}
 						if (this.onDeath) { this.onDeath.call(this); }
-						for (let i of this.perks) { if (i.perk.onDeath) { i.perk.onDeath.call(i); } }
+						for (let i in this.perks) { if (this.perks[i].perk.onDeath) { this.perks[i].perk.onDeath.call(this.perks[i]); } }
 						this.gain('dead');
 						if (reason) this.deathReason=reason;
 						if (this.combat) {
