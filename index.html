@@ -3759,7 +3759,13 @@ G={
 				req: ['dazed '+hardDisables]
 			});
 			new G.move({
-				chance: 2.5,
+				chance: function() {
+					let chance = 2.5;
+					if (this.has('frenzied')) { chance += 2.5; }
+					if (this.has('invigorated')) { chance += 0.8 * this.has('invigorated').power; }
+
+					return chance;
+				},
 				text: '[1] manages to [fairly quickly |]get up again.',
 				failText: '[1] tries to get up, but [[1:they] stumbled while doing so and fell again|[1:they] couldn\'t quite do it|was too shaken to stand properly and fell again]!',
 				fail: function() {
@@ -3782,7 +3788,7 @@ G={
 				successFunc: function() {
 					this.gain('fallen');	
 				},
-				req: ['!able !fallen !survivalist']
+				req: ['!able !fallen !frenzied !survivalist']
 			});
 			new G.move({
 				chance: 20,
