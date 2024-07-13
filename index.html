@@ -3731,10 +3731,10 @@ G={
 					}
 					this.lose('fallen');
 					this.healInjuries();
-					this.healAilments();
+					this.cureAilments();
 					return text + newText;
 				},
-				req: ['extreme_cinnamon_soda injured|ailed !able '+hardDisables]
+				req: ['extreme_cinnamon_soda injured|ailed|sociopath '+hardDisables]
 			});
 			new G.move({
 				chance: function() { return Math.pow(this.has('grieving').power, 0.3) * 0.3; },
