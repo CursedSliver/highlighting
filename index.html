@@ -1549,11 +1549,12 @@ G={
 					{
 						var el=l(member.l.id+'-perk-'+perkN);
 						var perk=G.perks[el.options[el.selectedIndex].value];
-						if (perk.name!='no perk' && perk.name!='no item' && (perk.type!='trait' || perks.indexOf(perk)==-1)) perks.push(new G.perkToken(perk, member));
+						if (perk.name!='no perk' && perk.name!='no item' && (perk.type!='trait' || perks.indexOf(perk)==-1)) perks.push(new G.perkToken(perk, null));
 						perkN++;
 					}
 					var me=new G.char({name:member.name,pic:member.pic,perks:perks,gender:member.gender,tier:member.tier});
 					members.push(me);
+					for (let i of me.perks) { i.owner = me; }
 				}
 				if (!base.teamless) new G.team({name:base.name,chars:members});
 			}
