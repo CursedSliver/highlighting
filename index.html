@@ -2815,7 +2815,7 @@ G={
 			new G.act(0.3,['!devious|sociopath|survivalist','+ dead'],`[1] [reminisces about|thinks about|remembers|recalls something about|remembers how much [1:g|he misses|she misses|they miss|it misses]] [2] and sobs quietly.`);
 			new G.act(0.3,['!devious|sociopath|survivalist alive:1'],`[1] [reminisces about|thinks about|remembers|remembers how much [1:g|he misses|she misses|they miss|it misses]] everybody and sobs quietly.`);
 			
-			new G.act(0.5,['mint_essence any%0.5|injured%0.5|ailed%0.5|*able%0.5'],`[1] decides to finally consume that mint essence [1:they] had for its effects... and with a bit of struggling, [1:they] managed it!`,p=>{p[1].lose('mine essence');p[1].gain('mint enhanced')});
+			new G.act(0.5,['mint_essence any%0.5|injured%0.5|ailed%0.5|*able%0.5'],`[1] decides to finally consume that mint essence [1:they] had for its effects... and with a bit of struggling, [1:they] managed it!`,p=>{p[1].lose('mint essence');p[1].gain('mint enhanced')});
 			new G.act(0.5,['mint_essence any !injured%0.2|ailed%0.2|*able%0.2'],`[1] decides to finally consume that mint essence [1:they] had for its effects, but it wouldn't go down [1:their] throat. [1] just finds it too [disgusting|repulsive|spicy|stimulating|minty].`);
 			
 			//accidents happen
