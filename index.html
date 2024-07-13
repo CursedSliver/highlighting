@@ -5270,7 +5270,7 @@ G={
 				failText: '[1] [lights|rips out the pins on|arms] [1:their] grenade and weakly throws it... it did not manage to hit anyone, and even hit [1:themself], which [S]!',
 				fail: function(cl) { let chance = this.adjust(this.adjust(0.25, 'throw'), 'runFail'); },
 				element: G.moveAssets.elements.alone,
-				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2'],
+				req: ['grenade any%0.6|suicidal|devious%0.2|sociopath%0.2 '+hardDisables],
 				pReq: ['h:2/20 v:2'],
 				successFunc: function() { this.lose('grenade'); },
 				failFunc: function() { 
