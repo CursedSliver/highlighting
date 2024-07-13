@@ -3734,7 +3734,7 @@ G={
 					this.cureAilments();
 					return text + newText;
 				},
-				req: ['extreme_cinnamon_soda injured|ailed|sociopath '+hardDisables]
+				req: ['extreme_cinnamon_soda injured|ailed|sociopath !frenzied !invigorated '+hardDisables]
 			});
 			new G.move({
 				chance: function() { return Math.pow(this.has('grieving').power, 0.3) * 0.3; },
