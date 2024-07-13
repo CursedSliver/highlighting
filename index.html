@@ -6880,7 +6880,7 @@ G={
 					this.gain('snake climbing');
 					this.combat.vertical += 5;
 				},
-				req: ['snake_charmer\'s_flute injured|ailed bruised|cut_up|singed any%0.5|crippled|seared|lacerated|poisoned !snake_climbing']
+				req: ['snake_charmer\'s_flute injured|ailed bruised|cut_up|singed any%0.5|crippled|seared|lacerated|poisoned !snake_climbing '+hardDisables]
 			});
 			new G.move({
 				chance: 0.25,
@@ -6893,7 +6893,7 @@ G={
 				successFunc: function() {
 					this.lose('snake climbing');
 				},
-				req: ['snake_charmer\'s_flute snake_climbing any%0.5 !injured%0.2|ailed%0.2|bruised%0.2|cut_up%0.2|singed%0.2|crippled%0.3|seared%0.3|lacerated%0.3|poisoned%0.3']
+				req: ['snake_charmer\'s_flute snake_climbing any%0.5 !injured%0.2|ailed%0.2|bruised%0.2|cut_up%0.2|singed%0.2|crippled%0.3|seared%0.3|lacerated%0.3|poisoned%0.3 '+hardDisables]
 			});
 			
 			G.parse = function(text,actors)
