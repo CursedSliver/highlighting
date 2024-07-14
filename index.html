@@ -3761,7 +3761,7 @@ G={
 				text: '[1] urges everyone to focus on [2]!',
 				element: new G.element({interact: 1, interactMin: 1}),
 				successFunc: function(cl) {
-					cl[1].gain('marked').setDuration.call(cl[1].has('marked'), this.has('leader')?7:4);
+					cl[1].gain('marked').perk.setDuration.call(cl[1].has('marked'), this.has('leader')?7:4);
 					for (let i of this.team) {
 						if (i == this) { continue; }
 						this.combat.overseer.addChar(i, null, 1);
