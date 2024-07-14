@@ -1653,8 +1653,8 @@ G={
 					item = item.replaceAll('_', ' ');
 					if (!G.perksBN[item]) { throw '"'+item+'" is not a valid perk!'; }
 					
-					if (!G.perksBN[item].disable && this.isDisabled()) { return actualFalse; }
-					if (!G.perksBN[item].out && this.isOut()) { return actualFalse; }
+					//if (!G.perksBN[item].disable && this.isDisabled()) { return actualFalse; }
+					//if (!G.perksBN[item].out && this.isOut()) { return actualFalse; }
 					if (this.has(item)) { return actualTrue; } else { return actualFalse; }
 				}
 				G.char.prototype.testCond = conditionTester;
