@@ -2488,7 +2488,7 @@ G={
 			new G.act(0.01,['lunatic'],`[BLUE][1] calms down for good, no longer subject to the whims of a changing brain.`,p=>{p[1].lose('lunatic');});
 			// - Status Effects
 			// - - Unstable
-			new G.act(0.2,['unstable !frenzied|peaceful%0.5|kind%0.2|naive%0.2|meek%0.2|analytical%0.2 bulky%0.5|lunatic%0.5|unstable%0.5|cursed_knife%0.5|bleeding_out%0.5|burnt%0.5|cut_up%0.3|broken%0.3|shot%0.3|singed%0.3|scratched%0.2|bruised%0.2'],`[RED][[1] finally snaps!|Something inside [1] snaps!]<br>[1] is now frenzied!`,p=>{p[1].gain('frenzied');});
+			new G.act(0.2,['unstable !frenzied|peaceful%0.5|kind%0.2|naive%0.2|meek%0.2|analytical%0.2 bulky%0.5|lunatic%0.5|unstable%0.5|cursed_knife%0.5|bleeding_out%0.5|burnt%0.5|cut_up%0.3|broken%0.3|shot%0.3|singed%0.3|scratched%0.2|bruised%0.2 !out'],`[RED][[1] finally snaps!|Something inside [1] snaps!]<br>[1] is now frenzied!`,p=>{p[1].gain('frenzied');});
 				new G.act(0.5,['frenzied peaceful%0.5|kind%0.5|analytical%0.2|meek%0.2|any%0.5'],`[1]'s frenzy finally dies down.`,p=>{p[1].lose('frenzied');});
 			// - - Evil Laughing
 			new G.act(0.2,['sociopath%0.8|devious%0.5|rich%0.2|cursed_knife%0.2 devious%0.5|sociopath%0.5|unstable%0.5|lunatic%0.5|glasses%0.5 !peaceful%0.8|kind%0.5|naive%0.5|meek%0.5|cowardly%0.5'],`[1] finds a [high up|quiet|out of the way] place to practice [1:their] evil laugh! [Muahahahaha|Ehehehehe|Buahahahaaa]!`,p=>{p[1].gain('laughed');});
