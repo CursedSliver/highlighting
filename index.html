@@ -3762,8 +3762,8 @@ G={
 				element: new G.element({interact: 1, interactMin: 1}),
 				successFunc: function(cl) {
 					cl[1].gain('marked').perk.setDuration.call(cl[1].has('marked'), this.has('leader')?7:4);
-					for (let i of this.team) {
-						if (i == this) { continue; }
+					for (let i of this.combat.overseer.participants) {
+						if (i == this || i.team != this.team) { continue; }
 						this.combat.overseer.addChar(i, null, 1);
 					}
 				},
