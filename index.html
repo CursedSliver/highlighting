@@ -14,8 +14,9 @@
 			-allow action func to override the text; this way, we can have special conditional events (ie. scrappy finding different kinds of items in one action)
 			-localstorage save
 			-load from pastebin
-			-better parsing : [1:They] (uppercase), [1:they|does|do] (>he does, she does, they do), [1:they] find[-s|] (>he finds, she finds, they find)
+			-better parsing : [1:they|does|do] (>he does, she does, they do), [1:they] find[-s|] (>he finds, she finds, they find)
 			-helping moves
+			-implement intercepts
 		-->
 		
 		<script type="text/javascript" src="sortable.js"></script> 
@@ -2881,6 +2882,21 @@ G={
 			let actsList=shuffle(G.actsForced).concat(shuffle(G.actsOther));
 
 			//Descriptive combat system by CS
+			/*HOW THIS WORKS - explanation by CursedSliver, original creator
+   				Sometimes, a "fight" may start, which puts any characters involved into stasis. Characters in fights cannot perform normal acts and instead use a turn-based system to make "moves"
+	   			Each round, the character list in each fight is shuffled then iterated through repeatedly for up to 20 times; before the 20th, each complete "mini-round" involving each character attempting to make a move have an increasing chance to break the loop prematurely
+	   			Each time a character attempts to make a move, it goes through every single move, where it checks for whether this move can be performed via its "req", "cReq", "pReq", and "reqFunc". You don't have to pass in any of those into a move, just what you need
+	   				- req: identical to acts people system and uses the same syntax. However, unlike in acts, the amount of people involved per move is not strictly defined based on the amount of items in req
+					- cReq: based on previous moves; see G.checkCReq. Currently very incomplete and only supports the last move performed locally, but the plan is for it to be able to somehow encapsulate multiple previous moves for checking as well as make a distinction between moves made towards the actor, toward team, or not
+	 				- pReq: array, based on proximity to other characters; see G.checkPReq.
+	  				- reqFunc: function, called with "this" as the character
+	   			Each move can also fail or succeed. The "fail" property is a number or function that returns a number; the number is the chance for the move to FAIL. (not succeed)
+	   			"text" is for text when succeeding, "failText" is for when not
+	   			chance can be a number or a function that returns a number. It is the number of times that the function pools it.
+	   			id is mainly used in conjunction with cReq.
+	   			"element" is complicated. It is a class of its own and mainly does one thing right now: through its "interact" and "interactMin" it defines how many people the move can target.
+	   			It was supposed to describe the nature of the move but unfortunately it was too complex to properly implement in such a short amount of time
+	  		*/
 			G.moves = [];
 			G.moveGlobAgainstEnemy = true; //whether to automatically sanitize stuff to fit for enemy
 			G.sanitizeMove = function(arr, interact) {
@@ -7109,9 +7125,13 @@ G={
 										out+=G.parse([bits[1],bits[2],bits[3],bits[4]][actor.gender].replaceAll('{PIPE}','|').replaceAll('{COLON}',':'),actors);
 									}
 									else if (prop=='they') {out+=['he','she','they','it'][actor.gender];}
+									else if (prop=='They') {out+=['He','She','They','It'][actor.gender];}
 									else if (prop=='them') {out+=['him','her','them','it'][actor.gender];}
+									else if (prop=='Them') {out+=['Him','Her','Them','It'][actor.gender];}
 									else if (prop=='their') {out+=['his','her','their','its'][actor.gender];}
+									else if (prop=='Their') {out+=['His','Her','Their','Its'][actor.gender];}
 									else if (prop=='themself' || prop=='themselves') {out+=['himself','herself','themself','itself'][actor.gender];}
+									else if (prop=='Themself' || prop=='Themselves') {out+=['Himself','Herself','Themself','Itself'][actor.gender];}
 									else out+='<e>'+actor.name+'</e>';
 								}
 								else out+='<e>[invalid actor : '+bits[0]+']</e>';
