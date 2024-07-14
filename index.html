@@ -7115,7 +7115,7 @@ G={
 				for (let i in G.chars){G.chars[i].acted=false;}
 				for (let i in G.ongoingCombats) { if (G.ongoingCombats[i].processed) { G.ongoingCombats[i].processed = false; G.ongoingCombats[i].roundCount++; G.ongoingCombats[i].clearOut(); G.ongoingCombats[i].addBox('Continuing the fight from last round, with [ALL]...', deepArrCopy(G.ongoingCombats[i].participants), true); } }
 				for (let i = 0; i < randomFloor(Math.log2(G.chars.length + 1)); i++) {
-					if (Math.random() < 0.2 / (G.ongoingCombats.length * 2 + 1)) {
+					if (Math.random() < 0.25 / (G.ongoingCombats.length * 1 + 1)) {
 						//chooses someone able to initiate combat with someone else
 						var pool = [];
 						for (let i in G.chars) {
