@@ -588,6 +588,7 @@ G={
   		"onInterrupt": function, called when interrupted in combat
     		"aggro": number, adds the number to the count for target selection (tier does the same thing but more complicated and actually represents something else)
 	  	"onDeath": function, called when the carrying character dies
+		"countFunc": function, uses its return value for the amount of disabled, injured, or ailed that it counts for (default 1 if it isnt defined, *5 for any hard disables); a type argument is passed into it (string) between "disable", "injury", "ailment", and "out" indicating which function is calling it
   		*/
 		G.glob={type:'trait',def:true};
 		new G.perk({name:`no perk`,desc:`No perk selected.`});
@@ -707,16 +708,16 @@ G={
 		new G.perk({name:`wet`,desc:`Is dripping with water.`,disable:false,injury:false});
 		new G.perk({name:`scratched`,desc:`Lightly scratched and bleeding a little bit.`,disable:false});
 		new G.perk({name:`bruised`,desc:`Been pounded badly.`,disable:false,injury:false,init:{count: 1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 4) + 5 && Math.random() < 0.75) { this.owner.gain('crippled'); } }, update:function() { if (Math.random() < 0.2) { this.count--; if (this.count == 0) { this.owner.lose('bruised'); }}}});
-		new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 10) + 3 && Math.random() < 0.75) { this.owner.gain('bleeding out'); } }});
+			new G.perk({name:`crippled`,desc:`Been pounded to the point of immobility.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 10) + 3 && Math.random() < 0.75) { this.owner.gain('bleeding out'); } },countFunc:function() { return this.count; }});
 		new G.perk({name:`cut up`,desc:`Received some slicing damage.`,disable:false,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.4) { this.owner.gain('lacerated'); } }, update:function() { if (Math.random() < 0.1) { this.count--; if (this.count == 0) { this.owner.lose('cut up'); }}}});
-		new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } }});
-		new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain(choose(['sick', 'dizzy', 'dazed', 'terrified', 'broken'])); if (Math.random() < 0.1) { this.owner.gain('comatose'); } } }});
+			new G.perk({name:`lacerated`,desc:`Received a lot of slicing damage, and it really hurts.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain('sick'); } },countFunc:function() { return this.count; }});
+			new G.perk({name:`bleeding out`,desc:`Losing blood at an alarming rate. Needs immediate treatment.`,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 1 && Math.random() < 0.6) { this.owner.gain(choose(['sick', 'dizzy', 'dazed', 'terrified', 'broken'])); if (Math.random() < 0.1) { this.owner.gain('comatose'); } } },countFunc:function() { return this.count * 2; }});
 		new G.perk({name:`singed`,desc:`Mildly burned and in some pain.`,disable:false,injury:false,ailment:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('seared'); this.count = Math.max(this.count - 3, 1); } }});
-		new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('burnt'); this.count = Math.max(this.count - 3, 1); } } });
-		new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`,ailment:true});
+			new G.perk({name:`seared`,desc:`Has received some bad burns, but it is still somewhat manageable.`,disable:false,ailment:true,injury:false,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } if (this.count > Math.round(Math.random() * 2) + 2 && Math.random() < 0.8) { this.owner.gain('burnt'); this.count = Math.max(this.count - 3, 1); } },countFunc:function() { return this.count; }});
+			new G.perk({name:`burnt`,desc:`Singed quite a lot. Everything hurts.`,ailment:true,init:{count:1},onGain:function(alreadyHasPerk) { if (alreadyHasPerk) { this.count++; } },countFunc: function() { return this.count; }});
 		new G.perk({name:`deep frozen`,desc:`Encased in ice!`,hard:true,init:{duration:1},onMove: function() { this.duration--; }});
 		new G.perk({name:`poisoned`,desc:`Slowly dying due to poison.`,disable:false,ailment:true,injury:false}); // Removed Disabled
-		new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true,injury:false});
+			new G.perk({name:`badly poisoned`,desc:`Bloodstream saturated with poison; will most likely die soon.`,ailment:true,injury:false});
 		new G.perk({name:`missing leg`,desc:`Missing a whole leg!`});
 		new G.perk({name:`missing arm`,desc:`Missing a whole arm!`,disable:false}); // Temporarily Removed until better handled.
 		new G.perk({name:`trapped`,desc:`Stuck in a trap, and waiting to be freed, if something doesn't kill them first.`});
@@ -763,9 +764,9 @@ G={
 		new G.perk({name:`bow`,desc:`Its arrows can easily chop a head clean off from a distance if skillfully wielded.`,tier:1});
 		new G.perk({name:`flamethrower`,desc:`Careful! May set both foes and friends on fire.`,tier:2,init:{ammo:0}});
 		new G.perk({name:`rocket launcher`,desc:`A dangerous weapon; excels at blowing stuff up.`,tier:3,init:{loaded:1}});
-		new G.perk({name:`lasergun`,desc:`Ultra-concentrated energy shots that burn through practically anything.`,tier:3,init:{energy:2},onMove:function() { if (Math.random() < 0.1) { this.energy = Math.max(0, this.energy - 1); } }});
+		new G.perk({name:`lasergun`,desc:`Ultra-concentrated energy shots that burn through practically anything.`,tier:3,init:{energy:1},onMove:function() { if (Math.random() < 0.1) { this.energy = Math.max(0, this.energy - 1); } }});
 		new G.perk({name:`magic wand`,desc:`Casts a variety of spells upon your friends and foes.`,tier:2,init:{charges:1}});
-		new G.perk({name:`ancient scepter`,desc:`Calls forth ancient beings, hexes, and curses on your adversaries.`,tier:3,init:{charges:0}});
+		new G.perk({name:`ancient scepter`,desc:`Calls forth ancient beings, hexes, and curses on your adversaries.`,tier:3,init:{charges:1},update:function() { if (this.charges < 1 && !this.combat) { this.charges = Math.min(this.charges + 1, 1); } }});
 		
 		new G.perk({name:`pet wolf`,desc:`A ravenous pet wolf to devour your opponents.`,tier:2});
 		new G.perk({name:`pet tiger`,desc:`A fierce pet tiger to tear your opponents to shreds.`,tier:3});
@@ -1426,31 +1427,32 @@ G={
 					let count = 0;
 					for (let i in this.perks) {
 						if (this.perks[i].perk.disable && !isHard) { 
-							count++; 
-							if (this.perks[i].perk.hard) { count += 4; }
+							let add = (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc('disable'):1);
+							if (this.perks[i].perk.hard) { add *= 5; }
+							count += add;
 						}
-						if (isHard && this.perks[i].perk.disable && this.perks[i].perk.hard) { count++; }
+						if (isHard && this.perks[i].perk.disable && this.perks[i].perk.hard) { count += (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc('disable'):1); }
 					}
 					return count;
 				}
 				G.char.prototype.isOut = function() {
 					let count = 0;
 					for (let i in this.perks) {
-						if (this.perks[i].perk.out) { count++; }
+						if (this.perks[i].perk.out) { count += (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc('out'):1); }
 					}
 					return count;
 				}
 				G.char.prototype.isAiled = function() {
 					let count = 0;
 					for (let i in this.perks) {
-						if (this.perks[i].perk.ailment) { count++; }
+						if (this.perks[i].perk.ailment) { count += (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc('ailment'):1); }
 					}
 					return count;
 				}
 				G.char.prototype.isInjured = function() {
 					let count = 0;
 					for (let i in this.perks) {
-						if (this.perks[i].perk.injury) { count++; }
+						if (this.perks[i].perk.injury) { count += (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc('injury'):1); }
 					}
 					return count;
 				}
@@ -3564,16 +3566,18 @@ G={
 				req: ['any']
 			});
 			new G.move({
+				chance: 0.5,
 				text: '[1] [stands still, vigilant and awaiting|awaits|awaits for] [2]\'s next move...',
-				req: ['able !out']
+				req: ['able']
 			});
 			new G.move({
-				chance: 2,
+				chance: 1,
 				text: '[1] is unsure what to do.',
 				element: G.moveAssets.elements.alone,
 				req: ['any%0.05|meek|naive']
 			});
 			new G.move({
+				chance: 1.5,
 				text: '[1] [carefully |slowly ||]approaches [2]...',
 				func: function(charList) {
 					this.combat.moveToward(charList[1], 2);
@@ -3582,6 +3586,7 @@ G={
 				req: ['', 'any']
 			});
 			new G.move({
+				chance: 1.5,
 				text: '[1] runs toward [2].',
 				func: function(cl) {
 					this.combat.moveToward(cl[1], Math.random() * 3 + 4);
@@ -3590,6 +3595,7 @@ G={
 				req: ['', 'any']
 			});
 			new G.move({
+				chance: 0.5,
 				text: 'In a fit of [unrelenting|] rage, [1] runs at [2] full force, [screaming on the top of [1:their] lungs|hysterically flailing [1:their] arms|staring down [2]\'s soul].',
 				fail: function(cl) {
 					let chance = 0.1;
@@ -3729,7 +3735,7 @@ G={
 			//status
 			G.moveDefault.element = G.moveAssets.elements.alone;
 			new G.move({
-				chance: 1,
+				chance: 0.5,
 				text: '[1] struggles [helplessly|uselessly|painfully] against [1:their] injuries.',
 				req: ['!able '+hardDisables]
 			});
@@ -3921,8 +3927,18 @@ G={
 					return chance;
 				},
 				text: '[1] [finally |at last |]succumbs to [1:their] [extensive |]blood loss.',
-				successFunc: function() { this.die('blood loss'); },
+				successFunc: function() { this.kill(this, 'gave up'); },
 				req: ['bleeding_out unconscious !survivalist']
+			});
+			new G.move({
+				chance: function() {
+					let chance = 0.01;
+					chance *= Math.pow(this.has('crippled').count, 4);
+					return chance;
+				},
+				text: 'Seeing the hopelessness of the situation, [1] closes [1:their] eyes, at last, for forever...',
+				successFunc: function() { this.kill(this, 'gave up'); },
+				req: ['crippled fallen !unconscious !survivalist']
 			});
 			new G.move({
 				chance: 2,
@@ -4011,7 +4027,7 @@ G={
 			//hand to hand combat
 			G.moveAssets.hardHeadHit = function() {
 				return function(cl, text) {
-					let chance = 0.6;
+					let chance = 0.9;
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'overall');
 
 					this.interrupt(cl[1]);
@@ -4036,7 +4052,7 @@ G={
 			}
 			G.moveAssets.hardBodyHit = function() {
 				return function(cl, text) {
-					let chance = 0.45; 
+					let chance = 0.7; 
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 
 					this.interrupt(cl[1]);
@@ -4051,7 +4067,7 @@ G={
 				return function(cl, text) {
 					if (cl[1].has('knight armor')) { return; }
 					
-					let chance = 0.2;
+					let chance = 0.35;
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
 
 					this.interrupt(cl[1]);
@@ -4541,7 +4557,7 @@ G={
 				return 1 - Math.pow(1 - chance, pow);
 			};
 			new G.move({
-				chance: 1.5,
+				chance: 3,
 				text: '[1] slams [1:their] big stick right down [2]\'s [skull|head][S].',
 				failText: '[1] slams down [1:their] big stick at [2], but only managed to [kick off dirt in all directions|hit the ground].',
 				element: new G.element({
@@ -4570,7 +4586,7 @@ G={
 				pReq: ['e:10']
 			});
 			new G.move({
-				chance: 1,
+				chance: 2,
 				text: '[1] [swings|flails] [1:their] big stick at [2], hitting [2:them][S].',
 				failText: '[1] [swings|flails] [1:their] big stick at [2], but it missed and hit nothing.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.2, 'swing'), 'dodge'); },
@@ -4594,7 +4610,7 @@ G={
 				pReq: ['p:15']
 			});
 			new G.move({
-				chance: 2,
+				chance: 4,
 				text: '[1] pokes [1:their] pitchfork at [2][S].',
 				failText: '[1] pokes [1:their] pitchfork at [2], but it missed.',
 				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'useSpearhead'), 'dodge'); },
@@ -4622,7 +4638,7 @@ G={
 				pReq: ['d:5']
 			});
 			new G.move({
-				chance: 9,
+				chance: 6,
 				text: '[1] uses [1:their] pitchfork to keep [2] away from [1:them].',
 				successFunc: function(cl) { 
 					cl[1].combat.moveToward(this, -8); 
@@ -4883,7 +4899,7 @@ G={
 			});
 			//cursed knife (4 moves) 
 			new G.move({ //cursed knife nerf
-				chance: 1.25,
+				chance: 0.5,
 				text: '[1] feels an overwhelming surge of energy from [1:their] cursed knife, and freezes in place.',
 				element: G.moveAssets.elements.alone,
 				req: ['cursed_knife !sociopath|frenzied'],
@@ -4918,7 +4934,7 @@ G={
 				pReq: ['d:10']
 			});
 			G.moveAssets.stabHeavy = function(item, chanceNew) {
-				if (!chanceNew) { chanceNew = 0.5; }
+				if (!chanceNew) { chanceNew = 0.75; }
 				return function(cl, text) {
 					let chance = chanceNew; //chance to embed; pow 2 is chance to bleed out instantly, another pow 2 is chance to die
 					chance = cl[1].adjust(this.adjust(chance, 'stabDamage'), 'stabDefense');
@@ -4933,7 +4949,7 @@ G={
 			};
 			G.moveAssets.sliceBig = function() {
 				return function(cl, text) {
-					let chance = 0.5;
+					let chance = 0.75;
 					chance = cl[1].adjust(cl[1].adjust(this.adjust(this.adjust(chance, 'stabDamage'), 'overall'), 'stabDefense'), 'stabDefense');
 
 					this.interrupt(cl[1]);
@@ -4978,7 +4994,7 @@ G={
 				fail: function(cl) { return this.adjust(0.4, 'overall'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 3 + 2); },
 				successFunc: function(cl, text) {
-					let chance = 0.35;
+					let chance = 0.6;
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'stabDefense');
 
 					this.interrupt(cl[1]);
@@ -5798,7 +5814,7 @@ G={
 				},
 				req: ['lasergun any%0.5|able '+hardDisables],
 				reqFunc: function() {
-					return (this.has('lasergun').energy < 4);
+					return (this.has('lasergun').energy < 3);
 				}
 			});
 			new G.move({
@@ -5807,7 +5823,7 @@ G={
 				failText: '[1] activates [1:their] laser gun and fires a beam of light at [2], but it missed.',
 				fail: function(cl) { return this.adjust(0.05, 'bulletAccuracy', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical); },
 				successFunc: function(cl, text) {
-					this.has('lasergun').energy = 0;
+					this.has('lasergun').energy -= 3;
 					let chance = 0.9;
 					chance = cl[1].adjust(chance, 'fireDefense');
 
@@ -5822,7 +5838,7 @@ G={
 				},
 				req: ['lasergun any%0.5|able%0.8|pyromania%0.2|frenzied%0.8 '+hardDisables],
 				reqFunc: function() {
-					return (this.has('lasergun').energy >= 4);
+					return (this.has('lasergun').energy >= 3);
 				},
 				pReq: ['d:6/60']
 			});
