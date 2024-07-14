@@ -4005,15 +4005,22 @@ G={
 				req: ['seared burnt fallen !unconscious !survivalist']
 			});
 			new G.move({
-				chance: 2,
+				chance: 0.25,
 				text: '[1] sleeps peacefully...',
-				req: ['comatose|unconscious']
+				req: ['unconscious']
 			});
 			new G.move({
-				chance: 0.5,
+				chance: 1,
+				text: '[1] sleeps peacefully, seemingly for the rest of eternity...<br>And perhaps, that might be the case.',
+				req: ['comatose !dead !nihil']
+			});
+			new G.move({
+				chance: 2.5,
 				text: '[1] wakes up from [1:their] [dreamless |]slumber!',
+				failText: '[1] is having a deep, dreamless sleep...',
+				fail: function() { return this.adjust(0.2, 'recover'); },
 				req: ['unconscious'],
-				successFunc: function() { this.lose('unconscious'); }
+				successFunc: function() { this.lose('unconscious'); this.lose('fallen'); }
 			});
 			G.moveDefault.chance = 10;
 			new G.move({
