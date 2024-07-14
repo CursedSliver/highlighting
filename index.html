@@ -3061,9 +3061,9 @@ G={
 						const max = (content.includes('/')?parseFloat(content.split('/')[1]):parseFloat(content));
 						//console.log('c1h: '+c1h, 'c1v: '+c1v, 'c2h: '+c2h, 'c2v: '+c2v, 'key: '+key, 'min: '+min, 'max: '+max);
 						
-						if (key=='h' && (Math.abs(c1h - c2h) >= min && Math.abs(c1h - c2h) <= max)) { fitOR = true; break; }
-						if (key=='v' && (Math.abs(c1v - c2v) >= min && Math.abs(c1v - c2v) <= max)) { fitOR = true; break; }
-						if (key=='d' && ((c1h-c2h)*(c1h-c2h) + (c1v-c2v)*(c1v-c2v) >= min*min && (c1h-c2h)*(c1h-c2h) + (c1v-c2v)*(c1v-c2v) <= max*max)) { fitOR = true; break; }
+						if (key=='h' && Math.abs(c1.horizontalDist(otherChar)) >= min && Math.abs(c1.horizontalDist(otherChar)) <= max) { fitOR = true; break; }
+						if (key=='v' && Math.abs(c1.verticalDist(otherChar)) >= min && Math.abs(c1.verticalDist(otherChar)) <= max) { fitOR = true; break; }
+						if (key=='d' && c1.straightDist(otherChar) >= min && c1.straightDist(otherChar) <= max) { fitOR = true; break; }
 						if (key=='t' && (Math.abs((c1h + c1v) - (c2h + c2v)) >= min && Math.abs((c1h + c1v) - (c2h + c2v)) <= max)) { fitOR = true; break; }
 						if (key=='e' && c1.dist(otherChar) >= min && c1.dist(otherChar) <= max) { fitOR = true; break; }
 						if (key=='p' && c1.projectileDist(otherChar) >= min && c1.projectileDist(otherChar) <= max) { fitOR = true; break; }
@@ -3265,6 +3265,12 @@ G={
 				let h = target.combat.horizontal;
 				if (this.horizontal < h) { this.horizontal = Math.min(this.horizontal + dist, h - 0.1); } else { this.horizontal = Math.max(this.horizontal - dist, h + 0.1); }
 			}
+			G.combatTracker.prototype.distMult = function(target) {
+				let mult = 1;
+				mult *= Math.pow(0.5, target.isDisabled(true));
+
+				return mult;
+			}
 			G.combatTracker.prototype.dist = function(target) {
 				//describes a function amount of effort requires for this character to reach another character
 				let verticalOffset = target.combat.vertical - this.vertical;
@@ -3275,7 +3281,7 @@ G={
 				} else {
 					mult = 1 / (-verticalOffset * 0.6 + 1);
 				}
-				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult;
+				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult * this.distMult();
 			} //vertical is here too, but each vertical distance above adds and each vertical distance below removes
 			G.combatTracker.prototype.projectileDist = function(target) {
 				let verticalOffset = target.combat.vertical - this.vertical;
@@ -3286,10 +3292,16 @@ G={
 				} else {
 					mult = 1 / (-verticalOffset * 0.05 + 1);
 				}
-				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult;
+				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult * this.distMult();
 			}
 			G.combatTracker.prototype.straightDist = function(target) {
-				return (Math.pow(target.combat.vertical - this.combat.vertical, 2) + Math.pow(target.combat.horizontal - this.combat.horizontal, 2)) ** 0.5
+				return ((Math.pow(target.combat.vertical - this.vertical, 2) + Math.pow(target.combat.horizontal - this.horizontal, 2)) ** 0.5) * this.distMult();
+			}
+			G.combatTracker.prototype.horizontalDist = function(target) {
+				return (target.combat.horizontal - this.horizontal) * this.distMult();
+			}
+			G.combatTracker.prototype.verticalDist = function(target) {
+				return (target.combat.vertical - this.vertical) * this.distMult();
 			}
 			G.combatOverseer.prototype.getHeightAt = function(horizontal) {
 				//"this" is the overseer
@@ -3361,6 +3373,7 @@ G={
 				count += 1.5 * this.isInjured(); 
 				count += 0.75 * this.isAiled(); 
 				if (this.has('embedded')) { count += 2; }
+				if (this.has('unconscious')) { count += 2; }
 				for (let i in this.perks) {
 					if (this.perks[i].perk.type != 'item') { continue; } 
 					if (this.perks[i].perk.tier == 3) { count += 0.45; }
@@ -4650,7 +4663,7 @@ G={
 			//slingshot (2 moves)
 			//bad move, meant to be a slingshot nerfer
 			new G.move({
-				chance: 2,
+				chance: 1,
 				text: '[1] gathers ammo for [1:their] slingshot.',
 				element: G.moveAssets.elements.alone,
 				req: ['slingshot !scrappy|vigilant%0.4|frenzied%0.5']
@@ -4681,7 +4694,16 @@ G={
 				pReq: ['h:10 v:1']
 			});
 			new G.move({
-				chance: 5,
+				chance: 3,
+				text: '[1] [runs away|is getting as far away as possible|is trying to get away] from [2].',
+				successFunc: function(cl) {
+					this.combat.moveToward(cl[1], -30 * (-30 * Math.random()));
+				},
+				req: ['able able%0.025|cowardly%0.25|slingshot%0.125|handgun%0.05|flamethrower%0.075|grenade%0.15|magic_wand%0.025|topaz_on_a_stick%0.125|rocket_launcher%0.15|lasergun%0.1|ancient_scepter%0.025'],
+				pReq: ['h:5 v:1']
+			});
+			new G.move({
+				chance: 3,
 				text: '[1] [runs away|is getting as far away as possible|is trying to get away] from [2].',
 				successFunc: function(cl) {
 					this.combat.moveToward(cl[1], -30 * (-30 * Math.random()));
