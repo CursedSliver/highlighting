@@ -3367,7 +3367,7 @@ G={
 				if (this.real) { this.combat.overseer.removeParticipant(this); } else { /*this.combat.overseer.removeExtra(this);*/ } //no removing extras only mark as nihil
 				this.combat = null;
 			}
-			G.char.prototype.targetCount = function(perpentrator) {
+			G.char.prototype.targetCount = function(perpetrator) {
 				if (!this.combat) { return 1; }
 				if (this.has('untargetable')) { return 0; }
 				let count = 1;
@@ -3390,16 +3390,16 @@ G={
 				if (this.has('marked')) {
 					count += 20 * Math.pow(this.has('marked').duration / this.has('marked').maxDuration, 0.5);
 				}
-				if (perpentrator.has('wolf') && this.has('wolves\' mark')) { count += 20; }
+				if (perpetrator.has('wolf') && this.has('wolves\' mark')) { count += 20; }
 				if (this.has('turtle')) { count += 6; }
 				
 				let retailation = 1;
 				for (let i = this.combat.interrupts.length - 1; i >= Math.max(this.combat.interrupts.length - 5, 0); i--) {
-					if (this.combat.interrupts[i].interrupted == perpentrator) { retailation += 0.2 * Math.max(5 - this.combat.interrupts.length + i, 0); }
+					if (this.combat.interrupts[i].interrupted == perpetrator) { retailation += 0.2 * Math.max(5 - this.combat.interrupts.length + i, 0); }
 				}
 				let followUp = 1;
-				for (let i = perpentrator.combat.interrupts.length - 1; i >= Math.max(perpentrator.interrupts.length - 5, 0); i--) {
-					if (perpentrator.combat.interrupts[i].interrupted == this) { followUp += 0.2 * Math.max(5 - perpentrator.combat.interrupts.length + i, 0); }
+				for (let i = perpetrator.combat.interrupts.length - 1; i >= Math.max(perpetrator.combat.interrupts.length - 5, 0); i--) {
+					if (perpetrator.combat.interrupts[i].interrupted == this) { followUp += 0.2 * Math.max(5 - perpetrator.combat.interrupts.length + i, 0); }
 				}
 				count += retailation;
 				count *= retailation;
