@@ -3741,6 +3741,19 @@ G={
 				cReq: ['m:taunt|m:taunt2']
 			});
 			new G.move({
+				chance: 1,
+				text: '[1] urges everyone to focus on [2]!',
+				successFunc: function(cl) {
+					cl[1].gain('marked').setDuration.call(cl[1].has('marked'), this.has('leader')?7:4);
+					for (let i of this.team) {
+						if (i == this) { continue; }
+						this.combat.overseer.addChar(i, null, 1);
+					}
+				},
+				req: ['inTeam any%0.1|leader', '- any%0.5|*able'],
+				pReq: ['e:25']
+			});
+			new G.move({
 				chance: 0.1,
 				text: '[1] fakes a charge at [2] before running away.',
 				failText: '[1] fakes a charge at [2] in an attempt to flee, but [2] saw right through and charged back, striking [1] on the [chest|head|heart|shoulder|kneecaps]!',
@@ -3837,18 +3850,36 @@ G={
 				chance: function() { return Math.pow(this.has('grieving').power, 0.3) * 0.3; },
 				text: 'Seeing the deaths of [1:their] pet, [1] clutches [1:their] face in pain, before undergoing a dramatic transformation in stance... As one can observe from the rage written all over [1:their] face.<br>[1] has become enraged!',
 				successFunc: function() { this.lose('grieving'); this.lose('dizzy'); this.lose('dazed'); this.gain('determined'); this.gain('frenzied'); },
-				req: ['grieving']
+				req: ['grieving able '+hardDisables]
 			});
+			G.adjustFuncs.recover = function(chance) {
+				//more = less likely
+				let pow = 1;
+				pow += this.isInjured() * 0.1;
+				pow += this.isAiled() * 0.2;
+				if (this.has('clumsy')) { pow += 0.5; }
+				if (this.has('meek')) { pow += 0.4; }
+				if (this.has('suicidal')) { pow += 0.3; }
+				if (this.has('weak')) { pow += 2; }
+				if (this.has('vulnerable')) { pow += 2; }
+				
+				if (this.has('survivalist')) { pow *= 0.6; }
+				if (this.has('bulky')) { pow *= 0.8; }
+				if (this.has('defensive')) { pow *= 0.9; }
+				if (this.has('determined')) { pow *= 0.9; }
+				if (this.has('medic')) { pow *= 0.7; }
+				if (this.has('haste') || this.has('ninja')) { pow *= 0.95; }
+				if (this.has('invigorated')) { pow *= Math.pow(0.85, this.has('invigorated').power); }
+				if (this.has('frenzied')) { pow *= 0.2; }
+				
+				return 1 - Math.pow(1 - chance, pow);
+			}
 			new G.move({
 				chance: 1.5,
 				text: '[1] [manages to shake|shakes] off [1:their] dizziness and stands up.',
 				failText: '[1] [[tries [1:their] best to [stand up|recover]|tries to muster up the strength to stand], but just can\'t quite do it.|[struggles to recover, but failing.|is having trouble [recovering|standing up].]]',
 				fail: function() {
-					let chance = 0.8;
-					if (this.has('survivalist') || this.has('medic')) { chance -= 0.15; }
-					if (this.has('analytical') || this.has('medic')) { chance -= 0.1; }
-					if (this.has('clumsy')) { chance += 0.1; }
-					return chance;
+					return this.adjust(0.5, 'recover');
 				},
 				successFunc: function() {
 					this.lose('dazed');
@@ -3857,7 +3888,7 @@ G={
 			});
 			new G.move({
 				chance: function() {
-					let chance = 2.5;
+					let chance = 4;
 					if (this.has('frenzied')) { chance += 2.5; }
 					if (this.has('invigorated')) { chance += 0.8 * this.has('invigorated').power; }
 
@@ -3866,13 +3897,7 @@ G={
 				text: '[1] manages to [fairly quickly |]get up again.',
 				failText: '[1] tries to get up, but [[1:they] stumbled while doing so and fell again|[1:they] couldn\'t quite do it|was too shaken to stand properly and fell again]!',
 				fail: function() {
-					let chance = 0.3;
-					if (this.has('clumsy')) { chance += 0.3; }
-					if (this.has('ninja')) { chance -= 0.2; }
-					if (this.has('haste')) { chance -= 0.1; }
-					if (this.has('bulky')) { chance += 0.1; }
-					if (this.has('frenzied')) { chance -= 0.2; }
-					return chance;
+					return this.adjust(this.adjust(0.2, 'recover'), 'recover');
 				},
 				successFunc: function() {
 					this.lose('fallen');
@@ -3969,6 +3994,15 @@ G={
 				text: 'Seeing the hopelessness of the situation, [1] closes [1:their] eyes, at last, for forever...',
 				successFunc: function() { this.kill(this, 'gave up'); },
 				req: ['crippled fallen !unconscious !survivalist']
+			});
+			new G.move({
+				chance: function() {
+					let chance = 0.2;
+					chance *= Math.pow(this.has('burnt').count, 2);
+				},
+				text: 'Overwhelmed by pain and agony, [1] finally succumbs to [1:their] extensive burns.',
+				successFunc: function() { this.kill(this, 'slow burn'); },
+				req: ['seared burnt fallen !unconscious !survivalist']
 			});
 			new G.move({
 				chance: 2,
