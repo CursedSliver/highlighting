@@ -4874,7 +4874,7 @@ G={
 				chance: 2.5,
 				text: '[1] uses a sharp edge on [1:their] shuriken and [digs|sinks it] [right |]into [2]\'s [chest|thigh|left shoulder|right shoulder][S]!',
 				failText: '[1] lurches at [2] with shuriken in hand, but[ luckily||], [2] [got out of the way in time|managed to avoid it]![S]',
-				fail: function(cl) { return cl[1].adjust(this.adjust(0.25, 'stabAccuracy'), 'dodge'); },
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.1, 'stabAccuracy'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random()); },
 				successFunc: G.moveAssets.stabLight('shuriken'),
 				failFunc: function(cl, text) {
@@ -4888,7 +4888,7 @@ G={
 				chance: 1.5,
 				text: '[1] uses a sharp edge on [1:their] piece of scrap metal and [digs|sinks it] [right |]into [2]\'s [chest|thigh|left shoulder|right shoulder][S]!',
 				failText: '[1] lurches at [2] with a piece of scrap metal in hand, but[ luckily||], [2] [got out of the way in time|managed to avoid it]![S]',
-				fail: function(cl) { return cl[1].adjust(this.adjust(0.35, 'stabAccuracy'), 'dodge'); },
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.15, 'stabAccuracy'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random()); },
 				successFunc: G.moveAssets.stabLight('scrap metal'),
 				failFunc: function(cl, text) {
@@ -4927,7 +4927,7 @@ G={
 				chance: 3, //normal move that dont have comically low fail rates and unusually high kill rates
 				text: '[1] uses their [ominous|strange|creepy] knife to stab [2][S]!',
 				failText: '[1] tries to use their [ominous|strange|creepy] knife to stab [2], but [2] [blocked it|got out of the way].',
-				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.15, 'stabAccuracy'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() + 1); },
 				successFunc: G.moveAssets.stabLight('cursed knife'),
 				req: ['cursed_knife able !frenzied', 'any !immaterial'],
@@ -4963,7 +4963,7 @@ G={
 				chance: 3,
 				text: '[1] stabs [2] with [1:their] sword[S]!',
 				failText: '[1] tries to stab [2] with [1:their] sword, but the sword just went past [2:them] without touching.',
-				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'stabAccuracy'), 'dodge'); },
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.15, 'stabAccuracy'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 3 + 2); },
 				successFunc: G.moveAssets.stabHeavy('sword'),
 				req: ['sword', 'any !immaterial'],
@@ -4973,7 +4973,7 @@ G={
 				chance: 4,
 				text: '[1] slashes [2] with [1:their] sword[S]!',
 				failText: '[1] slashes [2] with [1:their] sword, but the sword only slashed the air.',
-				fail: function(cl) { return cl[1].adjust(this.adjust(0.2, 'overall'), 'dodge'); },
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.1, 'overall'), 'dodge'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 2 + 1); },
 				successFunc: G.moveAssets.sliceBig(),
 				req: ['sword', 'any !immaterial'],
@@ -4991,7 +4991,7 @@ G={
 				chance: 8,
 				text: '[1] hacks at [2] with [1:their] axe[S]!',
 				failText: '[1] hacks at [2] with [1:their] axe, but [2:they] avoided all the swings [1] made at [2:them].',
-				fail: function(cl) { return this.adjust(0.4, 'overall'); },
+				fail: function(cl) { return this.adjust(0.2, 'overall'); },
 				func: function(cl) { this.combat.moveInFrontOf(cl[1], Math.random() * 3 + 2); },
 				successFunc: function(cl, text) {
 					let chance = 0.6;
@@ -5050,7 +5050,7 @@ G={
 				pow *= Math.pow(1.25, this.isDisabled()); 
 				pow *= Math.pow(1.1, this.isAiled()); 
 
-				pow *= (e / 15);
+				pow *= (e / 30);
 
 				return 1 - Math.pow(1 - chance, pow);
 			};
@@ -5135,7 +5135,7 @@ G={
 				chance: 7.5,
 				text: '[1] [fires a few shots|shoots at] [2] with [1:their] handgun, some hitting [2:their] body[S]!',
 				failText: '[1] [fires a few shots|shoots at] [2] with [1:their] handgun, but all the shots missed.',
-				fail: function(cl) { let hDiff = cl[1].combat.horizontal - this.combat.horizontal; let vDiff = cl[1].combat.horizontal - this.combat.horizontal; return cl[1].adjust(this.adjust(0.2, 'bulletAccuracy', hDiff, vDiff), 'bulletDodge', hDiff, vDiff); },
+				fail: function(cl) { let hDiff = cl[1].combat.horizontal - this.combat.horizontal; let vDiff = cl[1].combat.horizontal - this.combat.horizontal; return cl[1].adjust(this.adjust(0.1, 'bulletAccuracy', hDiff, vDiff), 'bulletDodge', hDiff, vDiff); },
 				successFunc: function(cl, text) {
 					this.has('handgun').loaded = 0;
 					let chance = 1; //chance to get the shot perk
@@ -5405,7 +5405,7 @@ G={
 				chance: 5,
 				text: '[1] draws [1:their] bow and unleashes a[n| deadly] arrow upon [2][S]!',
 				failText: '[1] attempted to shoot at arrow at [2], but it missed.',
-				fail: function(cl) { return cl[1].adjust(this.adjust(0.4, 'simpleProjectile'), 'dodge'); },
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.2, 'simpleProjectile'), 'dodge'); },
 				successFunc: function(cl, text) {
 					let chance = 0.5;
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen'); //cant be bothered to create a new adjustfunc for this one specifically
@@ -5440,7 +5440,7 @@ G={
 				chance: 4.5,
 				text: '[1] [throws|hurls] [1:their] shuriken at [2], hitting [2:them] on the [arm|shoulder|chest|thigh][S]!',
 				failText: '[1] [throws|hurls] [1:their] shuriken at [2], but it flew right past [2:them], never to be found again.',
-				fail: function(cl) { return cl[1].adjust(this.adjust(0.3, 'simpleProjectile'), 'dodge'); },
+				fail: function(cl) { return cl[1].adjust(this.adjust(0.15, 'simpleProjectile'), 'dodge'); },
 				successFunc: function(cl, text) {
 					let chance = 0.75;
 					chance = cl[1].adjust(this.adjust(chance, 'strength'), 'defenseGen');
@@ -5472,7 +5472,7 @@ G={
 				chance: 5,
 				text: '[1] loads [some slugs into |some shells into |some shots into |||][1:their] shotgun.',
 				failText: '[1] tried to loads [some slugs into | ][1:their] shotgun, but [1:they] [messed up|fumbled it].',
-				fail: function() { return this.adjust(0.3, 'chargeWeapon'); },
+				fail: function() { return this.adjust(0.15, 'chargeWeapon'); },
 				successFunc: function() { this.has('shotgun').loaded = 1; },
 				req: ['shotgun any%0.6|marksmen '+hardDisables],
 				element: G.moveAssets.elements.alone,
@@ -5497,7 +5497,7 @@ G={
 				if (this.has('the gift')) { pow *= 0.9; }
 				if (this.has('determined')) { pow *= 0.95; }
 
-				pow *= Math.max(Math.pow(e / 5, 2), e / 5);
+				pow *= Math.max(Math.pow(e / 10, 1.5), e / 10);
 
 				return 1 - Math.pow(1 - chance, pow);
 			};
@@ -5526,7 +5526,7 @@ G={
 				chance: 15,
 				text: '[1] presses down the trigger on [1:their] shotgun, aiming at [2][S]!',
 				failText: '[1] presses down the trigger on [1:their] shotgun at [2], but it appears that none of the [slugs|shells|shots] actually hit [2:them].',
-				fail: function(cl) { return this.adjust(0.1, 'spreadAccuracy', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical); },
+				fail: function(cl) { return this.adjust(0.05, 'spreadAccuracy', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical); },
 				successFunc: function(cl, text) {
 					let chance = 0.8;
 					chance = cl[1].adjust(chance, 'spreadDefense', cl[1].combat.horizontal - this.combat.horizontal, cl[1].combat.vertical - this.combat.vertical);
@@ -5754,7 +5754,7 @@ G={
 				failText: '[1] tries to load up [1:their] rocket launcher, but [1:they] [messed up|fumbled it|didn\'t follow instructions quite right][S].',
 				element: G.moveAssets.elements.alone,
 				fail: function() {
-					return this.adjust(0.3, 'chargeWeapon');
+					return this.adjust(0.15, 'chargeWeapon');
 				},
 				successFunc: function() {
 					this.has('rocket launcher').loaded = 1;
@@ -5801,7 +5801,7 @@ G={
 				chance: 5,
 				text: '[1] charges up [1:their] laser gun.',
 				failText: '[1] charges up [1:their] laser gun, but [S]!',
-				fail: function() { return this.adjust(0.2, 'chargeWeapon'); },
+				fail: function() { return this.adjust(0.1, 'chargeWeapon'); },
 				element: G.moveAssets.elements.alone,
 				successFunc: function() {
 					this.has('lasergun').energy++;
@@ -6200,7 +6200,7 @@ G={
 				chance: 0.5,
 				text: '[1] swoops down upon [2], [S]!',
 				failText: '[1] swoops down upon [2] in an attempt to steal something, but [2:they] managed to fend [1:them] off.',
-				fail: function(cl) { return cl[1].adjust(0.4, 'dodge'); },
+				fail: function(cl) { return cl[1].adjust(0.2, 'dodge'); },
 				func: function(cl) {
 					this.combat.moveToward(cl[1], 50);
 				},
@@ -6901,7 +6901,7 @@ G={
 				chance: 3,
 				text: '[1] holds up [1:their] topaz on a stick onto the sky, as a request for more power! And it seems that the gods agree...',
 				failText: '[1] holds up [1:their] topaz on a stick onto the sky, as a request for more power! But [nothing happens|it seems that the gods are a bit reluctant]...',
-				fail: 0.25,
+				fail: 0.15,
 				element: G.moveAssets.elements.alone,
 				successFunc: function() { this.has('topaz on a stick').charges++; },
 				req: ['topaz_on_a_stick any%0.8|wizard_robe '+hardDisables],
