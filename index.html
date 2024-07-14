@@ -3269,7 +3269,7 @@ G={
 			G.combatTracker.prototype.distMult = function(target) {
 				let mult = 1;
 				mult *= Math.pow(0.5, target.isDisabled(true));
-				for (let i = this.interrupts.length; i >= Math.max(0, this.interrupts.length - 5); i--) {
+				for (let i = this.interrupts.length - 1; i >= Math.max(0, this.interrupts.length - 5); i--) {
 					if (this.interrupts[i].interrupted == target) { mult *= 1 / Math.max(5 - this.interrupts.length + i, 1); break; }
 				}
 
@@ -3394,11 +3394,11 @@ G={
 				if (this.has('turtle')) { count += 6; }
 				
 				let retailation = 1;
-				for (let i = this.combat.interrupts.length; i >= Math.max(this.combat.interrupts.length - 5, 0); i--) {
+				for (let i = this.combat.interrupts.length - 1; i >= Math.max(this.combat.interrupts.length - 5, 0); i--) {
 					if (this.combat.interrupts[i].interrupted == perpentrator) { retailation += 0.2 * Math.max(5 - this.combat.interrupts.length + i, 0); }
 				}
 				let followUp = 1;
-				for (let i = perpentrator.combat.interrupts.length; i >= Math.max(perpentrator.interrupts.length - 5, 0); i--) {
+				for (let i = perpentrator.combat.interrupts.length - 1; i >= Math.max(perpentrator.interrupts.length - 5, 0); i--) {
 					if (perpentrator.combat.interrupts[i].interrupted == this) { followUp += 0.2 * Math.max(5 - perpentrator.combat.interrupts.length + i, 0); }
 				}
 				count += retailation;
