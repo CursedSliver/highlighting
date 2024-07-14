@@ -3285,7 +3285,7 @@ G={
 				} else {
 					mult = 1 / (-verticalOffset * 0.6 + 1);
 				}
-				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult * this.distMult();
+				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult * this.distMult(target);
 			} //vertical is here too, but each vertical distance above adds and each vertical distance below removes
 			G.combatTracker.prototype.projectileDist = function(target) {
 				let verticalOffset = target.combat.vertical - this.vertical;
@@ -3296,16 +3296,16 @@ G={
 				} else {
 					mult = 1 / (-verticalOffset * 0.05 + 1);
 				}
-				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult * this.distMult();
+				return (Math.abs(target.combat.horizontal - this.horizontal) + add) * mult * this.distMult(target);
 			}
 			G.combatTracker.prototype.straightDist = function(target) {
-				return ((Math.pow(target.combat.vertical - this.vertical, 2) + Math.pow(target.combat.horizontal - this.horizontal, 2)) ** 0.5) * this.distMult();
+				return ((Math.pow(target.combat.vertical - this.vertical, 2) + Math.pow(target.combat.horizontal - this.horizontal, 2)) ** 0.5) * this.distMult(target);
 			}
 			G.combatTracker.prototype.horizontalDist = function(target) {
-				return (target.combat.horizontal - this.horizontal) * this.distMult();
+				return (target.combat.horizontal - this.horizontal) * this.distMult(target);
 			}
 			G.combatTracker.prototype.verticalDist = function(target) {
-				return (target.combat.vertical - this.vertical) * this.distMult();
+				return (target.combat.vertical - this.vertical) * this.distMult(target);
 			}
 			G.combatOverseer.prototype.getHeightAt = function(horizontal) {
 				//"this" is the overseer
