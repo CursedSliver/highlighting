@@ -1439,21 +1439,21 @@ G={
 				G.char.prototype.isOut = function() {
 					let count = 0;
 					for (let i in this.perks) {
-						if (this.perks[i].perk.out) { count += (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc('out'):1); }
+						if (this.perks[i].perk.out) { count += (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc.call(this.perks[i], 'out'):1); }
 					}
 					return count;
 				}
 				G.char.prototype.isAiled = function() {
 					let count = 0;
 					for (let i in this.perks) {
-						if (this.perks[i].perk.ailment) { count += (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc('ailment'):1); }
+						if (this.perks[i].perk.ailment) { count += (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc.call(this.perks[i], 'ailment'):1); }
 					}
 					return count;
 				}
 				G.char.prototype.isInjured = function() {
 					let count = 0;
 					for (let i in this.perks) {
-						if (this.perks[i].perk.injury) { count += (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc('injury'):1); }
+						if (this.perks[i].perk.injury) { count += (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc.call(this.perks[i], 'injury'):1); }
 					}
 					return count;
 				}
