@@ -1428,7 +1428,7 @@ G={
 					let count = 0;
 					for (let i in this.perks) {
 						if (this.perks[i].perk.disable && !isHard) { 
-							let add = (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc('disable'):1);
+							let add = (this.perks[i].perk.countFunc?this.perks[i].perk.countFunc.call(this.perks[i], 'disable'):1);
 							if (this.perks[i].perk.hard) { add *= 5; }
 							count += add;
 						}
