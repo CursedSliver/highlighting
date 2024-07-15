@@ -6037,7 +6037,7 @@ G={
 				successFunc: function() {
 					const all = this.combat.overseer.all();
 					for (let i in all) {
-						if (all[i] == this) { continue; }
+						if (all[i] == this || !this.combat || !this.combat.overseer) { continue; }
 						this.combat.overseer.addChar(all[i]);
 						if (all[i].real) { all[i].fleeCombat(true); }
 					}
