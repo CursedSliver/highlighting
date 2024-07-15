@@ -684,7 +684,7 @@ G={
 		new G.perk({name:`ignorable`,desc:`No one really takes notice of them.`});
 		new G.perk({name:`carrying`,desc:`Carrying something heavy.`,init:{items:[]},addItem:function(item){ this.items.push(item); },onMove:function() { this.owner.combat.vertical = Math.max(this.owner.combat.overseer.getHeightAt(this.owner.combat.horizontal), this.owner.combat.vertical - 2.5); },onLose:function() { this.items = []; }});
 		new G.perk({name:`flying`,desc:`Burrowing through the air!`,init:{heightMult:1},onMove:function() { this.owner.combat.vertical += (15 + 10 * Math.random()) * this.heightMult; }});
-		new G.perk({name:`coupled`,desc:`Horizontal and vertical position locked to the partner.`,init:{partner:null},onMove: function() { if (this.partner) { this.owner.combat.horizontal = this.partner.combat.horizontal; this.owner.combat.vertical = this.partner.combat.vertical; } }});
+		new G.perk({name:`coupled`,desc:`Horizontal and vertical position locked to the partner.`,init:{partner:null},onMove: function() { if (this.partner) { this.owner.combat.horizontal = this.partner.combat.horizontal; this.owner.combat.vertical = this.partner.combat.vertical; } else { this.owner.lose(this); } }});
 		new G.perk({name:`ancient charging`,desc:`Your Ancient scepter is charging up!`,onMove:function() { this.owner.has('ancient scepter').charges++; this.owner.lose(this); },onInterrupt:function() { this.owner.lose(this); this.owner.combat.overseer.injectBack('<br><e>'+this.owner.name+'</e>\'s focus on the ancient scepter has been disrupted!'); },aggro:10});
 		new G.perk({name:`snake climbing`,desc:`You are climbing on a snake!`,disable:true,init:{height:5},onMove:function() { this.owner.combat.vertical += this.height; this.height += 10; }});
 		//summon perks
@@ -7300,7 +7300,7 @@ G={
 								if (participants[i].makeMove()) { participants[i].fleeCombat(); }
 							}
 							for (let i in participants) { if (participants[i].combat && isNaN(participants[i].combat.horizontal)) { throw 'NaN has appeared!'; } }
-							if (participants.length <= 1 || Math.random() > 1 / (count * 0.75 + 1)) { break; }
+							if (participants.length <= 1 || Math.random() > 1 / (count * 0.6 + 1)) { break; }
 							count++;
 						}
 						str += G.parseBoxes(overseer.processInjects());
