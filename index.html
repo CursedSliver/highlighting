@@ -2304,7 +2304,7 @@ G={
 			//panaceas pellet
 			new G.act(0.01,['panaceas_pellet cowardly%0.5|any%0.1|naive%0.25|clumsy%0.1|cursed_knife%0.05'],`[BLUE][1] takes a good look at [1:their] glowing, glittering miracular pellet... and downs it in one swing!<br>Suddenly, [1:they] feel rejuvenated with energy - but was that really worth it?`,p=>{ p[1].globalRestore(); p[1].lose('panacea pellet'); });
 			G.fitFuncs.inHelpFunc = (n) => {
-				n = n??parseFloat(n):1;
+				n = parseFloat(n)??1;
 				let count = 0;
 				count += this.isDisabled();
 				count += 0.4 * this.isAiled();
