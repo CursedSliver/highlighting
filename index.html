@@ -1685,7 +1685,7 @@ G={
 						}
 						if (key == 'func') {
 							const toPass = amount.split('#')[1];
-							return cNegate(actualFalse, (Math.random() < G.fitFuncs[amount].call(this, toPass)));
+							return cNegate(actualFalse, (Math.random() < G.fitFuncs[amount.split('#')[0]].call(this, toPass)));
 						}
 						throw 'Special variable keyword not found!';
 					} 
