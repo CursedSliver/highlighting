@@ -1408,9 +1408,9 @@ G={
 						<div class="picBox"><img src="${me.pic}" class="pic" title="${me.name}"/>${me.has('dead')?'<div class="picSkull"></div>':''} ${me.has('revived')?'<div class="picAngel"></div>':''}</div>
 						<div style="text-align:center;">
 							<e style="float:left;margin-right:8px;">${me.name}</e>
-							<div style="min-width:32%;display:inline-block;"><cap>Perks :</cap> ${me.perks.map(perk=>(perk.perk.type=='trait' && perk.perk.name!='no perk')?('<div class="bit" title="'+perk.desc+'">'+perk.perk.name+'</div>'):'').join(' ')}</div>
-							<div style="min-width:32%;display:inline-block;"><cap>Items :</cap> ${me.perks.map(perk=>(perk.perk.type=='item' && perk.perk.name!='no item')?('<div class="bit" title="'+perk.desc+'">'+perk.perk.name+'</div>'):'').join(' ')}</div>
-							<div style="min-width:32%;display:inline-block;"><cap>Other :</cap> ${me.perks.map(perk=>(perk.perk.type!='item' && perk.perk.type!='trait')?('<div class="bit" title="'+perk.desc+'">'+perk.perk.name+'</div>'):'').join(' ')}</div>
+							<div style="min-width:32%;display:inline-block;"><cap>Perks :</cap> ${me.perks.map(perk=>(perk.perk.type=='trait' && perk.perk.name!='no perk')?('<div class="bit" title="'+perk.perk.desc+'">'+perk.perk.name+'</div>'):'').join(' ')}</div>
+							<div style="min-width:32%;display:inline-block;"><cap>Items :</cap> ${me.perks.map(perk=>(perk.perk.type=='item' && perk.perk.name!='no item')?('<div class="bit" title="'+perk.perk.desc+'">'+perk.perk.name+'</div>'):'').join(' ')}</div>
+							<div style="min-width:32%;display:inline-block;"><cap>Other :</cap> ${me.perks.map(perk=>(perk.perk.type!='item' && perk.perk.type!='trait')?('<div class="bit" title="'+perk.perk.desc+'">'+perk.perk.name+'</div>'):'').join(' ')}</div>
 						</div>
 						${me.kills.length>0?('<div style="color:#e2461f;">Killed '+me.kills.length+' (<e>'+me.kills.map(char=>char.name).join(', ')+'</e>)</div>'):''}
 						${(me.killer.length>0 && me.has('dead'))?('<div style="color:#e2461f;">Dead, killed by <e>'+me.killer.map(char=>char.name).join(', ')+'</e> ('+me.deathReason+')</div>'):''}
@@ -8517,3 +8517,4 @@ G={
 
 if (!G.launched) G.init();
 </script>
+
